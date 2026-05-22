@@ -128,8 +128,6 @@ pub async fn issue_api_key(
     .execute(pool)
     .await?;
 
-    crate::metering::upsert_api_key_billing_team(pool, &hash, team_id).await?;
-
     let row = IssuedKeyRow {
         id,
         ledger_tenant_id: ledger_tenant_id.to_string(),

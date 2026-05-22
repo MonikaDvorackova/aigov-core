@@ -83,8 +83,8 @@ pub fn ai_trace_event_appended(
     emit(Value::Object(o));
 }
 
-pub fn tenant_console_snapshot_served(ledger_scope: &str, team_id_present: bool) {
-    let mut o = base("tenant_console_snapshot_requested");
+pub fn audit_snapshot_served(ledger_scope: &str, team_id_present: bool) {
+    let mut o = base("audit_snapshot_requested");
     o.insert("ledger_scope".into(), json!(ledger_scope));
     o.insert("team_context".into(), json!(if team_id_present {
         "resolved"

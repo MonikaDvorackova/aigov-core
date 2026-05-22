@@ -9,7 +9,7 @@ const HDR: &str = "x-govai-project";
 
 /// Reads `X-GovAI-Project`; empty or missing → `"default"`.
 /// Single entry for billing / `GET /usage` tenant scope: header + bearer (see [`tenant_id_for_usage`]).
-pub fn billing_tenant_id(headers: &HeaderMap) -> String {
+pub fn usage_tenant_id(headers: &HeaderMap) -> String {
     tenant_id_for_usage(headers, audit_api_key::raw_bearer_token(headers))
 }
 
@@ -129,25 +129,25 @@ mod tests {
     }
 
     #[test]
-    fn billing_tenant_prefers_x_govai_project() {
+    fn usage_tenant_prefers_x_govai_project() {
         let mut h = HeaderMap::new();
         h.insert("x-govai-project", HeaderValue::from_static("team-alpha"));
-        assert_eq!(billing_tenant_id(&h), "team-alpha");
+        assert_eq!(usage_tenant_id(&h), "team-alpha");
     }
 
     #[test]
-    fn billing_tenant_falls_back_to_key_fingerprint() {
+    fn usage_tenant_falls_back_to_key_fingerprint() {
         let mut h = HeaderMap::new();
         h.insert("Authorization", HeaderValue::from_static("Bearer test-api-key"));
-        let tid = billing_tenant_id(&h);
+        let tid = usage_tenant_id(&h);
         assert_ne!(tid, "default");
         assert_eq!(tid, crate::api_usage::key_fingerprint("test-api-key"));
     }
 
     #[test]
-    fn billing_tenant_default_without_header_or_bearer() {
+    fn usage_tenant_default_without_header_or_bearer() {
         let h = HeaderMap::new();
-        assert_eq!(billing_tenant_id(&h), "default");
+        assert_eq!(usage_tenant_id(&h), "default");
     }
 
     #[test]

@@ -657,69 +657,16 @@ audit:
 	cd rust && cargo run --bin $(AIGOV_AUDIT_BIN) --locked
 
 audit_bg:
-	@set -euo pipefail; \
-	if curl -fsS --max-time 1 "$(AUDIT_URL)/health" >/dev/null 2>&1; then \
-		echo "GovAI Core runtime already running on $(AUDIT_URL)"; \
-		exit 0; \
-	fi; \
-	PIDS="$$(lsof -tiTCP:$(AUDIT_PORT) -sTCP:LISTEN 2>/dev/null || true)"; \
-	if [ -n "$$PIDS" ]; then \
-		echo "port $(AUDIT_PORT) already in use by: $$PIDS"; \
-		exit 2; \
-	fi; \
-	echo "building $(AIGOV_AUDIT_BIN) ($(CURDIR)/rust) ..."; \
-	cd rust && cargo build --bin $(AIGOV_AUDIT_BIN) --locked; \
-	echo "starting $(AIGOV_AUDIT_BIN) in background on $(AUDIT_URL)"; \
-	echo "log: $(AUDIT_LOG)"; \
-	: > "$(AUDIT_LOG)"; \
-	nohup env GOVAI_AUTO_MIGRATE="$(GOVAI_AUTO_MIGRATE)" bash -lc "cd '$(CURDIR)/rust' && exec ./target/debug/$(AIGOV_AUDIT_BIN)" >>"$(AUDIT_LOG)" 2>&1 & echo $$! >"$(AUDIT_PIDFILE)"; \
-	for i in $$(seq 1 60); do \
-		if curl -fsS --max-time 1 "$(AUDIT_URL)/health" >/dev/null 2>&1; then \
-			echo "healthy (GET /health) on $(AUDIT_URL)"; \
-			exit 0; \
-		fi; \
-		sleep 0.5; \
-	done; \
-	echo "start failed, tail $(AUDIT_LOG):"; \
-	tail -n 200 "$(AUDIT_LOG)" || true; \
-	exit 1
+	@echo "audit_bg is not available in GovAI Core; run hosted platform services from the proprietary platform repository."
 
 audit_stop:
-	@set -euo pipefail; \
-	PID=""; \
-	if [ -f "$(AUDIT_PIDFILE)" ]; then \
-		PID="$$(cat "$(AUDIT_PIDFILE)" 2>/dev/null || true)"; \
-	fi; \
-	if [ -n "$$PID" ] && kill -0 "$$PID" >/dev/null 2>&1; then \
-		echo "stopping pid $$PID"; \
-		kill "$$PID" || true; \
-		sleep 0.3; \
-	fi; \
-	PIDS="$$(lsof -tiTCP:$(AUDIT_PORT) -sTCP:LISTEN 2>/dev/null || true)"; \
-	if [ -n "$$PIDS" ]; then \
-		echo "stopping processes on port $(AUDIT_PORT): $$PIDS"; \
-		kill $$PIDS || true; \
-		sleep 0.3; \
-		PIDS2="$$(lsof -tiTCP:$(AUDIT_PORT) -sTCP:LISTEN 2>/dev/null || true)"; \
-		if [ -n "$$PIDS2" ]; then \
-			echo "forcing stop: $$PIDS2"; \
-			kill -9 $$PIDS2 || true; \
-		fi; \
-	fi; \
-	rm -f "$(AUDIT_PIDFILE)"; \
-	echo "stopped"
+	@echo "audit_stop is not available in GovAI Core; no hosted audit service is managed here."
 
 audit_restart:
-	@$(MAKE) audit_stop
-	@$(MAKE) GOVAI_AUTO_MIGRATE=false audit_bg
+	@echo "audit_restart is not available in GovAI Core; no hosted audit service is managed here."
 
 audit_logs:
-	@set -euo pipefail; \
-	if [ -f "$(AUDIT_LOG)" ]; then \
-		tail -n 200 "$(AUDIT_LOG)"; \
-	else \
-		echo "no log file yet: $(AUDIT_LOG)"; \
-	fi
+	@echo "audit_logs is not available in GovAI Core; no hosted audit service log is managed here."
 
 status:
 	curl -sS $(AUDIT_URL)/status ; echo

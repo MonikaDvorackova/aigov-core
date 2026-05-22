@@ -4,9 +4,9 @@ version = "0.2.1"
 edition = "2021"
 
 [features]
-# Default builds intentionally exclude cloud immutable backends to keep
-# the dependency tree minimal and security scans deterministic.
+# Default public core build excludes hosted SaaS, billing, Stripe, onboarding, and tenant console.
 default = []
+hosted-platform = []
 
 [[bin]]
 name = "portable_evidence_digest_once"

@@ -41,7 +41,7 @@ fn runtime_tenant_map() -> &'static RwLock<HashMap<String, String>> {
 }
 
 /// Hosted self-service (`GOVAI_HOSTED_SELF_SERVICE=on`): DB-issued keys resolve by bearer hash.
-pub fn hosted_self_service_enabled() -> bool {
+pub fn runtime_key_lookup_enabled() -> bool {
     matches!(
         std::env::var("GOVAI_HOSTED_SELF_SERVICE")
             .map(|s| s.trim().to_ascii_lowercase())
@@ -151,7 +151,7 @@ pub fn init_api_key_tenant_map(deployment_env: GovaiEnvironment) -> Result<(), S
                 Ok(())
             }
             GovaiEnvironment::Staging | GovaiEnvironment::Prod => {
-                if hosted_self_service_enabled() {
+                if runtime_key_lookup_enabled() {
                     let _ = API_KEY_TENANT_MAP.set(Arc::new(HashMap::new()));
                     Ok(())
                 } else {
@@ -210,7 +210,7 @@ pub fn require_tenant_id_from_api_key_for_ledger(
         Some(t) if !t.is_empty() => t,
         _ => {
             return match deployment_env {
-                GovaiEnvironment::Dev if !hosted_self_service_enabled() => {
+                GovaiEnvironment::Dev if !runtime_key_lookup_enabled() => {
                     Ok("default".to_string())
                 }
                 _ => Err("missing_api_key".to_string()),
@@ -228,12 +228,12 @@ pub fn require_tenant_id_from_api_key_for_ledger(
         .unwrap_or(true);
 
     match deployment_env {
-        GovaiEnvironment::Dev if !hosted_self_service_enabled() && env_map_empty => {
+        GovaiEnvironment::Dev if !runtime_key_lookup_enabled() && env_map_empty => {
             Ok("default".to_string())
         }
         GovaiEnvironment::Dev => Err("unknown_api_key".to_string()),
         GovaiEnvironment::Staging | GovaiEnvironment::Prod => {
-            if API_KEY_TENANT_MAP.get().is_some() || hosted_self_service_enabled() {
+            if API_KEY_TENANT_MAP.get().is_some() || runtime_key_lookup_enabled() {
                 Err("unknown_api_key".to_string())
             } else {
                 Err(
@@ -467,10 +467,10 @@ pub async fn gate_audit_routes_with_state(
 
     let map_initialized = api_key_tenant_map_is_initialized();
     let keys_configured = cfg.keys.is_some();
-    let hosted_self_service = hosted_self_service_enabled();
+    let runtime_key_lookup = runtime_key_lookup_enabled();
 
     // Primary allowlist: env JSON map, configured API keys, and/or hosted DB-issued keys by hash lookup.
-    if map_initialized || keys_configured || hosted_self_service {
+    if map_initialized || keys_configured || runtime_key_lookup {
         if token.is_empty() {
             log_auth_failure_diagnostic(&token, "MISSING_API_KEY", &req_method, &req_path);
             return api_error(

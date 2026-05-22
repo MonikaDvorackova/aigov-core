@@ -32,10 +32,6 @@ pub fn route_metric_key(method: &Method, path: &str) -> String {
         out.push_str("/status");
         return out;
     }
-    if p == "/pricing" {
-        out.push_str("/pricing");
-        return out;
-    }
     if p == "/evidence" {
         out.push_str("/evidence");
         return out;
@@ -82,18 +78,6 @@ pub fn route_metric_key(method: &Method, path: &str) -> String {
     }
     if p.starts_with("/usage") {
         out.push_str("/usage");
-        return out;
-    }
-    if p.starts_with("/billing/") {
-        // Keep coarse prefix only
-        let seg = p.trim_start_matches("/billing/");
-        let first = seg.split('/').next().unwrap_or("unknown");
-        out.push_str("/billing/");
-        out.push_str(first);
-        return out;
-    }
-    if p.starts_with("/stripe/webhook") {
-        out.push_str("/stripe/webhook");
         return out;
     }
     // Fallback: first two segments only

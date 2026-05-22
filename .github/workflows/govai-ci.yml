@@ -59,7 +59,7 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
 
       - name: Build audit service
-        run: cd rust && cargo build --locked --bin aigov_audit
+        run: cd rust && cargo build --locked --bin portable_evidence_digest_once
 
       - name: Prepare ledger dir (writable)
         run: |

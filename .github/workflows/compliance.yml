@@ -365,13 +365,13 @@ jobs:
 
           sqlx migrate run --source "${GITHUB_WORKSPACE}/.aigov_ci_migrations" --database-url "${DATABASE_URL}"
 
-      - name: Build local audit server (aigov_audit)
+      - name: Build local audit server (portable_evidence_digest_once)
         if: ${{ env.RUN_ARTIFACT_GATE == 'true' }}
         working-directory: rust
         run: |
           set -euo pipefail
           # Pre-compile so Start audit service does not race GET /ready against a cold `cargo run` compile.
-          cargo build --locked --bin aigov_audit
+          cargo build --locked --bin portable_evidence_digest_once
 
       - id: start_audit_service
         name: Start audit service
@@ -397,7 +397,7 @@ jobs:
           env | sort | grep -E '^(GOVAI|AIGOV|DATABASE_URL|PORT)=' || true
           echo "----------------------------------"
 
-          AUDIT_BIN="${GITHUB_WORKSPACE}/rust/target/debug/aigov_audit"
+          AUDIT_BIN="${GITHUB_WORKSPACE}/rust/target/debug/portable_evidence_digest_once"
           if [ ! -x "${AUDIT_BIN}" ]; then
             echo "::error::Missing audit binary at ${AUDIT_BIN} (build step must succeed first)."
             exit 1

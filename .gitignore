@@ -1,0 +1,13 @@
+target/
+node_modules/
+.next/
+dist/
+.pytest_cache/
+.ruff_cache/
+.DS_Store
+.env
+.env.*
+*.log
+*.pid
+audit_log*.jsonl
+audit_log*.bak.*

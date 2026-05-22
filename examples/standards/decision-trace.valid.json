@@ -1,0 +1,25 @@
+{
+  "schema_version": "govai.standards.governance_decision_trace.v1",
+  "trace_id": "trace.demo.001",
+  "tenant_scope": "tenant.demo",
+  "run_id": "00000000-0000-4000-8000-000000000001",
+  "recorded_gate_verdict": "VALID",
+  "gate_inputs": {
+    "model_validation": "passed",
+    "evidence_complete": true,
+    "ai_discovery_present": true,
+    "evaluation_result": "pass",
+    "evaluation_internal_consistent": true,
+    "approval": "granted",
+    "trace_consistent": true,
+    "run_available": true,
+    "evidence_pack_present": true,
+    "events_content_sha256_match": true,
+    "export_digest_match": true,
+    "artifact_bound_verification": true,
+    "policy_version_match": true,
+    "approval_is_stale": false,
+    "causal_evaluation_before_approval": true,
+    "run_id_matches_decision_scope": true
+  }
+}

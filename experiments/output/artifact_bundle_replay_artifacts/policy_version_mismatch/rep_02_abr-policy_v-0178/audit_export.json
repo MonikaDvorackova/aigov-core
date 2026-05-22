@@ -1,0 +1,12 @@
+{
+  "evidence_hashes": {
+    "bundle_sha256": "75fa8456ced15f9fadea332509eb63706a27fb9afbb5d8a9b70dda55a256315e",
+    "events_content_sha256": "fc26e0428c806e04c98213b2510d9f45d61e3f73cefb846992349a7d9406642e"
+  },
+  "policy_version": "v2",
+  "run": {
+    "policy_version": "v2",
+    "run_id": "abr-policy_v-0178"
+  },
+  "schema_version": "aigov.audit_export.v1"
+}

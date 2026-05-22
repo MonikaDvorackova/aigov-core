@@ -1,0 +1,24 @@
+# GovAI code ownership
+#
+# This file defines default review ownership for key project areas.
+
+# Default owner
+* @MonikaDvorackova
+
+# Python SDK and CLI
+/python/ @MonikaDvorackova
+
+# Rust audit service and enforcement core
+/rust/ @MonikaDvorackova
+
+# GitHub Actions and CI governance gates
+/.github/ @MonikaDvorackova
+
+# Documentation and reports
+/docs/ @MonikaDvorackova
+
+# Examples and onboarding materials
+/examples/ @MonikaDvorackova
+
+# Project scripts and automation
+/scripts/ @MonikaDvorackova

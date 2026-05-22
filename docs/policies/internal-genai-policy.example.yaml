@@ -1,0 +1,32 @@
+policy:
+  id: "internal-genai-policy"
+  name: "Internal GenAI Policy (example mapping)"
+  version: "2026-05-01"
+
+requirements:
+  - code: "INT.GENAI.01"
+    description: "Ensure AI discovery is recorded for traceability and downstream policy gating."
+    required_evidence:
+      - ai_discovery_completed
+
+  - code: "INT.GENAI.02"
+    description: "Maintain a usage policy for any GenAI usage detected by discovery."
+    required_evidence:
+      - usage_policy_defined
+
+  - code: "INT.GENAI.03"
+    description: "Require evaluation metrics to be reported prior to any promotion decision."
+    required_evidence:
+      - evaluation_reported
+
+  - code: "INT.GENAI.04"
+    description: "Require risk review and human approval before promotion."
+    required_evidence:
+      - risk_reviewed
+      - human_approved
+
+  - code: "INT.GENAI.05"
+    description: "Require explicit promotion evidence to close the release decision."
+    required_evidence:
+      - model_promoted
+

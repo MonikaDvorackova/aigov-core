@@ -1,0 +1,39 @@
+{
+  "benchmark_artifacts": [
+    "benchmark-runs/latest/event-ingestion-benchmarks.json",
+    "benchmark-runs/latest/hash-chain-benchmarks.json",
+    "benchmark-runs/latest/export-benchmarks.json",
+    "benchmark-runs/latest/storage-benchmarks.json",
+    "benchmark-runs/latest/multi-tenant-benchmarks.json",
+    "benchmark-runs/latest/failure-benchmarks.json",
+    "benchmark-runs/latest/empirical-evaluation-summary.json"
+  ],
+  "documentation": [
+    "docs/research/empirical-evaluation.md",
+    "docs/research/load-testing-methodology.md",
+    "docs/research/performance-results.md",
+    "docs/research/storage-analysis.md",
+    "docs/research/scalability-analysis.md",
+    "docs/research/statistical-methodology.md",
+    "docs/reports/tenant_console_product_ops_package.md"
+  ],
+  "examples": [
+    "examples/research/run-empirical-evaluation.sh",
+    "examples/research/sample-benchmark-results.json"
+  ],
+  "manifest_version": 1,
+  "orchestrator": "scripts/run_full_empirical_evaluation.py",
+  "schema_version": 1,
+  "scripts": [
+    "scripts/empirical_benchmark_lib.py",
+    "scripts/run_event_ingestion_benchmarks.py",
+    "scripts/run_hash_chain_benchmarks.py",
+    "scripts/run_export_benchmarks.py",
+    "scripts/run_storage_benchmarks.py",
+    "scripts/run_multi_tenant_benchmarks.py",
+    "scripts/run_failure_benchmarks.py",
+    "scripts/run_full_empirical_evaluation.py",
+    "scripts/empirical_evaluation_check.py"
+  ],
+  "validator": "scripts/empirical_evaluation_check.py"
+}

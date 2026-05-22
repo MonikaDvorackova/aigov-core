@@ -1,0 +1,47 @@
+{
+  "valid": {
+    "total": 100,
+    "baseline_miss": 0,
+    "govai_detect": 0
+  },
+  "missing_evidence": {
+    "total": 100,
+    "baseline_miss": 100,
+    "govai_detect": 100
+  },
+  "missing_discovery": {
+    "total": 100,
+    "baseline_miss": 100,
+    "govai_detect": 100
+  },
+  "missing_approval": {
+    "total": 100,
+    "baseline_miss": 100,
+    "govai_detect": 100
+  },
+  "failed_compliance_evaluation": {
+    "total": 100,
+    "baseline_miss": 100,
+    "govai_detect": 100
+  },
+  "inconsistent_context": {
+    "total": 100,
+    "baseline_miss": 100,
+    "govai_detect": 100
+  },
+  "unavailable_run": {
+    "total": 100,
+    "baseline_miss": 100,
+    "govai_detect": 100
+  },
+  "partial_evidence": {
+    "total": 100,
+    "baseline_miss": 100,
+    "govai_detect": 100
+  },
+  "noisy_metadata": {
+    "total": 100,
+    "baseline_miss": 0,
+    "govai_detect": 0
+  }
+}

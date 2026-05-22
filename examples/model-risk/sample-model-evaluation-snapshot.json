@@ -1,0 +1,40 @@
+{
+  "captured_at": "2026-05-01T12:00:00Z",
+  "diagnostics": {
+    "checks": [
+      "manifest_references_resolved",
+      "snapshot_schema_ok"
+    ],
+    "failure_count": 0,
+    "summary": "Sample GovAI model evaluation snapshot for Phase 20 deterministic scoring and assurance report generation.",
+    "warning_count": 1
+  },
+  "environment": "ci-sample",
+  "evaluation": {
+    "documentation_completeness_score": 78,
+    "latency_p95_ms": 380,
+    "task_fit_score": 84
+  },
+  "fairness": {
+    "fairness_eval_coverage_percent": 92.0,
+    "max_group_metric_delta_percent": 2.8
+  },
+  "model": {
+    "id": "govai-text-assistant-demo",
+    "modality": "text",
+    "version": "0.4.1"
+  },
+  "robustness": {
+    "input_perturbation_degradation_percent": 3.5,
+    "jailbreak_attempt_success_rate_percent": 0.0,
+    "stability_score": 87
+  },
+  "safety": {
+    "harmful_eval_pass_rate_percent": 95.0,
+    "policy_violation_rate_percent": 0.15,
+    "red_team_findings_open": 1
+  },
+  "schema_version": 1,
+  "snapshot_id": "govai-sample-model-eval-20260501",
+  "window_days": 30
+}

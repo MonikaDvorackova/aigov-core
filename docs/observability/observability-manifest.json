@@ -1,0 +1,184 @@
+{
+  "boundaries": {
+    "billing": "no_billing_observability_in_scope",
+    "data": "operational_snapshots_only_no_evidence_payloads",
+    "enforcement": "no_runtime_enforcement_semantics_changes",
+    "ledger": "no_ledger_writes_or_mutations",
+    "summary": "Phase 17 observability tooling reads operational snapshots and emits deterministic diagnostics; it does not modify runtime enforcement, billing, ledger storage, or database schemas."
+  },
+  "evidence_flow_signals": [
+    {
+      "guide": "docs/observability/evidence-flow-observability.md",
+      "id": "evidence_arrival_latency_p95_seconds",
+      "summary": "P95 latency between evidence emission and acknowledged ingest, observed externally; not a hosted verdict guarantee."
+    },
+    {
+      "guide": "docs/observability/evidence-flow-observability.md",
+      "id": "evidence_arrival_success_rate",
+      "summary": "Ratio of accepted evidence submissions vs total submissions over the observation window, used to surface ingest regressions."
+    },
+    {
+      "guide": "docs/observability/evidence-flow-observability.md",
+      "id": "compliance_summary_decision_distribution",
+      "summary": "Distribution of VALID, INVALID, and BLOCKED verdicts emitted by the audit service during the observation window."
+    }
+  ],
+  "non_goals": [
+    "Phase 17 does not introduce billing telemetry, ledger telemetry, or schema migrations.",
+    "Phase 17 does not redefine VALID / INVALID / BLOCKED verdict semantics or runtime enforcement.",
+    "Operational snapshots are not legal certifications and must not be treated as conformity statements."
+  ],
+  "operational_probes": [
+    {
+      "command": "python3 scripts/validate_observability_manifest.py --json",
+      "description": "Schema and reference path validation for this manifest.",
+      "name": "validate_observability_manifest"
+    },
+    {
+      "command": "python3 scripts/validate_operational_snapshot.py --input examples/observability/sample-operational-snapshot.json --json",
+      "description": "Schema validation for a single operational snapshot payload.",
+      "name": "validate_operational_snapshot"
+    },
+    {
+      "command": "python3 scripts/operational_health_score.py --input examples/observability/sample-operational-snapshot.json",
+      "description": "Deterministic health, readiness, evidence, and diagnostics scoring with risk_level and findings.",
+      "name": "operational_health_score"
+    },
+    {
+      "command": "python3 scripts/observability_check.py --json",
+      "description": "Aggregated observability diagnostics across manifest, snapshot, Makefile wiring, and documentation paths.",
+      "name": "observability_check"
+    },
+    {
+      "command": "python3 scripts/generate_operational_intelligence_report.py --input examples/observability/sample-operational-snapshot.json",
+      "description": "Deterministic Markdown operational intelligence report assembled from a single snapshot.",
+      "name": "generate_operational_intelligence_report"
+    }
+  ],
+  "readiness_signals": [
+    {
+      "guide": "docs/observability/readiness-signals.md",
+      "id": "audit_ready_endpoint_status",
+      "summary": "Boolean derived from GET /ready against the hosted or self-hosted audit service; treated as a non-authoritative liveness hint."
+    },
+    {
+      "guide": "docs/observability/readiness-signals.md",
+      "id": "migration_state_consistent",
+      "summary": "Indicates whether the operator-controlled migration runner reports a consistent state without partial application warnings."
+    },
+    {
+      "guide": "docs/observability/readiness-signals.md",
+      "id": "policy_pack_load_status",
+      "summary": "Whether the configured policy pack manifest loaded without surfaced validation errors during the snapshot window."
+    }
+  ],
+  "referenced_documents": [
+    {
+      "path": "docs/observability/README.md",
+      "role": "observability_index"
+    },
+    {
+      "path": "docs/observability/runtime-health.md",
+      "role": "runtime_health_overview"
+    },
+    {
+      "path": "docs/observability/readiness-signals.md",
+      "role": "readiness_signals_guide"
+    },
+    {
+      "path": "docs/observability/evidence-flow-observability.md",
+      "role": "evidence_flow_guide"
+    },
+    {
+      "path": "docs/observability/diagnostic-snapshots.md",
+      "role": "snapshot_schema_guide"
+    },
+    {
+      "path": "docs/observability/operational-risk.md",
+      "role": "operational_risk_guide"
+    },
+    {
+      "path": "docs/observability/telemetry-boundaries.md",
+      "role": "telemetry_boundaries_guide"
+    },
+    {
+      "path": "docs/observability/operational-intelligence-report.md",
+      "role": "report_generator_guide"
+    }
+  ],
+  "referenced_examples": [
+    {
+      "path": "examples/observability/README.md",
+      "role": "example_index"
+    },
+    {
+      "path": "examples/observability/sample-operational-snapshot.json",
+      "role": "sample_operational_snapshot"
+    },
+    {
+      "path": "examples/observability/run-observability-check.sh",
+      "role": "shell_driver_check"
+    },
+    {
+      "path": "examples/observability/run-operational-health-score.sh",
+      "role": "shell_driver_health_score"
+    },
+    {
+      "path": "examples/observability/run-operational-intelligence-report.sh",
+      "role": "shell_driver_intelligence_report"
+    }
+  ],
+  "required_checks": [
+    "make observability",
+    "make observability-manifest",
+    "make operational-snapshot",
+    "make operational-health-score",
+    "make operational-intelligence-report",
+    "make observability-check"
+  ],
+  "runtime_health_signals": [
+    {
+      "guide": "docs/observability/runtime-health.md",
+      "id": "audit_service_uptime_minutes",
+      "summary": "Observed uptime of the audit service over the snapshot window expressed in whole minutes; informational only."
+    },
+    {
+      "guide": "docs/observability/runtime-health.md",
+      "id": "error_rate_percent",
+      "summary": "Operator-visible error rate across audit ingest, summary, and export endpoints expressed as an integer percentage."
+    },
+    {
+      "guide": "docs/observability/runtime-health.md",
+      "id": "open_incidents_count",
+      "summary": "Count of currently open operational incidents tracked outside GovAI; included only for risk weighting."
+    }
+  ],
+  "score_weights": {
+    "diagnostics": 25,
+    "evidence_flow": 25,
+    "readiness": 20,
+    "runtime_health": 30
+  },
+  "snapshot_schema": {
+    "required_collections": [
+      "runtime_health",
+      "readiness",
+      "evidence_flow",
+      "diagnostics"
+    ],
+    "required_keys": [
+      "schema_version",
+      "snapshot_id",
+      "captured_at",
+      "environment",
+      "window_minutes",
+      "runtime_health",
+      "readiness",
+      "evidence_flow",
+      "diagnostics"
+    ],
+    "summary": "Operational snapshots are JSON objects describing a deterministic point-in-time view of audit service runtime, readiness, evidence flow, and diagnostic checks for offline scoring; they are not ledger entries."
+  },
+  "summary": "Observability manifest for GovAI Phase 17: machine-readable index of runtime health, readiness, evidence-flow, diagnostics, and operational-intelligence tooling. Operators use it to compute deterministic scores and generate diagnostic reports without changing runtime enforcement, billing, ledger, or schema semantics.",
+  "version": 1
+}

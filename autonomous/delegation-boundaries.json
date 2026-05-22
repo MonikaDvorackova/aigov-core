@@ -1,0 +1,30 @@
+{
+  "artifact_version": "1",
+  "bundle_id": "govai-autonomous-governance",
+  "allowed_delegation_edges": [
+    {
+      "capability_class": "analysis_and_summarization",
+      "from_role": "supervisor",
+      "requires_evidence_pack": true,
+      "to_role": "executor_readonly"
+    },
+    {
+      "capability_class": "draft_patch_proposal",
+      "from_role": "supervisor",
+      "requires_evidence_pack": true,
+      "to_role": "executor_scoped_write"
+    }
+  ],
+  "forbidden_delegation_edges": [
+    {
+      "from_role": "executor_readonly",
+      "reason": "Executors must not re-delegate authority.",
+      "to_role": "supervisor"
+    },
+    {
+      "from_role": "executor_scoped_write",
+      "reason": "Executors must not re-delegate authority.",
+      "to_role": "supervisor"
+    }
+  ]
+}

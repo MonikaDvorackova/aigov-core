@@ -1,0 +1,16 @@
+[package]
+name = "aigov_immutable_s3"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+aigov_audit = { path = "../..", package = "aigov_audit" }
+tokio = { version = "1", features = ["full"] }
+aws-config = { version = "1.8.16", default-features = false, features = ["behavior-version-latest", "rt-tokio"] }
+aws-sdk-s3 = { version = "1.132.0", default-features = false, features = ["rt-tokio", "http-1x", "sigv4a"] }
+aws-smithy-http-client-reqwest = "0.1.0"
+reqwest = { version = "0.13.3", default-features = false, features = ["rustls"] }
+chrono = { version = "0.4" }
+
+[dev-dependencies]
+tokio = { version = "1", features = ["full"] }

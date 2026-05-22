@@ -1,0 +1,104 @@
+{
+  "schema_version": "1.0.0",
+  "workflow_id": "govai.conformity.risk_management_workflow.v1",
+  "summary": "Iterative risk management lifecycle for high-risk AI systems (Article 9). Operators run this lifecycle continuously across design, development, deployment, and post-market phases; GovAI evidence packs may attach to individual lifecycle events.",
+  "lifecycle_stages": [
+    {
+      "stage_id": "identify",
+      "title": "Risk identification",
+      "activities": [
+        "Enumerate foreseeable harms for the intended purpose.",
+        "Catalog data, model, and operational hazards.",
+        "Consider reasonably foreseeable misuse."
+      ],
+      "outputs": [
+        "risk_register_entries"
+      ]
+    },
+    {
+      "stage_id": "analyze",
+      "title": "Risk analysis and estimation",
+      "activities": [
+        "Estimate severity and likelihood for each risk.",
+        "Identify affected groups and impacted rights.",
+        "Document analysis assumptions and uncertainty."
+      ],
+      "outputs": [
+        "risk_analysis_records"
+      ]
+    },
+    {
+      "stage_id": "treat",
+      "title": "Risk treatment",
+      "activities": [
+        "Select mitigations and record residual risk.",
+        "Link mitigations to engineering and process controls.",
+        "Trigger redesign when residual risk exceeds tolerance."
+      ],
+      "outputs": [
+        "mitigation_plan",
+        "residual_risk_statement"
+      ]
+    },
+    {
+      "stage_id": "evaluate",
+      "title": "Risk evaluation",
+      "activities": [
+        "Compare treated risk against acceptance criteria.",
+        "Capture sign-off from designated risk owners.",
+        "Decide whether to deploy, restrict, or block release."
+      ],
+      "outputs": [
+        "risk_acceptance_record"
+      ],
+      "human_approvals": [
+        "risk_owner",
+        "regulatory_owner"
+      ]
+    },
+    {
+      "stage_id": "monitor",
+      "title": "Ongoing risk monitoring",
+      "activities": [
+        "Track post-deployment incidents and metric drift.",
+        "Refresh risk register on substantial change.",
+        "Coordinate with post-market monitoring workflow."
+      ],
+      "outputs": [
+        "risk_review_minutes"
+      ]
+    }
+  ],
+  "risk_tier_taxonomy": [
+    {
+      "tier": "high",
+      "criteria": "Risks to fundamental rights, safety, or health when system used as intended or in reasonably foreseeable misuse."
+    },
+    {
+      "tier": "medium",
+      "criteria": "Material operational risk that requires documented mitigations but does not block release."
+    },
+    {
+      "tier": "low",
+      "criteria": "Limited or transient risk addressed by routine engineering controls."
+    }
+  ],
+  "review_cadence": {
+    "minimum_review_per_release": true,
+    "post_market_review_days_default": 90,
+    "trigger_events": [
+      "substantial_modification",
+      "serious_incident",
+      "regulatory_change"
+    ]
+  },
+  "evidence_links": [
+    "docs/regulatory/risk-management-system.md",
+    "conformity/conformity-assessment-workflow.json",
+    "conformity/post-market-monitoring-workflow.json"
+  ],
+  "boundaries": [
+    "GovAI does not assign risk tiers automatically; the taxonomy supports operator decisions.",
+    "Risk acceptance remains a human, accountable decision."
+  ]
+}

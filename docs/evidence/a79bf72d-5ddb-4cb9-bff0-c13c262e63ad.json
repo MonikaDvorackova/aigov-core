@@ -1,0 +1,27 @@
+{
+  "run_id": "a79bf72d-5ddb-4cb9-bff0-c13c262e63ad",
+  "created_ts_utc": "2026-02-04T11:17:34.401310Z",
+  "events": [
+    {
+      "id": "human_approved_a79bf72d-5ddb-4cb9-bff0-c13c262e63ad_cc1bdc6c-bfe4-4c30-8485-46ee3a9af8cc",
+      "type": "human_approved",
+      "ts_utc": "2026-02-04T11:17:34.402211Z",
+      "actor": "human",
+      "system": "aigov_poc",
+      "run_id": "a79bf72d-5ddb-4cb9-bff0-c13c262e63ad",
+      "payload": {
+        "scope": "model_promoted",
+        "decision": "approve",
+        "approver": "human",
+        "justification": "manual approval for demo"
+      },
+      "prev_sha256": null,
+      "sha256": "a7f12b9e28a28de387380b033f66e512e5b3d6cf0b640de56db7188a531932be"
+    }
+  ],
+  "chain": {
+    "algorithm": "event_hash_chain_v1",
+    "head_sha256": "a7f12b9e28a28de387380b033f66e512e5b3d6cf0b640de56db7188a531932be",
+    "ts_utc": "2026-02-04T11:17:34.402243Z"
+  }
+}

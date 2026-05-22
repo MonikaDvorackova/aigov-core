@@ -1,0 +1,26 @@
+{
+  "artifact_version": "1",
+  "bundle_id": "govai-autonomous-governance",
+  "intervention_points": [
+    {
+      "default_response": "halt_pending_human",
+      "id": "kill_switch_operator",
+      "trigger_class": "operator_console_or_api"
+    },
+    {
+      "default_response": "escalate_to_governance_officer",
+      "id": "policy_violation_signal",
+      "trigger_class": "runtime_guardrail_or_policy_engine"
+    },
+    {
+      "default_response": "degrade_to_readonly_executor",
+      "id": "budget_or_rate_exceeded",
+      "trigger_class": "autonomy_limits_enforcement"
+    },
+    {
+      "default_response": "pause_and_request_approval",
+      "id": "approval_gateway_hit",
+      "trigger_class": "approval_boundaries_match"
+    }
+  ]
+}

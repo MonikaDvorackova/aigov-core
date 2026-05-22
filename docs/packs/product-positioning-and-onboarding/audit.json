@@ -1,0 +1,22 @@
+{
+  "run_id": "product-positioning-and-onboarding",
+  "bundle_sha256": "95d451eb99a66519144736a9ccb1dae59991eb9f688482bcb1a31a63629b9d27",
+  "policy_version": "v0.5_dev",
+  "identifiers": {
+    "ai_system_id": null,
+    "dataset_id": null,
+    "model_version_id": null,
+    "primary_risk_id": null,
+    "risk_ids": []
+  },
+  "generated_ts_utc": "2026-04-24T18:37:52.758355Z",
+  "evidence_chain_head_sha256": null,
+  "hashes": {
+    "evidence_sha256": "47856d221a51e382fc56cb33e852e79c97b488a4918c30a13fd324647e507377",
+    "report_sha256": "ff2b1a7508825bfa1c585b59c036d7a7ff477721e40b16150aacc6ee02a8495b"
+  },
+  "paths": {
+    "evidence_json": "docs/evidence/product-positioning-and-onboarding.json",
+    "report_md": "docs/reports/product-positioning-and-onboarding.md"
+  }
+}

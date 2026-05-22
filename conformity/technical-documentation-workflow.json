@@ -1,0 +1,120 @@
+{
+  "schema_version": "1.0.0",
+  "workflow_id": "govai.conformity.technical_documentation_workflow.v1",
+  "summary": "Workflow for assembling the EU AI Act Annex IV technical documentation dossier. The structure follows Annex IV sections; GovAI exports provide supporting evidence for selected items where counsel approves.",
+  "annex_iv_sections": [
+    {
+      "section_id": "system_description",
+      "title": "Description of the AI system",
+      "required_elements": [
+        "intended_purpose",
+        "provider_identification",
+        "system_version_and_release_history",
+        "interaction_with_hardware_or_other_software"
+      ],
+      "evidence_sources": [
+        "product_specification_document",
+        "release_notes_and_changelog"
+      ]
+    },
+    {
+      "section_id": "design_and_development",
+      "title": "Detailed description of design and development",
+      "required_elements": [
+        "general_methodology",
+        "model_architecture_overview",
+        "training_data_categories",
+        "validation_and_testing_procedures"
+      ],
+      "evidence_sources": [
+        "model_card",
+        "evaluation_reports",
+        "examples/evidence-quality/sample-dataset-provenance-snapshot.json"
+      ]
+    },
+    {
+      "section_id": "monitoring_and_logging",
+      "title": "Monitoring, functioning, and control",
+      "required_elements": [
+        "logging_capabilities",
+        "human_oversight_mechanisms",
+        "performance_metrics_and_thresholds"
+      ],
+      "evidence_sources": [
+        "docs/observability/runtime-telemetry-contract.md",
+        "scripts/generate_regulatory_evidence_export.py"
+      ]
+    },
+    {
+      "section_id": "risk_management",
+      "title": "Risk management measures",
+      "required_elements": [
+        "identified_risks",
+        "mitigation_measures",
+        "residual_risk_assessment"
+      ],
+      "evidence_sources": [
+        "conformity/risk-management-workflow.json",
+        "docs/regulatory/risk-management-system.md"
+      ]
+    },
+    {
+      "section_id": "performance_and_robustness",
+      "title": "Accuracy, robustness, and cybersecurity",
+      "required_elements": [
+        "metrics_definition",
+        "robustness_testing_summary",
+        "cybersecurity_controls"
+      ],
+      "evidence_sources": [
+        "docs/regulatory/high-risk-system-obligations.md"
+      ]
+    },
+    {
+      "section_id": "post_market_monitoring_plan",
+      "title": "Post-market monitoring plan",
+      "required_elements": [
+        "monitoring_metrics",
+        "incident_reporting_path",
+        "review_cadence"
+      ],
+      "evidence_sources": [
+        "conformity/post-market-monitoring-workflow.json",
+        "conformity/incident-reporting-workflow.json"
+      ]
+    },
+    {
+      "section_id": "quality_management",
+      "title": "Quality management system summary",
+      "required_elements": [
+        "qms_scope_statement",
+        "change_management_policy",
+        "supplier_and_data_governance"
+      ],
+      "evidence_sources": [
+        "docs/regulatory/evidence-obligations.md"
+      ]
+    }
+  ],
+  "dossier_lifecycle": {
+    "preparation_states": [
+      "draft",
+      "internal_review",
+      "frozen_for_declaration"
+    ],
+    "frozen_dossier_requirements": [
+      "version_locked",
+      "evidence_attachments_listed_by_path",
+      "approvals_recorded"
+    ],
+    "retention_years_minimum": 10
+  },
+  "export_hooks": [
+    "scripts/generate_regulatory_evidence_export.py",
+    "scripts/validate_regulatory_evidence_manifest.py"
+  ],
+  "boundaries": [
+    "Annex IV legal sufficiency is determined by counsel and competent authorities.",
+    "GovAI artefacts are appendices, not stand-alone dossier sections."
+  ]
+}

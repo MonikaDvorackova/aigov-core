@@ -1,0 +1,109 @@
+{
+  "run_id": "5c6413a1-f178-4aaf-af2e-7e33351d56c4",
+  "created_ts_utc": "2026-02-03T15:07:30.800814Z",
+  "events": [
+    {
+      "id": "cf7b7a11-b5f3-4b8a-8b88-fe94ebd8d2e5",
+      "type": "approve_started",
+      "ts_utc": "2026-02-03T15:07:30.801389Z",
+      "actor": "monika",
+      "seq": 1,
+      "payload": {
+        "event_id": "ha_1ea7e6d9-ee1a-4977-a2f9-f58ecc59367b",
+        "ts_utc": "2026-02-03T15:07:30.800552Z",
+        "system": "aigov_poc"
+      },
+      "prev_sha256": null,
+      "sha256": "cc5e6785dfe6d1fa7b2c4fb757d6d100980e82e227e29b1564bd6441e5a5fde9"
+    },
+    {
+      "id": "a9c40110-7ee0-4a18-9fdc-98dbd949807b",
+      "type": "human_approved",
+      "ts_utc": "2026-02-03T15:07:30.824077Z",
+      "actor": "monika",
+      "seq": 2,
+      "payload": {
+        "event_id": "ha_1ea7e6d9-ee1a-4977-a2f9-f58ecc59367b",
+        "ts_utc": "2026-02-03T15:07:30.800552Z",
+        "system": "aigov_poc",
+        "request": {
+          "event_id": "ha_1ea7e6d9-ee1a-4977-a2f9-f58ecc59367b",
+          "event_type": "human_approved",
+          "ts_utc": "2026-02-03T15:07:30.800552Z",
+          "actor": "monika",
+          "system": "aigov_poc",
+          "run_id": "5c6413a1-f178-4aaf-af2e-7e33351d56c4",
+          "payload": {
+            "scope": "model_promoted",
+            "decision": "approve",
+            "approver": "compliance_officer",
+            "justification": "metrics meet threshold and dataset fingerprint verified"
+          }
+        },
+        "response": {
+          "ok": true,
+          "policy_version": "v0.4_human_approval",
+          "record_hash": "8b060b1dc71c4b7862fc9d19e867d640587a83904862d5836ebed830ebb7d096"
+        }
+      },
+      "prev_sha256": "cc5e6785dfe6d1fa7b2c4fb757d6d100980e82e227e29b1564bd6441e5a5fde9",
+      "sha256": "a50126d24544fb798ff27db3d2c849892a75d5f3a4481fcf7f4f9506b72be356"
+    },
+    {
+      "id": "956efeb2-0ba6-4e0b-8bf5-e9d0e8f5029d",
+      "type": "evaluation_reported",
+      "ts_utc": "2026-02-03T15:07:31.092370Z",
+      "actor": "monika",
+      "seq": 3,
+      "payload": {
+        "ts_utc": "2026-02-03T15:07:31.092030Z",
+        "system": "aigov_poc",
+        "metric": "accuracy",
+        "value": 0.9,
+        "threshold": 0.8,
+        "passed": true,
+        "evaluation_attempt_id": "33feefe1-34ea-4c6d-9f98-7c4fe3be8302",
+        "remote_event_id": "evaluation_5c6413a1-f178-4aaf-af2e-7e33351d56c4_33feefe1-34ea-4c6d-9f98-7c4fe3be8302"
+      },
+      "prev_sha256": "a50126d24544fb798ff27db3d2c849892a75d5f3a4481fcf7f4f9506b72be356",
+      "sha256": "63108c1a5977a568dcc85e50a4b3cccc587426d89defca9d484d903de410fffa"
+    },
+    {
+      "id": "fe50556a-bbba-4311-b3e1-52133c8443ab",
+      "type": "promote_started",
+      "ts_utc": "2026-02-03T15:07:31.309494Z",
+      "actor": "monika",
+      "seq": 4,
+      "payload": {
+        "ts_utc": "2026-02-03T15:07:31.309163Z",
+        "system": "aigov_poc",
+        "event_id": "mp_5c6413a1-f178-4aaf-af2e-7e33351d56c4_82720286-5d60-43d2-8a87-117e3bb5ae47"
+      },
+      "prev_sha256": "63108c1a5977a568dcc85e50a4b3cccc587426d89defca9d484d903de410fffa",
+      "sha256": "0a7e20465b13228c4c9488a289897a4b45a70d1b6ed913232eba43f4cb2620ea"
+    },
+    {
+      "id": "5f79b46e-907b-4b06-8576-e15e279fa983",
+      "type": "model_promoted",
+      "ts_utc": "2026-02-03T15:07:31.318917Z",
+      "actor": "monika",
+      "seq": 5,
+      "payload": {
+        "ts_utc": "2026-02-03T15:07:31.309163Z",
+        "system": "aigov_poc",
+        "event_id": "mp_5c6413a1-f178-4aaf-af2e-7e33351d56c4_82720286-5d60-43d2-8a87-117e3bb5ae47",
+        "http_status": 200,
+        "response_text": "{\"ok\":true,\"policy_version\":\"v0.4_human_approval\",\"record_hash\":\"2a78984eebdb74958f50268f9057c86de10e29bb46a7a91b09b11c5a067de2dc\"}"
+      },
+      "prev_sha256": "0a7e20465b13228c4c9488a289897a4b45a70d1b6ed913232eba43f4cb2620ea",
+      "sha256": "5697ede21690a0b1effa3336ef3ee9f795c5058e75e15ab896264697b2a83b76"
+    }
+  ],
+  "chain": {
+    "head_sha256": "5697ede21690a0b1effa3336ef3ee9f795c5058e75e15ab896264697b2a83b76",
+    "count": 5,
+    "version": "v1",
+    "algorithm": "event_hash_chain_v1",
+    "ts_utc": "2026-02-03T15:23:39.885105Z"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "references": {
+    "ai_act_control_mapping": "conformity/ai-act-control-mapping.json",
+    "conformity_assessment_workflow": "conformity/conformity-assessment-workflow.json",
+    "regulatory_workflow_manifest": "conformity/regulatory-workflow-manifest.json",
+    "source_obligations": "docs/regulatory/ai-act-obligations.json"
+  },
+  "review_notes": "Illustrative snapshot for CI and documentation; not a real conformity assessment record. Provider details, risk register entries, and notified body interactions are operator-owned.",
+  "schema_version": "1.0.0",
+  "system": {
+    "applicable_module": "internal_production_control",
+    "classification": "high_risk_ai_system_annex_iii",
+    "intended_purpose": "Example documentation-only system used to illustrate the conformity workflow structure.",
+    "system_id": "example-system-alpha"
+  }
+}

@@ -1,0 +1,28 @@
+schema_version: aigov.governance_controls.v1
+controls:
+  - control_id: CTRL.DATA.LINEAGE.V1
+    name: Dataset lineage is declared
+    description: Runtime decisions must be traceable to an approved dataset identity and digest.
+    risk_class_applicability: [HIGH]
+    tags: [DATASET, RUNTIME, AIACT]
+    evidence_requirements:
+      - evidence_type: LOG_EVENT
+        required_fields:
+          - runtime_decision.payload.dataset_id
+          - runtime_decision.payload.dataset_digest
+    policy_links:
+      - policy_id: ai-act-high-risk
+        anchor: data_and_lineage
+
+  - control_id: CTRL.GOV.AUDIT.REASON_CODES.V1
+    name: Blocked reason codes are namespaced and mapped
+    description: All governance reason codes must map to an existing control for readiness reporting.
+    risk_class_applicability: [MINIMAL, LIMITED, HIGH, PROHIBITED]
+    tags: [RUNTIME, AIACT, GOVERNANCE]
+    evidence_requirements:
+      - evidence_type: ARTIFACT
+        required_fields:
+          - docs/governance/reason_codes.v1.yaml
+    policy_links:
+      - policy_id: ai-act-high-risk
+        anchor: reason_codes

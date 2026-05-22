@@ -1,0 +1,80 @@
+{
+  "ok": true,
+  "schema_version": "aigov.govai_functions_v2.flight_pack.v1",
+  "flight_pack_version": 1,
+  "ledger_tenant_id": "fixture-tenant",
+  "run_id": "fixture-run",
+  "base_export": {
+    "ok": true,
+    "trace_version": 2,
+    "ledger_tenant_id": "fixture-tenant",
+    "run_id": "fixture-run",
+    "correlation_id": null,
+    "compliance_summary_run_id": null,
+    "relation_to_compliance_summary": "fixture",
+    "model": { "provider": "openai", "name": "gpt-4o", "version": "2024-05-13" },
+    "hashes": { "prompt": "p", "input": "i", "output": "o" },
+    "agents": {
+      "root": { "agent_id": "root", "agent_role": "planner" },
+      "delegations": [],
+      "delegation_graph": {}
+    },
+    "tool_calls": [],
+    "steps": [],
+    "policies_evaluated": [],
+    "human": { "approval_state": "unknown", "override_state": "none" },
+    "human_approval_workflow": {},
+    "final_audit_verdict": "VALID",
+    "derived_audit_verdict": "VALID",
+    "producer_final_audit_verdict": "VALID",
+    "verdict_consistent": true,
+    "trace_integrity": { "status": "ok", "detail": { "integrity_status": "ok" } },
+    "explainability": {
+      "last_policy_eval": null,
+      "completed": null,
+      "last_executive_brief": null,
+      "open_appeal_signals": 0,
+      "open_incident_signals": 0
+    },
+    "risk_indicators": {
+      "integrity_broken": false,
+      "delegation_invalid": false,
+      "verdict_inconsistent": false,
+      "policy_blocked": false
+    },
+    "govai_functions_v2": {
+      "schema_version": "aigov.functions_v2.extensions.v1",
+      "approval_steps": [],
+      "appeals": [],
+      "incidents": [],
+      "remediations": [],
+      "monitoring_samples": [],
+      "seal_attestations": [],
+      "legal_evidence_refs": [],
+      "certification_marks": [],
+      "business_impacts": [],
+      "executive_briefs": []
+    },
+    "events": []
+  },
+  "governance_operating_system": {
+    "workflow_counts": {
+      "approval_steps_recorded": 0,
+      "appeals_recorded": 0,
+      "incidents_recorded": 0,
+      "remediations_recorded": 0,
+      "certification_marks_recorded": 0
+    },
+    "governance_scorecard": {
+      "governance_readiness_0_100": 75,
+      "integrity_ok": true,
+      "verdict_consistent": true,
+      "policies_evaluated_count": 0,
+      "approval_steps_count": 0,
+      "seal_present": false,
+      "legal_evidence_refs_present": false,
+      "tool_call_events": 0
+    },
+    "continuous_monitoring": { "samples": 0, "kinds_observed": [] }
+  }
+}

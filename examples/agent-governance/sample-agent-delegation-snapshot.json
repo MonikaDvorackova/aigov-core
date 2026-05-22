@@ -1,0 +1,37 @@
+{
+  "approval_chain": {
+    "human_in_loop_observed": true,
+    "human_in_loop_required": true,
+    "recorded_approvals": 2,
+    "required_approvals": 2,
+    "stale_pending_approvals": 0
+  },
+  "auditability": {
+    "correlation_ids_present_rate_percent": 100,
+    "decision_artifacts_exported": true,
+    "delegation_edges_logged": true,
+    "retention_policy_acknowledged": true
+  },
+  "captured_at": "2026-05-12T16:00:00Z",
+  "delegation": {
+    "cross_tenant_delegation_observed": false,
+    "delegate_agent_ids": [
+      "worker-analytics-1",
+      "worker-policy-2"
+    ],
+    "delegation_scopes": [
+      "read_telemetry",
+      "draft_recommendation"
+    ],
+    "delegator_agent_id": "orchestrator-primary",
+    "max_delegation_depth_observed": 2
+  },
+  "environment": "staging",
+  "override_governance": {
+    "emergency_break_glass_used": false,
+    "override_events_observed": 0,
+    "undocumented_override_events": 0
+  },
+  "schema_version": 1,
+  "snapshot_id": "phase22_sample_delegation_001"
+}

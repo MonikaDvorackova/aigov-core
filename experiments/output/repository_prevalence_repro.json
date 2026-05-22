@@ -1,0 +1,9 @@
+{
+  "schema": "aigov.repository_prevalence_repro.v1",
+  "generated_at_utc": "2026-05-03T14:49:38.649971+00:00",
+  "script": "experiments/repository_prevalence_check.py",
+  "coding_rubric_doc": "docs/reports/repository-prevalence-coding-rubric.md",
+  "total_repositories": 30,
+  "row_order": "fixed tuple order in repository_prevalence_check.CURATED_REPO_ROWS",
+  "signals_version": "2026-05-03"
+}

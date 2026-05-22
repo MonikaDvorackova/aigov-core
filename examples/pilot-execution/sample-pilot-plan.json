@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "pilot_name": "example-govai-pilot",
+  "duration_weeks": 6,
+  "environments": ["sandbox", "staging"],
+  "success_criteria": [
+    "CI pipeline emits evidence for golden path runs",
+    "BLOCKED outcome reproducible on missing evidence fixture",
+    "Export bundle retrieved for at least one approved run"
+  ],
+  "stakeholders": {
+    "sponsor": "example.role@customer.example",
+    "security_owner": "example.security@customer.example",
+    "platform_owner": "example.platform@customer.example"
+  },
+  "non_goals": [
+    "Production billing migration",
+    "Custom ledger semantics outside operator policy"
+  ]
+}

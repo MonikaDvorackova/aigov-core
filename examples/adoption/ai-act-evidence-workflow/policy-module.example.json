@@ -1,0 +1,18 @@
+{
+  "schema_version": "govai.standards.governance_policy_module.v1",
+  "policy": {
+    "id": "pol.adoption_kit.ai_act_illustrative",
+    "name": "Illustrative AI Act–style requirements (documentation only)",
+    "version": "1.0.0"
+  },
+  "requirements": [
+    {
+      "code": "model_release",
+      "required_evidence": ["ev.model.card", "ev.bias.eval"]
+    },
+    {
+      "code": "data_governance",
+      "required_evidence": ["ev.dataset.register", "ev.purpose.limitation"]
+    }
+  ]
+}

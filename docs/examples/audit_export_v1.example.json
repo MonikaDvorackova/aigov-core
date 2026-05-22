@@ -1,0 +1,158 @@
+{
+  "ok": true,
+  "schema_version": "aigov.audit_export.v1",
+  "policy_version": "2026-04-01",
+  "environment": "prod",
+  "exported_at_utc": "2026-01-01T00:00:04Z",
+  "tenant": {
+    "ledger_tenant_id": "university-lab-1",
+    "billing_tenant_id": "university-lab-1"
+  },
+  "run": {
+    "run_id": "run-123",
+    "policy_version": "2026-04-01",
+    "log_path": "rust/audit_log__university-lab-1.jsonl",
+    "model_artifact_path": null,
+    "identifiers": {
+      "ai_system_id": "as-1",
+      "dataset_id": "ds-1",
+      "model_version_id": "mv-1"
+    }
+  },
+  "discovery": {
+    "findings": {
+      "openai": true,
+      "transformers": false,
+      "model_artifacts": false
+    },
+    "required_evidence": [
+      "ai_discovery_completed",
+      "model_registered",
+      "usage_policy_defined"
+    ],
+    "required_requirements": [
+      {
+        "code": "ai_discovery_completed",
+        "source": "lifecycle",
+        "description": "AI discovery scan must be completed before compliance decision."
+      },
+      {
+        "code": "model_registered",
+        "source": "discovery",
+        "description": "Detected OpenAI usage requires model registration."
+      },
+      {
+        "code": "usage_policy_defined",
+        "source": "discovery",
+        "description": "Detected OpenAI usage requires usage policy definition."
+      }
+    ]
+  },
+  "discovery_findings": [
+    {
+      "file_path": "package.json",
+      "detector": "dependency_package_json",
+      "confidence": 0.9,
+      "matched_pattern": null,
+      "hash": "1f2a2e3e4d5c6b7a8a9b0c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f"
+    },
+    {
+      "file_path": "src/app.ts",
+      "detector": "code_signature",
+      "confidence": 0.75,
+      "matched_pattern": null,
+      "hash": "0f9e8d7c6b5a4e3d2c1b0a9f8e7d6c5b4a3f2e1d0c9b8a7a6b5c4d3e2f1a0b9c"
+    }
+  ],
+  "evidence_hashes": {
+    "bundle_sha256": "4b3f3ab0b2d5c0b3b8c7f6c67a502e7dd7a8c0e7f7cf1ab4c4f6bd0e9c4f3a2b",
+    "chain_head_record_sha256": "84c3c1b2f4a5c88c37f9d1d67b02c20bdbf0e8ddf7a6f9502cb6ccbded0a2a11",
+    "log_chain": [
+      {
+        "event_id": "e1",
+        "ts_utc": "2026-01-01T00:00:01Z",
+        "event_type": "ai_discovery_reported",
+        "prev_hash": null,
+        "record_hash": "a36f2b8a00f3a4e14c1d7c6c30e81f0c7d3a1f4d4c9e9b2b6d8d7dbeb0d8d8d8"
+      }
+    ]
+  },
+  "decision": {
+    "human_approval": null,
+    "promotion": null,
+    "evaluation_passed": true,
+    "verdict": "BLOCKED",
+    "blocked_reasons": [
+      {
+        "code": "awaiting_approval_or_promotion",
+        "message": "Run is not yet promotable: approval/promotion prerequisites are not satisfied."
+      }
+    ]
+  },
+  "evidence_requirements": {
+    "required_evidence": [
+      "ai_discovery_completed",
+      "model_registered",
+      "usage_policy_defined"
+    ],
+    "provided_evidence": [
+      "ai_discovery_completed",
+      "model_registered",
+      "usage_policy_defined"
+    ],
+    "missing_evidence": [],
+    "required_requirements": [
+      {
+        "code": "ai_discovery_completed",
+        "source": "lifecycle",
+        "description": "AI discovery scan must be completed before compliance decision."
+      },
+      {
+        "code": "model_registered",
+        "source": "discovery",
+        "description": "Detected OpenAI usage requires model registration."
+      },
+      {
+        "code": "usage_policy_defined",
+        "source": "discovery",
+        "description": "Detected OpenAI usage requires usage policy definition."
+      }
+    ],
+    "provided_requirements": [
+      {
+        "code": "ai_discovery_completed",
+        "source": "lifecycle",
+        "description": "AI discovery scan must be completed before compliance decision."
+      },
+      {
+        "code": "model_registered",
+        "source": "discovery",
+        "description": "Detected OpenAI usage requires model registration."
+      },
+      {
+        "code": "usage_policy_defined",
+        "source": "discovery",
+        "description": "Detected OpenAI usage requires usage policy definition."
+      }
+    ],
+    "missing_requirements": []
+  },
+  "evidence_events": [
+    {
+      "event_id": "e1",
+      "event_type": "ai_discovery_reported",
+      "ts_utc": "2026-01-01T00:00:01Z",
+      "actor": "system",
+      "system": "govai",
+      "run_id": "run-123",
+      "payload": { "openai": true, "transformers": false, "model_artifacts": false }
+    }
+  ],
+  "timestamps": {
+    "first_event_ts_utc": "2026-01-01T00:00:01Z",
+    "last_event_ts_utc": "2026-01-01T00:00:04Z",
+    "human_approval_ts_utc": null,
+    "promotion_ts_utc": null
+  }
+}
+

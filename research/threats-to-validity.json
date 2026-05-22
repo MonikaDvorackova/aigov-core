@@ -1,0 +1,31 @@
+{
+  "artifact_id": "govai-research-threats-to-validity",
+  "cross_references": {
+    "benchmark_methodology": "research/benchmark-methodology.json",
+    "citation_metadata": "research/citation-metadata.json",
+    "experimental_design": "research/experimental-design.json",
+    "reproducibility_checklist": "research/reproducibility-checklist.json",
+    "research_manifest": "research/research-manifest.json"
+  },
+  "documentation_anchor": "docs/research/threats-to-validity.md",
+  "schema_version": 1,
+  "stable_package_urn": "urn:govai:research:package:1",
+  "threat_categories": [
+    {
+      "mitigation_doc_path": "docs/research/benchmark-methodology.md",
+      "threat_description": "Local benchmarks describe expected governance signals for education; they are not a second implementation of production verdict logic.",
+      "threat_id": "govai-threat-construct-benchmark-vs-runtime"
+    },
+    {
+      "mitigation_doc_path": "docs/research/reproducibility.md",
+      "threat_description": "Replication without pinned commits or environment metadata may drift when CI dependencies change.",
+      "threat_id": "govai-threat-internal-history"
+    },
+    {
+      "mitigation_doc_path": "docs/research/threats-to-validity.md",
+      "threat_description": "Self-hosted deployments differ from the OSS reference layout; external validity requires operator-specific evidence.",
+      "threat_id": "govai-threat-external-validity-deployment"
+    }
+  ],
+  "title": "GovAI threats to validity"
+}

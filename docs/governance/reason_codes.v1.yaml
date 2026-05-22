@@ -1,0 +1,11 @@
+schema_version: aigov.reason_code_registry.v1
+reason_codes:
+  - reason_code: AIACT.DATA.LINEAGE_MISSING
+    control_id: CTRL.DATA.LINEAGE.V1
+    severity: BLOCKING
+    description: Required dataset identity/digest lineage was not provided for a governed decision.
+
+  - reason_code: AIACT.GOV.REASON_CODE_UNMAPPED
+    control_id: CTRL.GOV.AUDIT.REASON_CODES.V1
+    severity: BLOCKING
+    description: A governance reason code was produced without a catalog mapping (metadata integrity error).

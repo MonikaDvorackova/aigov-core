@@ -1,0 +1,19 @@
+schema_version: aigov.aiact_requirements.v1
+requirements:
+  - requirement_id: AIACT.HRA.ART_9.2.A
+    article_ref: "EU AI Act Art 9(2)(a)"
+    title: Risk management system (iterative process)
+    description: Maintain a continuous, iterative risk management system across the lifecycle.
+    risk_class_applicability: [HIGH]
+
+  - requirement_id: AIACT.HRA.ART_10.2.C
+    article_ref: "EU AI Act Art 10(2)(c)"
+    title: Data governance and management
+    description: Ensure data governance practices including traceability and documentation for training/validation/testing data.
+    risk_class_applicability: [HIGH]
+
+  - requirement_id: AIACT.HRA.ART_12.1
+    article_ref: "EU AI Act Art 12(1)"
+    title: Logging capabilities
+    description: Ensure automatic recording of events (logs) to support monitoring and accountability.
+    risk_class_applicability: [HIGH]

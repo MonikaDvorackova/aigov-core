@@ -1,0 +1,155 @@
+{
+  "boundaries": {
+    "billing": "no_billing_or_usage_semantics_in_model_risk_tooling",
+    "data": "evaluation_snapshots_only_no_production_model_payloads",
+    "enforcement": "no_runtime_enforcement_semantics_changes",
+    "ledger": "no_ledger_writes_or_mutations",
+    "summary": "Phase 20 model risk tooling reads manifests and evaluation snapshots, emits deterministic scores and Markdown assurance reports, and does not change GovAI verdict semantics, billing, ledger storage, or database schemas."
+  },
+  "evaluation_snapshot_schema": {
+    "required_collections": [
+      "diagnostics.checks",
+      "model"
+    ],
+    "required_keys": [
+      "captured_at",
+      "diagnostics",
+      "environment",
+      "evaluation",
+      "fairness",
+      "model",
+      "robustness",
+      "safety",
+      "schema_version",
+      "snapshot_id",
+      "window_days"
+    ],
+    "summary": "Structured model evaluation snapshot with evaluation, safety, robustness, fairness pillars and diagnostics counts for deterministic scoring."
+  },
+  "evaluation_signals": [
+    {
+      "guide": "docs/model-risk/evaluation-planning.md",
+      "id": "task_fit_and_documentation",
+      "summary": "Task fit and documentation completeness scores anchor offline evaluation planning before production promotion."
+    },
+    {
+      "guide": "docs/model-risk/safety-evaluation.md",
+      "id": "safety_rates_and_red_team",
+      "summary": "Policy violation rates, harmful-output eval pass rates, and open red-team findings surface safety posture without hosting model traffic."
+    },
+    {
+      "guide": "docs/model-risk/robustness-evaluation.md",
+      "id": "perturbation_and_jailbreak_resistance",
+      "summary": "Perturbation degradation and jailbreak success rates approximate robustness under controlled offline probes."
+    },
+    {
+      "guide": "docs/model-risk/fairness-evaluation.md",
+      "id": "group_metrics_and_coverage",
+      "summary": "Maximum group metric deltas and fairness eval coverage summarise fairness evidence for assurance reviews."
+    }
+  ],
+  "non_goals": [
+    "Phase 20 does not train, host, or serve models.",
+    "Scores are not legal conformity statements or EU AI Act Annex IV certificates.",
+    "Tooling does not mutate billing configuration, ledger files, or enforcement modes."
+  ],
+  "operational_probes": [
+    {
+      "command": "python3 scripts/validate_model_risk_manifest.py --json",
+      "description": "Schema and reference path validation for this manifest.",
+      "name": "validate_model_risk_manifest"
+    },
+    {
+      "command": "python3 scripts/validate_model_evaluation_snapshot.py --input examples/model-risk/sample-model-evaluation-snapshot.json --json",
+      "description": "Schema validation for the sample evaluation snapshot.",
+      "name": "validate_model_evaluation_snapshot"
+    },
+    {
+      "command": "python3 scripts/model_risk_score.py --input examples/model-risk/sample-model-evaluation-snapshot.json",
+      "description": "Deterministic composite model risk score with per-pillar sub-scores.",
+      "name": "model_risk_score"
+    },
+    {
+      "command": "python3 scripts/model_risk_check.py --json",
+      "description": "Aggregated diagnostics across manifest, snapshot, Makefile wiring, and documentation paths.",
+      "name": "model_risk_check"
+    },
+    {
+      "command": "python3 scripts/generate_model_assurance_report.py --input examples/model-risk/sample-model-evaluation-snapshot.json",
+      "description": "Deterministic Markdown assurance report from a single snapshot.",
+      "name": "generate_model_assurance_report"
+    }
+  ],
+  "referenced_documents": [
+    {
+      "path": "docs/model-risk/README.md",
+      "role": "model_risk_index"
+    },
+    {
+      "path": "docs/model-risk/model-risk-management.md",
+      "role": "governance_practices"
+    },
+    {
+      "path": "docs/model-risk/evaluation-planning.md",
+      "role": "evaluation_planning"
+    },
+    {
+      "path": "docs/model-risk/safety-evaluation.md",
+      "role": "safety_evaluation"
+    },
+    {
+      "path": "docs/model-risk/robustness-evaluation.md",
+      "role": "robustness_evaluation"
+    },
+    {
+      "path": "docs/model-risk/fairness-evaluation.md",
+      "role": "fairness_evaluation"
+    },
+    {
+      "path": "docs/model-risk/assurance-levels.md",
+      "role": "assurance_levels"
+    },
+    {
+      "path": "docs/model-risk/model-assurance-report.md",
+      "role": "assurance_report_contract"
+    }
+  ],
+  "referenced_examples": [
+    {
+      "path": "examples/model-risk/README.md",
+      "role": "example_index"
+    },
+    {
+      "path": "examples/model-risk/sample-model-evaluation-snapshot.json",
+      "role": "sample_snapshot"
+    },
+    {
+      "path": "examples/model-risk/run-model-risk-check.sh",
+      "role": "driver_check"
+    },
+    {
+      "path": "examples/model-risk/run-model-risk-score.sh",
+      "role": "driver_score"
+    },
+    {
+      "path": "examples/model-risk/run-model-assurance-report.sh",
+      "role": "driver_report"
+    }
+  ],
+  "required_checks": [
+    "make model-risk",
+    "make model-risk-manifest",
+    "make model-evaluation-snapshot",
+    "make model-risk-score",
+    "make model-assurance-report",
+    "make model-risk-assurance-check"
+  ],
+  "score_weights": {
+    "evaluation": 25,
+    "fairness": 25,
+    "robustness": 25,
+    "safety": 25
+  },
+  "summary": "GovAI Phase 20 model risk manifest indexes evaluation snapshot schema, deterministic scoring weights, referenced operator documentation, and stdlib validation probes. It frames assurance as engineering evidence, not runtime enforcement.",
+  "version": 1
+}

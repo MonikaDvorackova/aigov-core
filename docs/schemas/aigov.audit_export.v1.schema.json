@@ -1,0 +1,169 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://kovali.ai/schemas/aigov.audit_export.v1.schema.json",
+  "title": "GovAI Audit Export v1",
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["ok", "schema_version", "policy_version", "environment", "exported_at_utc", "tenant", "run", "evidence_hashes", "decision", "evidence_requirements", "evidence_events", "timestamps"],
+  "properties": {
+    "Requirement": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["code", "source", "description"],
+      "properties": {
+        "code": { "type": "string" },
+        "source": { "type": "string", "enum": ["policy", "discovery", "lifecycle"] },
+        "description": { "type": "string" }
+      }
+    },
+    "ok": { "type": "boolean" },
+    "schema_version": { "const": "aigov.audit_export.v1" },
+    "policy_version": { "type": "string" },
+    "environment": { "type": "string", "enum": ["dev", "staging", "prod"] },
+    "exported_at_utc": { "type": ["string", "null"], "description": "Deterministic export time: last event timestamp for the run.", "format": "date-time" },
+    "tenant": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["ledger_tenant_id", "billing_tenant_id"],
+      "properties": {
+        "ledger_tenant_id": { "type": "string", "description": "Tenant identifier used to resolve the tenant-scoped evidence ledger." },
+        "billing_tenant_id": { "type": "string", "description": "Tenant identifier used for billing/quota scope when metering is disabled." }
+      }
+    },
+    "run": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["run_id", "policy_version", "log_path", "model_artifact_path", "identifiers"],
+      "properties": {
+        "run_id": { "type": "string" },
+        "policy_version": { "type": "string" },
+        "log_path": { "type": "string" },
+        "model_artifact_path": { "type": ["string", "null"] },
+        "identifiers": { "type": ["object", "null"] }
+      }
+    },
+    "discovery": {
+      "type": ["object", "null"],
+      "additionalProperties": true,
+      "properties": {
+        "findings": {
+          "type": "object",
+          "additionalProperties": true,
+          "properties": {
+            "openai": { "type": "boolean" },
+            "transformers": { "type": "boolean" },
+            "model_artifacts": { "type": "boolean" }
+          }
+        },
+        "required_evidence": { "type": "array", "items": { "type": "string" } },
+        "required_requirements": { "type": "array", "items": { "$ref": "#/properties/Requirement" } }
+      }
+    },
+    "discovery_findings": {
+      "type": "array",
+      "description": "File-level AI discovery findings from submitted evidence (no new scan is performed during export). Deterministic ordering.",
+      "items": {
+        "type": "object",
+        "additionalProperties": true,
+        "required": ["file_path", "detector", "confidence", "matched_pattern", "hash"],
+        "properties": {
+          "file_path": { "type": "string" },
+          "detector": { "type": "string" },
+          "confidence": { "type": "number" },
+          "matched_pattern": { "type": ["string", "null"] },
+          "hash": { "type": "string" }
+        }
+      }
+    },
+    "evidence_hashes": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["bundle_sha256", "chain_head_record_sha256", "log_chain"],
+      "properties": {
+        "bundle_sha256": { "type": "string" },
+        "chain_head_record_sha256": { "type": ["string", "null"] },
+        "log_chain": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": true,
+            "required": ["event_id", "ts_utc", "event_type", "prev_hash", "record_hash"],
+            "properties": {
+              "event_id": { "type": "string" },
+              "ts_utc": { "type": "string", "format": "date-time" },
+              "event_type": { "type": "string" },
+              "prev_hash": { "type": ["string", "null"] },
+              "record_hash": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    "decision": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["human_approval", "promotion", "evaluation_passed", "verdict", "blocked_reasons"],
+      "properties": {
+        "human_approval": { "type": ["object", "null"] },
+        "promotion": { "type": ["object", "null"] },
+        "evaluation_passed": { "type": ["boolean", "null"] },
+        "verdict": { "type": "string", "enum": ["VALID", "BLOCKED", "INVALID"] },
+        "blocked_reasons": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": true,
+            "required": ["code", "message"],
+            "properties": {
+              "code": { "type": "string" },
+              "message": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    "evidence_requirements": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["required_evidence", "provided_evidence", "missing_evidence"],
+      "properties": {
+        "required_evidence": { "type": "array", "items": { "type": "string" } },
+        "provided_evidence": { "type": "array", "items": { "type": "string" } },
+        "missing_evidence": { "type": "array", "items": { "type": "string" } },
+        "required_requirements": { "type": "array", "items": { "$ref": "#/properties/Requirement" } },
+        "provided_requirements": { "type": "array", "items": { "$ref": "#/properties/Requirement" } },
+        "missing_requirements": { "type": "array", "items": { "$ref": "#/properties/Requirement" } }
+      }
+    },
+    "evidence_events": {
+      "type": ["array", "null"],
+      "items": {
+        "type": "object",
+        "additionalProperties": true,
+        "required": ["event_id", "event_type", "ts_utc", "actor", "system", "run_id", "payload"],
+        "properties": {
+          "event_id": { "type": "string" },
+          "event_type": { "type": "string" },
+          "ts_utc": { "type": "string", "format": "date-time" },
+          "actor": { "type": "string" },
+          "system": { "type": "string" },
+          "run_id": { "type": "string" },
+          "environment": { "type": ["string", "null"] },
+          "payload": {}
+        }
+      }
+    },
+    "timestamps": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["first_event_ts_utc", "last_event_ts_utc", "human_approval_ts_utc", "promotion_ts_utc"],
+      "properties": {
+        "first_event_ts_utc": { "type": ["string", "null"], "format": "date-time" },
+        "last_event_ts_utc": { "type": ["string", "null"], "format": "date-time" },
+        "human_approval_ts_utc": { "type": ["string", "null"], "format": "date-time" },
+        "promotion_ts_utc": { "type": ["string", "null"], "format": "date-time" }
+      }
+    }
+  }
+}
+

@@ -1,0 +1,27 @@
+---
+description: Audit report requirement for core enforcement or governance-impacting changes.
+globs: []
+alwaysApply: false
+---
+
+# Audit report required (GovAI)
+
+## When this applies
+
+Any change that **materially affects enforcement**, compliance gates, policy interpretation surfaced to users, or **core governance semantics** must ship with **exactly one** new or updated markdown file under `docs/reports/` for that change set (unless the work is strictly non-functional documentation with zero enforcement impact — still prefer a report when in doubt).
+
+## Required sections
+
+The audit report **must** include these level-2 headings (exact strings, on their own lines):
+
+- `## Evaluation gate`
+- `## Human approval gate`
+- `## Risk assessment`
+- `## Rollback plan`
+
+CI gate `scripts/gate_reports.py` enforces a subset of headings across all `docs/reports/*.md`; new reports must satisfy the full list above for human review, not only the automated minimum.
+
+## Scope discipline
+
+- Prefer **one** focused report per change set rather than splitting across many files.
+- Do not remove or weaken existing reports solely to satisfy gate scripts.

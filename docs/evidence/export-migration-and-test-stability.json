@@ -1,0 +1,60 @@
+{
+  "dataset_governance": {
+    "ai_system_id": "govai",
+    "dataset": "migration-test",
+    "dataset_fingerprint": "fp",
+    "dataset_governance_commitment": "c",
+    "dataset_governance_id": "g1",
+    "dataset_id": "export-migration-test",
+    "dataset_version": "v1",
+    "governance_status": "gs",
+    "intended_use": "audit report gate",
+    "limitations": "ci evidence only",
+    "quality_summary": "report evidence record",
+    "source": "repo"
+  },
+  "evaluation": null,
+  "events": [
+    {
+      "actor": "ci-report",
+      "environment": "dev",
+      "event_id": "47920b56-024f-4428-b156-c3c41da09434",
+      "event_type": "data_registered",
+      "payload": {
+        "ai_system_id": "govai",
+        "dataset": "migration-test",
+        "dataset_fingerprint": "fp",
+        "dataset_governance_commitment": "c",
+        "dataset_governance_id": "g1",
+        "dataset_id": "export-migration-test",
+        "dataset_version": "v1",
+        "governance_status": "gs",
+        "intended_use": "audit report gate",
+        "limitations": "ci evidence only",
+        "quality_summary": "report evidence record",
+        "source": "repo"
+      },
+      "run_id": "export-migration-and-test-stability",
+      "system": "govai-ci",
+      "ts_utc": "2026-04-24T14:40:00Z"
+    }
+  ],
+  "human_approval": null,
+  "identifiers": {
+    "ai_system_id": "govai",
+    "dataset_id": "export-migration-test",
+    "model_version_id": null,
+    "primary_risk_id": null,
+    "risk_ids": []
+  },
+  "log_path": "rust/audit_log__default.jsonl",
+  "model_artifact_path": null,
+  "model_version": null,
+  "ok": true,
+  "policy_version": "v0.5_dev",
+  "promotion": null,
+  "risk_register": null,
+  "run_id": "export-migration-and-test-stability",
+  "schema_version": "aigov.bundle.v1",
+  "bundle_sha256": "4bdfdc0a94adbd4a5550136eb95f761c2384e67c1a1fffc8a864339ede5384fb"
+}

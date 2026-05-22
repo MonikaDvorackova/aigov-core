@@ -1,0 +1,24 @@
+---
+description: GovAI repository branch flow — feature branches, staging, and main.
+globs: []
+alwaysApply: true
+---
+
+# Branch policy (GovAI compliance engine)
+
+## Required flow
+
+- **Development** happens on **feature branches** derived from the appropriate base (typically `staging` or `main` per team convention).
+- Changes integrate **feature → staging → main** in that order. Do not skip staging for governance-sensitive merges unless an explicit exception is documented in the audit report.
+
+## Prohibited practices
+
+- **Do not push directly to `main`.**
+- **Do not push directly to `staging`.**
+- **Do not open or merge pull requests into `main` except from `staging`** (i.e. promotion PRs that carry the already-integrated staging branch).
+- **Do not perform routine implementation work directly on `staging`** unless the user has **explicitly instructed** that this session is a hotfix or staging-only change with written scope.
+
+## Agent behaviour
+
+- Assume the current branch is a **feature branch** unless the user states otherwise.
+- When preparing commits or PRs, prefer targets that respect the flow above and call out any conflict with repository automation (for example branch protection or `pr-branch-policy` workflows).

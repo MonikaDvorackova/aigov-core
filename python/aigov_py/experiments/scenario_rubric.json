@@ -1,0 +1,255 @@
+{
+  "version": 1,
+  "policy_notes": {
+    "events_digest": "events_content_sha256 is defined over a canonical multiset of events (sorted by event_id). Reordering required events that share the same canonical projection therefore leaves events_content_sha256_match true.",
+    "inconsistent_evaluation_result": "When the primary evaluation_result is pass but evaluation_internal_consistent is false (conflicting evaluation signals), the gate returns BLOCKED as fail-closed ambiguity rather than INVALID.",
+    "digest_mismatch_events_only": "Only events_content_sha256_match is false; export_digest_match remains true to isolate the events digest path.",
+    "digest_mismatch_export_only": "Only export_digest_match is false; events_content_sha256_match remains true.",
+    "duplicated_evidence_event_idempotent": "Duplicate events are content-identical; digest and artifact-bound verification still succeed.",
+    "duplicated_evidence_event_conflicting": "Non-idempotent duplicate breaks artifact-bound verification while other pipeline fields remain superficially satisfied."
+  },
+  "scenarios": [
+    {
+      "scenario_name": "valid_complete_trace",
+      "failure_family": "none",
+      "primary_violated_invariant": null,
+      "expected_verdict": "VALID",
+      "injected_violation": false,
+      "should_pass": true,
+      "artifact_continuity_related": false,
+      "digest_related": false,
+      "approval_ordering_related": false
+    },
+    {
+      "scenario_name": "noisy_but_valid_metadata",
+      "failure_family": "none",
+      "primary_violated_invariant": null,
+      "expected_verdict": "VALID",
+      "injected_violation": false,
+      "should_pass": true,
+      "artifact_continuity_related": false,
+      "digest_related": false,
+      "approval_ordering_related": false
+    },
+    {
+      "scenario_name": "unknown_optional_metadata",
+      "failure_family": "none",
+      "primary_violated_invariant": null,
+      "expected_verdict": "VALID",
+      "injected_violation": false,
+      "should_pass": true,
+      "artifact_continuity_related": false,
+      "digest_related": false,
+      "approval_ordering_related": false
+    },
+    {
+      "scenario_name": "reordered_required_events",
+      "failure_family": "none",
+      "primary_violated_invariant": null,
+      "expected_verdict": "VALID",
+      "injected_violation": false,
+      "should_pass": true,
+      "artifact_continuity_related": false,
+      "digest_related": true,
+      "approval_ordering_related": false
+    },
+    {
+      "scenario_name": "duplicated_evidence_event_idempotent",
+      "failure_family": "none",
+      "primary_violated_invariant": null,
+      "expected_verdict": "VALID",
+      "injected_violation": false,
+      "should_pass": true,
+      "artifact_continuity_related": true,
+      "digest_related": false,
+      "approval_ordering_related": false
+    },
+    {
+      "scenario_name": "missing_audit_evidence",
+      "failure_family": "evidence_completeness",
+      "primary_violated_invariant": "evidence_complete",
+      "expected_verdict": "BLOCKED",
+      "injected_violation": true,
+      "should_pass": false,
+      "artifact_continuity_related": false,
+      "digest_related": false,
+      "approval_ordering_related": false
+    },
+    {
+      "scenario_name": "missing_ai_discovery_output",
+      "failure_family": "evidence_completeness",
+      "primary_violated_invariant": "ai_discovery_present",
+      "expected_verdict": "BLOCKED",
+      "injected_violation": true,
+      "should_pass": false,
+      "artifact_continuity_related": false,
+      "digest_related": false,
+      "approval_ordering_related": false
+    },
+    {
+      "scenario_name": "missing_evidence_pack",
+      "failure_family": "artifact",
+      "primary_violated_invariant": "evidence_pack_present",
+      "expected_verdict": "BLOCKED",
+      "injected_violation": true,
+      "should_pass": false,
+      "artifact_continuity_related": true,
+      "digest_related": false,
+      "approval_ordering_related": false
+    },
+    {
+      "scenario_name": "partial_evidence_bundle",
+      "failure_family": "artifact",
+      "primary_violated_invariant": "partial_bundle_integrity",
+      "expected_verdict": "BLOCKED",
+      "injected_violation": true,
+      "should_pass": false,
+      "artifact_continuity_related": true,
+      "digest_related": true,
+      "approval_ordering_related": false
+    },
+    {
+      "scenario_name": "failed_compliance_evaluation",
+      "failure_family": "evaluation",
+      "primary_violated_invariant": "evaluation_result",
+      "expected_verdict": "INVALID",
+      "injected_violation": true,
+      "should_pass": false,
+      "artifact_continuity_related": false,
+      "digest_related": false,
+      "approval_ordering_related": false
+    },
+    {
+      "scenario_name": "inconsistent_evaluation_result",
+      "failure_family": "evaluation",
+      "primary_violated_invariant": "evaluation_internal_consistent",
+      "expected_verdict": "BLOCKED",
+      "injected_violation": true,
+      "should_pass": false,
+      "artifact_continuity_related": false,
+      "digest_related": false,
+      "approval_ordering_related": false
+    },
+    {
+      "scenario_name": "missing_approval_record",
+      "failure_family": "approval",
+      "primary_violated_invariant": "approval_state",
+      "expected_verdict": "BLOCKED",
+      "injected_violation": true,
+      "should_pass": false,
+      "artifact_continuity_related": false,
+      "digest_related": false,
+      "approval_ordering_related": false
+    },
+    {
+      "scenario_name": "stale_approval",
+      "failure_family": "approval",
+      "primary_violated_invariant": "approval_freshness",
+      "expected_verdict": "BLOCKED",
+      "injected_violation": true,
+      "should_pass": false,
+      "artifact_continuity_related": false,
+      "digest_related": false,
+      "approval_ordering_related": true
+    },
+    {
+      "scenario_name": "approval_recorded_before_evaluation",
+      "failure_family": "approval",
+      "primary_violated_invariant": "causal_evaluation_before_approval",
+      "expected_verdict": "BLOCKED",
+      "injected_violation": true,
+      "should_pass": false,
+      "artifact_continuity_related": false,
+      "digest_related": false,
+      "approval_ordering_related": true
+    },
+    {
+      "scenario_name": "invalid_approval_state",
+      "failure_family": "approval",
+      "primary_violated_invariant": "approval_state",
+      "expected_verdict": "BLOCKED",
+      "injected_violation": true,
+      "should_pass": false,
+      "artifact_continuity_related": false,
+      "digest_related": false,
+      "approval_ordering_related": false
+    },
+    {
+      "scenario_name": "inconsistent_run_context",
+      "failure_family": "trace",
+      "primary_violated_invariant": "trace_consistent",
+      "expected_verdict": "BLOCKED",
+      "injected_violation": true,
+      "should_pass": false,
+      "artifact_continuity_related": false,
+      "digest_related": false,
+      "approval_ordering_related": false
+    },
+    {
+      "scenario_name": "wrong_run_id",
+      "failure_family": "trace",
+      "primary_violated_invariant": "run_id_matches_decision_scope",
+      "expected_verdict": "BLOCKED",
+      "injected_violation": true,
+      "should_pass": false,
+      "artifact_continuity_related": false,
+      "digest_related": false,
+      "approval_ordering_related": false
+    },
+    {
+      "scenario_name": "unavailable_audit_run",
+      "failure_family": "availability",
+      "primary_violated_invariant": "run_available",
+      "expected_verdict": "BLOCKED",
+      "injected_violation": true,
+      "should_pass": false,
+      "artifact_continuity_related": false,
+      "digest_related": false,
+      "approval_ordering_related": false
+    },
+    {
+      "scenario_name": "digest_mismatch_events_only",
+      "failure_family": "digest",
+      "primary_violated_invariant": "events_content_sha256_match",
+      "expected_verdict": "BLOCKED",
+      "injected_violation": true,
+      "should_pass": false,
+      "artifact_continuity_related": false,
+      "digest_related": true,
+      "approval_ordering_related": false
+    },
+    {
+      "scenario_name": "digest_mismatch_export_only",
+      "failure_family": "digest",
+      "primary_violated_invariant": "export_digest_match",
+      "expected_verdict": "BLOCKED",
+      "injected_violation": true,
+      "should_pass": false,
+      "artifact_continuity_related": false,
+      "digest_related": true,
+      "approval_ordering_related": false
+    },
+    {
+      "scenario_name": "policy_version_mismatch",
+      "failure_family": "policy",
+      "primary_violated_invariant": "policy_version_match",
+      "expected_verdict": "BLOCKED",
+      "injected_violation": true,
+      "should_pass": false,
+      "artifact_continuity_related": false,
+      "digest_related": false,
+      "approval_ordering_related": false
+    },
+    {
+      "scenario_name": "duplicated_evidence_event_conflicting",
+      "failure_family": "artifact",
+      "primary_violated_invariant": "artifact_bound_verification",
+      "expected_verdict": "BLOCKED",
+      "injected_violation": true,
+      "should_pass": false,
+      "artifact_continuity_related": true,
+      "digest_related": false,
+      "approval_ordering_related": false
+    }
+  ]
+}

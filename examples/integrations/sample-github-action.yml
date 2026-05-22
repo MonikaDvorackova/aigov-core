@@ -1,0 +1,21 @@
+# Sample: Phase 16 developer integrations checks in GitHub Actions.
+# Copy into .github/workflows/ and adjust triggers; this snippet is illustrative only.
+name: govai-developer-integrations-sample
+
+on:
+  workflow_dispatch:
+
+jobs:
+  phase16-sample:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Phase 16 checks (sample)
+        run: |
+          set -euo pipefail
+          make developer-integrations
+          make developer-integrations-manifest
+          make automation-pack
+          make automation-pack-summary
+          make gate

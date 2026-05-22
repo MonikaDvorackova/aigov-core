@@ -1,0 +1,7 @@
+{
+  "run_id": "32945358-00be-4711-ad8d-0de566a461ce",
+  "ts_utc": "2026-02-05T21:15:55Z",
+  "system": "ci_fallback",
+  "kind": "evidence_stub",
+  "notes": "Auto generated stub so report_init can run. Replace with real evidence events."
+}

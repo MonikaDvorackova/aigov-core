@@ -1,0 +1,69 @@
+{
+  "schema_version": "1.0.0",
+  "model_id": "govai.enterprise.role_hierarchy.v1",
+  "summary": "Enterprise RBAC: platform roles, tenant-scoped roles, inheritance, and permission labels used for governance reviews.",
+  "platform_roles": [
+    {
+      "id": "platform_superadmin",
+      "description": "Full platform configuration; must be extremely rare and MFA-gated.",
+      "inherits_from": []
+    },
+    {
+      "id": "platform_support_readonly",
+      "description": "Read-only operational dashboards without tenant secret material.",
+      "inherits_from": []
+    }
+  ],
+  "tenant_scoped_roles": [
+    {
+      "id": "tenant_owner",
+      "description": "Commercial and policy ownership for a single tenant.",
+      "inherits_from": []
+    },
+    {
+      "id": "tenant_admin",
+      "description": "Day-2 configuration for integrations, webhooks, and non-production environments.",
+      "inherits_from": [
+        "tenant_operator"
+      ]
+    },
+    {
+      "id": "tenant_operator",
+      "description": "Deploy, rotate keys in non-prod, trigger exports where policy allows.",
+      "inherits_from": [
+        "tenant_auditor_readonly"
+      ]
+    },
+    {
+      "id": "tenant_auditor_readonly",
+      "description": "Read compliance summaries and evidence exports for audits.",
+      "inherits_from": []
+    },
+    {
+      "id": "tenant_billing_admin",
+      "description": "Subscription and invoice visibility; no deployment rights.",
+      "inherits_from": []
+    }
+  ],
+  "inheritance_edges": [
+    {
+      "child": "tenant_admin",
+      "parent": "tenant_operator"
+    },
+    {
+      "child": "tenant_operator",
+      "parent": "tenant_auditor_readonly"
+    }
+  ],
+  "permission_labels": [
+    "evidence.ingest",
+    "evidence.export",
+    "compliance.read_summary",
+    "policy.edit",
+    "billing.read",
+    "billing.manage",
+    "integration.manage_webhooks",
+    "environment.promote_production",
+    "break_glass.request"
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "event_type": "data_registered",
+  "run_id": "00000000-0000-4000-8000-000000000099",
+  "payload": {
+    "ai_system_id": "adoption-kit-demo",
+    "dataset_id": "adoption_kit_dataset_v1",
+    "dataset_commitment": "documentation_only_sample"
+  }
+}

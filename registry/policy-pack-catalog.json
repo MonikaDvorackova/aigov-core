@@ -1,0 +1,68 @@
+{
+  "catalog_kind": "govai_policy_pack_registry_catalog",
+  "policy_packs": [
+    {
+      "capability_ids": [
+        "risk_management",
+        "human_oversight",
+        "traceability",
+        "post_market_monitoring"
+      ],
+      "certification_level_id": "community",
+      "id": "eu-ai-act-basic",
+      "path": "examples/marketplace/eu-ai-act-basic"
+    },
+    {
+      "capability_ids": [
+        "risk_management",
+        "robustness",
+        "traceability"
+      ],
+      "certification_level_id": "community",
+      "id": "financial-services-ai",
+      "path": "examples/marketplace/financial-services-ai"
+    },
+    {
+      "capability_ids": [
+        "risk_management",
+        "human_oversight",
+        "traceability"
+      ],
+      "certification_level_id": "community",
+      "id": "healthcare-ai",
+      "path": "examples/marketplace/healthcare-ai"
+    },
+    {
+      "capability_ids": [
+        "risk_management",
+        "traceability",
+        "robustness"
+      ],
+      "certification_level_id": "community",
+      "id": "internal-model-risk",
+      "path": "examples/marketplace/internal-model-risk"
+    },
+    {
+      "capability_ids": [
+        "risk_management",
+        "traceability",
+        "robustness"
+      ],
+      "certification_level_id": "community",
+      "id": "vendor-evaluation",
+      "path": "examples/marketplace/vendor-evaluation"
+    },
+    {
+      "capability_ids": [
+        "risk_management",
+        "traceability",
+        "robustness"
+      ],
+      "certification_level_id": "community",
+      "id": "vendor-risk",
+      "path": "examples/marketplace/vendor-risk"
+    }
+  ],
+  "schema_version": "1",
+  "summary": "Registry view of curated example policy packs shipped in-repo. Paths align with marketplace/manifest.json; certification and capability fields support ecosystem documentation and offline validation only."
+}

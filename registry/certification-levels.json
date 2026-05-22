@@ -1,0 +1,33 @@
+{
+  "catalog_kind": "govai_certification_levels",
+  "levels": [
+    {
+      "description": "Community-maintained packs and registry entries published under public review guidelines. Suitable for experimentation, teaching, and forks. Does not assert third-party audit or legal certification.",
+      "documentation_paths": [
+        "docs/registry/certification-program.md"
+      ],
+      "id": "community",
+      "label": "Community"
+    },
+    {
+      "description": "Maintainer-reviewed entries with documented checks, reproducible validators, and signed or attested release artefacts where applicable. Indicates process maturity, not a statutory seal of approval.",
+      "documentation_paths": [
+        "docs/registry/certification-program.md",
+        "docs/registry/verified-policy-packs.md"
+      ],
+      "id": "enterprise",
+      "label": "Enterprise"
+    },
+    {
+      "description": "Entries that pass extended review, compatibility checks against interchange versions, and documented evidence expectations. Still documentation-oriented; operators remain responsible for deployment context.",
+      "documentation_paths": [
+        "docs/registry/certification-program.md",
+        "docs/registry/verified-policy-packs.md"
+      ],
+      "id": "verified",
+      "label": "Verified"
+    }
+  ],
+  "schema_version": "1",
+  "summary": "Documentation-oriented certification levels for GovAI registry and marketplace metadata. These levels describe review depth and trust packaging expectations; they do not replace hosted audit verdicts or legal compliance determinations."
+}

@@ -1,0 +1,26 @@
+{
+  "schema_version": "govai.standards.delegation_graph.v1",
+  "graph_id": "graph.demo",
+  "tenant_scope": "tenant.demo",
+  "nodes": [
+    {
+      "node_id": "n_human",
+      "node_type": "HUMAN",
+      "principal_id": "u_1"
+    },
+    {
+      "node_id": "n_agent",
+      "node_type": "AGENT",
+      "agent_id": "agent_1"
+    }
+  ],
+  "edges": [
+    {
+      "delegation_id": "del_1",
+      "from_node_id": "n_human",
+      "to_node_id": "n_agent",
+      "capability_id": "cap.read_docs",
+      "scope": "org.docs"
+    }
+  ]
+}

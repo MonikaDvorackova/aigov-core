@@ -1,0 +1,140 @@
+name: nightly-full-validation
+
+on:
+  schedule:
+    - cron: "17 2 * * *"
+  workflow_dispatch:
+
+env:
+  AIGOV_POLICY_STRICT: "true"
+
+jobs:
+  full-validation:
+    name: full-validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_USER: postgres
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/postgres
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Rust dependencies
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: rust -> target
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+          cache-dependency-path: |
+            python/pyproject.toml
+            python/requirements*.txt
+
+      - name: Install Python package
+        working-directory: python
+        run: |
+          set -euo pipefail
+          python -m venv .venv
+          . .venv/bin/activate
+          pip install -U pip
+          pip install -e ".[dev]"
+
+      - name: Full Rust tests
+        run: |
+          set -euo pipefail
+          cd rust
+          cargo test --all --locked -- --test-threads=1
+
+      - name: Full Python tests
+        working-directory: python
+        timeout-minutes: 120
+        run: |
+          set -euo pipefail
+          . .venv/bin/activate
+          python -m pytest -q
+
+      - name: Enterprise readiness
+        run: |
+          set -euo pipefail
+          make enterprise-readiness-check
+
+      - name: Write validation summary
+        if: always()
+        run: |
+          set -euo pipefail
+          {
+            echo "# GovAI nightly full validation"
+            echo
+            echo "Status: ${{ job.status }}"
+            echo "Repository: ${{ github.repository }}"
+            echo "Branch: ${{ github.ref_name }}"
+            echo "Run: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+            echo
+            echo "Executed checks:"
+            echo
+            echo "1. Full Rust test suite"
+            echo "2. Full Python test suite"
+            echo "3. Enterprise readiness check"
+          } >> "${GITHUB_STEP_SUMMARY}"
+
+      - name: Notify Slack
+        if: always()
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          JOB_STATUS: ${{ job.status }}
+          RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set -euo pipefail
+
+          if [ -z "${SLACK_WEBHOOK_URL:-}" ]; then
+            echo "SLACK_WEBHOOK_URL is not set; skipping Slack notification."
+            exit 0
+          fi
+
+          if [ "${JOB_STATUS}" = "success" ]; then
+            STATUS_TEXT="GovAI nightly full validation passed"
+          else
+            STATUS_TEXT="GovAI nightly full validation failed"
+          fi
+
+          python3 - <<'PY_NOTIFY'
+          import json
+          import os
+          import urllib.request
+
+          webhook = os.environ["SLACK_WEBHOOK_URL"]
+          text = (
+              f"{os.environ['STATUS_TEXT']}\n"
+              f"Repository: ${{ github.repository }}\n"
+              f"Branch: ${{ github.ref_name }}\n"
+              f"Run: {os.environ['RUN_URL']}"
+          )
+          data = json.dumps({"text": text}).encode("utf-8")
+          req = urllib.request.Request(
+              webhook,
+              data=data,
+              headers={"Content-Type": "application/json"},
+              method="POST",
+          )
+          urllib.request.urlopen(req, timeout=20).read()
+          PY_NOTIFY

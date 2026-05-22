@@ -1,0 +1,180 @@
+name: "GovAI artifact-bound compliance gate"
+description: >-
+  Posts CI-produced evidence artefacts to the GovAI ledger, verifies digest continuity via
+  events_content_sha256, and fails CI unless hosted evaluation is VALID (production semantics).
+
+branding:
+  icon: activity
+  color: blue
+
+inputs:
+  run_id:
+    description: >-
+      Evidence run id (same identifier as CI evidence artefacts: <artifacts_path>/<run_id>.json).
+    required: true
+  artifacts_path:
+    description: >-
+      Directory containing CI evidence artefacts: evidence_digest_manifest.json and <run_id>.json
+      (typically downloaded from CI upload-artifact steps).
+    required: true
+  base_url:
+    description: "GovAI audit service base URL"
+    required: true
+  api_key:
+    description: "GovAI API key"
+    required: true
+  project:
+    description: "Optional project label (X-GovAI-Project, metadata only). Default: github-actions."
+    required: false
+    default: "github-actions"
+  require_export:
+    description: >-
+      When true, pass --require-export to verify-evidence-pack (fail if /api/export cross-check is unavailable).
+    required: false
+    default: "true"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.11"
+
+    - name: Install GovAI CLI
+      shell: bash
+      run: |
+        set -euo pipefail
+        python -m pip install --upgrade pip
+        python -m pip install "aigov-py==0.2.1"
+        govai --help >/dev/null
+
+    - name: Artifact-bound gate (submit + verify)
+      shell: bash
+      env:
+        GOVAI_AUDIT_BASE_URL: ${{ inputs.base_url }}
+        GOVAI_API_KEY: ${{ inputs.api_key }}
+        GOVAI_PROJECT: ${{ inputs.project }}
+      run: |
+        set -euo pipefail
+
+        if [ -z "${{ inputs.run_id }}" ]; then
+          echo "::error::Missing required input: run_id"
+          exit 4
+        fi
+
+        if [ -z "${{ inputs.artifacts_path }}" ]; then
+          echo "::error::Missing required input: artifacts_path (directory from CI artefacts)"
+          exit 4
+        fi
+
+        if [ ! -d "${{ inputs.artifacts_path }}" ]; then
+          echo "::error::artifacts_path is not a directory: ${{ inputs.artifacts_path }}"
+          exit 4
+        fi
+
+        if [ -z "${GOVAI_AUDIT_BASE_URL:-}" ]; then
+          echo "::error::Missing required input: base_url"
+          exit 4
+        fi
+
+        if [ -z "${GOVAI_API_KEY:-}" ]; then
+          echo "::error::Missing required input: api_key (set GOVAI_API_KEY as a GitHub Actions secret and pass it to the action)"
+          exit 4
+        fi
+
+        ARTIFACTS="$(cd "${{ inputs.artifacts_path }}" && pwd)"
+        RUN_ID="${{ inputs.run_id }}"
+        REQUIRE_EXPORT_FLAG=""
+        if [ "${{ inputs.require_export }}" = "true" ]; then
+          REQUIRE_EXPORT_FLAG="--require-export"
+        fi
+
+        echo "::group::GovAI gate inputs"
+        echo "Effective GOVAI_RUN_ID=${RUN_ID}"
+        echo "Effective GOVAI_ARTIFACTS_DIR=${ARTIFACTS}"
+        echo "Effective GOVAI_AUDIT_BASE_URL=${GOVAI_AUDIT_BASE_URL}"
+        echo "Effective GOVAI_PROJECT=${GOVAI_PROJECT:-}"
+        echo "Effective require_export=${{ inputs.require_export }}"
+        echo "::endgroup::"
+
+        echo "::group::GovAI submit evidence pack"
+        govai --project "${GOVAI_PROJECT:-github-actions}" submit-evidence-pack \
+          --path "${ARTIFACTS}" \
+          --run-id "${RUN_ID}"
+        echo "::endgroup::"
+
+        set +e
+        echo "::group::GovAI verify evidence pack (digest continuity + verdict)"
+        # shellcheck disable=SC2086
+        govai --project "${GOVAI_PROJECT:-github-actions}" verify-evidence-pack \
+          --path "${ARTIFACTS}" \
+          --run-id "${RUN_ID}" \
+          ${REQUIRE_EXPORT_FLAG}
+        verify_code="$?"
+        echo "::endgroup::"
+        set -e
+
+        printf '\nGovAI artifact-bound gate exit code=%s\n' "${verify_code}"
+        case "${verify_code}" in
+          0)
+            printf 'GovAI gate result: PASS (verdict VALID)\n'
+            ;;
+          1)
+            printf 'GovAI gate result: FAIL (ERROR)\n'
+            echo "::error::GovAI gate failed due to transport/HTTP/parse/digest mismatch. See grouped logs above."
+            ;;
+          2)
+            printf 'GovAI gate result: FAIL (INVALID)\n'
+            echo "::error::GovAI verdict INVALID (evaluation explicitly failed). See details above."
+            ;;
+          3)
+            printf 'GovAI gate result: FAIL (BLOCKED)\n'
+            echo "::error::GovAI verdict BLOCKED (missing required evidence and/or promotion prerequisites). See missing/blocked details above."
+            ;;
+          4)
+            printf 'GovAI gate result: FAIL (USAGE)\n'
+            echo "::error::GovAI gate misconfigured (missing inputs/flags)."
+            ;;
+        esac
+        printf 'Exit codes (cli_exit): 1=ERROR · 2=INVALID · 3=BLOCKED · 4=USAGE\n'
+
+        # Deterministic one-screen summary (append-only; control flow unchanged).
+        verdict="ERROR"
+        category="integration"
+        reason_codes='["INTEGRATION_ERROR"]'
+        next_action="Check GOVAI_AUDIT_BASE_URL and GOVAI_API_KEY (and network), then re-run this job."
+        if [ "${verify_code}" = "0" ]; then
+          verdict="VALID"
+          category="policy"
+          reason_codes="[]"
+          next_action="Proceed with deployment."
+        elif [ "${verify_code}" = "2" ]; then
+          verdict="INVALID"
+          category="policy"
+          reason_codes='["EVALUATION_FAILED"]'
+          next_action="Fix the failed evaluation evidence and re-run this job."
+        elif [ "${verify_code}" = "3" ]; then
+          verdict="BLOCKED"
+          category="evidence"
+          reason_codes='["EVIDENCE_MISSING"]'
+          next_action="Submit the missing evidence for this run_id, then re-run this job."
+        elif [ "${verify_code}" = "4" ]; then
+          verdict="ERROR"
+          category="integration"
+          reason_codes='["USAGE_ERROR"]'
+          next_action="Fix action inputs (run_id/artifacts_path/base_url/api_key), then re-run this job."
+        fi
+
+        repro_cmd="govai --project \"${GOVAI_PROJECT:-github-actions}\" verify-evidence-pack --path \"${ARTIFACTS}\" --run-id \"${RUN_ID}\" ${REQUIRE_EXPORT_FLAG}"
+
+        printf '%s\n' "--------------------------------"
+        printf '%s\n' "GovAI summary"
+        printf 'verdict: %s\n' "${verdict}"
+        printf 'category: %s\n' "${category}"
+        printf 'reason_codes: %s\n' "${reason_codes}"
+        printf 'next_action: %s\n' "${next_action}"
+        printf 'repro: %s\n' "${repro_cmd}"
+        printf '%s\n' "--------------------------------"
+
+        exit "${verify_code}"

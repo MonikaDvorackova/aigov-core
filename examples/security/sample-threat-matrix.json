@@ -1,0 +1,70 @@
+{
+  "categories": [
+    {
+      "adversary_capability": "Privileged operator or compromised admin account modifies ledger files or database rows outside enforced append-only interfaces.",
+      "id": "insider_tampering",
+      "in_scope": true,
+      "mitigation": "Append-only hash-chained storage, least-privilege RBAC, separation of duties, external copies of exports, integrity verification endpoints.",
+      "out_of_scope": "Insider with unfettered OS access who disables all controls simultaneously; supply-chain replacement of the entire runtime.",
+      "residual_risk": "Break-glass procedures and offline backups can still be abused if policy is weak."
+    },
+    {
+      "adversary_capability": "Attacker deletes or truncates evidence logs, bundles, or export archives to hide non-compliance.",
+      "id": "evidence_deletion",
+      "in_scope": true,
+      "mitigation": "Immutable or WORM storage where deployed, replicated exports to independent systems, hash checkpoints, off-site backups.",
+      "out_of_scope": "Recovery of evidence never ingested; protection when the deployer refuses all external replication.",
+      "residual_risk": "If no independent copy exists, deletion may be undetectable beyond absence of records."
+    },
+    {
+      "adversary_capability": "Model provider and deploying organisation collude to omit unfavourable evaluations or incidents from submitted evidence.",
+      "id": "provider_deployer_collusion",
+      "in_scope": true,
+      "mitigation": "Third-party monitoring, customer-controlled keys, independent attestation, regulatory access to raw telemetry outside vendor-only channels.",
+      "out_of_scope": "Cryptographic proof of model weights or hidden provider behaviour without agreed attestation APIs.",
+      "residual_risk": "Collusion undermines any voluntary disclosure regime."
+    },
+    {
+      "adversary_capability": "API keys, JWT signing material, or database credentials exfiltrated; attacker forges evidence or verdict reads.",
+      "id": "key_compromise",
+      "in_scope": true,
+      "mitigation": "Short-lived credentials, HSM/KMS where available, rotation, anomaly detection, mTLS between CI and audit service.",
+      "out_of_scope": "Endpoint compromise that exfiltrates plaintext after legitimate decryption.",
+      "residual_risk": "Stolen active sessions may still submit events until revocation."
+    },
+    {
+      "adversary_capability": "Withholding evidence submission so runs remain BLOCKED or ambiguous indefinitely.",
+      "id": "denial_of_evidence",
+      "in_scope": true,
+      "mitigation": "Policy timeouts, escalation workflows, contractual audit rights, fail-closed defaults documented in trust model.",
+      "out_of_scope": "Forcing a vendor to produce proprietary telemetry they legally cannot export.",
+      "residual_risk": "Organisational deadlock is a process problem, not solely technical."
+    },
+    {
+      "adversary_capability": "Fabricated metrics, synthetic benchmarks, or misleading model cards supplied as evidence events.",
+      "id": "false_inputs",
+      "in_scope": true,
+      "mitigation": "Signed attestations where available, cross-checks against independent probes, human review gates, anomaly rules on ingest.",
+      "out_of_scope": "Semantic guarantee that natural-language claims are truthful.",
+      "residual_risk": "High-quality false data may pass structural checks."
+    },
+    {
+      "adversary_capability": "Partial evidence set satisfies schema but omits decisive incidents or populations.",
+      "id": "incomplete_evidence",
+      "in_scope": true,
+      "mitigation": "Explicit required-evidence model, discovery-driven requirements, BLOCKED semantics until prerequisites met.",
+      "out_of_scope": "Detection of unknown unknowns never instrumented in the first place.",
+      "residual_risk": "Policy may be under-specified relative to real harm scenarios."
+    },
+    {
+      "adversary_capability": "Provider refuses model lineage, safety benchmark, or usage metadata needed for policy.",
+      "id": "unavailable_provider_metadata",
+      "in_scope": true,
+      "mitigation": "Fallback strategies (see docs/standards/fallback-strategies.md), contractual minimums, open-weights alternatives, regulatory pressure.",
+      "out_of_scope": "Extracting trade secrets absent legal authority or cooperation.",
+      "residual_risk": "Some deployments cannot reach VALID without vendor cooperation."
+    }
+  ],
+  "description": "Structured threat rows aligned with GovAI research documentation; illustrative, not exhaustive.",
+  "version": 1
+}

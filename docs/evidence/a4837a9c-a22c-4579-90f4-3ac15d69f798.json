@@ -1,0 +1,134 @@
+{
+  "run_id": "a4837a9c-a22c-4579-90f4-3ac15d69f798",
+  "created_ts_utc": "2026-02-04T13:03:48.148560Z",
+  "events": [
+    {
+      "id": "approve_started_a4837a9c-a22c-4579-90f4-3ac15d69f798_e8d8e4f8-ea2e-4fff-9071-47034b9c7e8a",
+      "type": "approve_started",
+      "ts_utc": "2026-02-04T13:03:48.148218Z",
+      "actor": "monika",
+      "system": "aigov_poc",
+      "run_id": "a4837a9c-a22c-4579-90f4-3ac15d69f798",
+      "payload": {
+        "approval_attempt_id": "ha_a4837a9c-a22c-4579-90f4-3ac15d69f798_4ac7c038-58d3-4a69-b57c-83c10e1a8068"
+      },
+      "prev_sha256": null,
+      "sha256": "e9972c8bab9643b0e07f1208245722db9281d96f91606ba90d2b80404242f422"
+    },
+    {
+      "id": "human_approved_a4837a9c-a22c-4579-90f4-3ac15d69f798_8cd56feb-6b99-4699-9cab-05f36e26d94f",
+      "type": "human_approved",
+      "ts_utc": "2026-02-04T13:03:48.166145Z",
+      "actor": "monika",
+      "system": "aigov_poc",
+      "run_id": "a4837a9c-a22c-4579-90f4-3ac15d69f798",
+      "payload": {
+        "approval_attempt_id": "ha_a4837a9c-a22c-4579-90f4-3ac15d69f798_4ac7c038-58d3-4a69-b57c-83c10e1a8068",
+        "request": {
+          "event_id": "ha_a4837a9c-a22c-4579-90f4-3ac15d69f798_4ac7c038-58d3-4a69-b57c-83c10e1a8068",
+          "event_type": "human_approved",
+          "ts_utc": "2026-02-04T13:03:48.148218Z",
+          "actor": "monika",
+          "system": "aigov_poc",
+          "run_id": "a4837a9c-a22c-4579-90f4-3ac15d69f798",
+          "payload": {
+            "scope": "model_promoted",
+            "decision": "approve",
+            "approver": "compliance_officer",
+            "justification": "metrics meet threshold and dataset fingerprint verified"
+          }
+        },
+        "response": {
+          "ok": true,
+          "policy_version": "v0.4_human_approval",
+          "record_hash": "ca041d513c55ef64562d55cd4c544d5ca6be11ff8d11b0822b6aec5e4484f494"
+        }
+      },
+      "prev_sha256": "e9972c8bab9643b0e07f1208245722db9281d96f91606ba90d2b80404242f422",
+      "sha256": "605a64484c33fe8fec22bfcef8fce0081832361de36e7ec89813278c82dd334e"
+    },
+    {
+      "id": "evaluation_started_a4837a9c-a22c-4579-90f4-3ac15d69f798_58cf682c-89c0-4703-b459-db4761138ce7",
+      "type": "evaluation_started",
+      "ts_utc": "2026-02-04T13:03:50.526403Z",
+      "actor": "monika",
+      "system": "aigov_poc",
+      "run_id": "a4837a9c-a22c-4579-90f4-3ac15d69f798",
+      "payload": {
+        "ts_utc": "2026-02-04T13:03:50.526061Z",
+        "remote_event_id": "eval_a4837a9c-a22c-4579-90f4-3ac15d69f798_aa405c6b-770a-4d44-aa72-3d0e3d56930b",
+        "metric": "f1"
+      },
+      "prev_sha256": "605a64484c33fe8fec22bfcef8fce0081832361de36e7ec89813278c82dd334e",
+      "sha256": "087c38e1be07a3e177bbcdacc0443139b88947adbba90892335e1faef0aa2763"
+    },
+    {
+      "id": "evaluation_reported_a4837a9c-a22c-4579-90f4-3ac15d69f798_2fbde7bd-e907-49e3-856e-012b2c31c476",
+      "type": "evaluation_reported",
+      "ts_utc": "2026-02-04T13:03:50.541297Z",
+      "actor": "monika",
+      "system": "aigov_poc",
+      "run_id": "a4837a9c-a22c-4579-90f4-3ac15d69f798",
+      "payload": {
+        "ts_utc": "2026-02-04T13:03:50.526061Z",
+        "remote_event_id": "eval_a4837a9c-a22c-4579-90f4-3ac15d69f798_aa405c6b-770a-4d44-aa72-3d0e3d56930b",
+        "http_status": 200,
+        "response_text": "{\"ok\":true,\"policy_version\":\"v0.4_human_approval\",\"record_hash\":\"7866034a46c26ffb5b9a27ce00a072aad995b7d76a80102001756b48dd130658\"}",
+        "metric": "f1",
+        "value": 1.0,
+        "threshold": 0.85,
+        "passed": true
+      },
+      "prev_sha256": "087c38e1be07a3e177bbcdacc0443139b88947adbba90892335e1faef0aa2763",
+      "sha256": "3fbc1bc29db2ce940a07954cabe2e290a59ec704f87da2f3161dae5af1327ddf"
+    },
+    {
+      "id": "promote_started_a4837a9c-a22c-4579-90f4-3ac15d69f798_c3596c46-8903-4045-a236-8a1820e2d26b",
+      "type": "promote_started",
+      "ts_utc": "2026-02-04T13:03:50.670950Z",
+      "actor": "monika",
+      "system": "aigov_poc",
+      "run_id": "a4837a9c-a22c-4579-90f4-3ac15d69f798",
+      "payload": {
+        "promotion_attempt_id": "mp_after_approval_a4837a9c-a22c-4579-90f4-3ac15d69f798_b97b6b47-2244-4e08-b055-3fdc2800ca17"
+      },
+      "prev_sha256": "3fbc1bc29db2ce940a07954cabe2e290a59ec704f87da2f3161dae5af1327ddf",
+      "sha256": "1a88002e6d15fb056b08e7eefd18f81228b55056fbefa44ba2af0cb74839ec10"
+    },
+    {
+      "id": "model_promoted_a4837a9c-a22c-4579-90f4-3ac15d69f798_ae967905-abf9-4d24-a984-fc90ffd3589d",
+      "type": "model_promoted",
+      "ts_utc": "2026-02-04T13:03:50.686180Z",
+      "actor": "monika",
+      "system": "aigov_poc",
+      "run_id": "a4837a9c-a22c-4579-90f4-3ac15d69f798",
+      "payload": {
+        "promotion_attempt_id": "mp_after_approval_a4837a9c-a22c-4579-90f4-3ac15d69f798_b97b6b47-2244-4e08-b055-3fdc2800ca17",
+        "request": {
+          "event_id": "mp_after_approval_a4837a9c-a22c-4579-90f4-3ac15d69f798_b97b6b47-2244-4e08-b055-3fdc2800ca17",
+          "event_type": "model_promoted",
+          "ts_utc": "2026-02-04T13:03:50.670950Z",
+          "actor": "monika",
+          "system": "aigov_poc",
+          "run_id": "a4837a9c-a22c-4579-90f4-3ac15d69f798",
+          "payload": {
+            "artifact_path": "python/artifacts/model_a4837a9c-a22c-4579-90f4-3ac15d69f798.joblib",
+            "promotion_reason": "approved_by_human"
+          }
+        },
+        "response": {
+          "ok": true,
+          "policy_version": "v0.4_human_approval",
+          "record_hash": "43f1cba3df78d0ccab837b6a001a4ce0a1ee733380b68f54557a31ccdc08f5f2"
+        }
+      },
+      "prev_sha256": "1a88002e6d15fb056b08e7eefd18f81228b55056fbefa44ba2af0cb74839ec10",
+      "sha256": "2c0fda0e51f1f9916ded60a8f0c16c9af9befed7ae45e638f6cd2efa1a39de20"
+    }
+  ],
+  "chain": {
+    "algorithm": "event_hash_chain_v1",
+    "head_sha256": "2c0fda0e51f1f9916ded60a8f0c16c9af9befed7ae45e638f6cd2efa1a39de20",
+    "ts_utc": "2026-02-04T13:03:50.686418Z"
+  }
+}

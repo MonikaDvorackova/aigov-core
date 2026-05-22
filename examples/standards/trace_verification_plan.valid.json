@@ -1,0 +1,19 @@
+{
+  "schema_version": "govai.standards.trace_verification_plan.v1",
+  "trace_id": "trace.demo",
+  "tenant_scope": "tenant.demo",
+  "requirements": [
+    {
+      "requirement_id": "req.chain",
+      "description": "Digest chain present"
+    }
+  ],
+  "findings": [
+    {
+      "finding_id": "f1",
+      "requirement_id": "req.chain",
+      "status": "PASS"
+    }
+  ],
+  "plan_digest": "sha256:26cb97db8839ae984c0e08f12faccf708e6be4000b1315846a7912d1780097ed"
+}

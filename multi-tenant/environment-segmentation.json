@@ -1,0 +1,51 @@
+{
+  "schema_version": "1.0.0",
+  "model_id": "govai.enterprise.environment_segmentation.v1",
+  "summary": "Environment tags, secret handling, and promotion rules separating experimentation from regulated production workloads.",
+  "environments": [
+    {
+      "tag": "development",
+      "risk_tier": "low",
+      "data_classes_allowed": [
+        "synthetic",
+        "public"
+      ],
+      "production_promotion_allowed": false
+    },
+    {
+      "tag": "staging",
+      "risk_tier": "medium",
+      "data_classes_allowed": [
+        "synthetic",
+        "internal_non_phi"
+      ],
+      "production_promotion_allowed": false
+    },
+    {
+      "tag": "production",
+      "risk_tier": "high",
+      "data_classes_allowed": [
+        "internal_non_phi",
+        "regulated_customer_defined"
+      ],
+      "production_promotion_allowed": true
+    }
+  ],
+  "network_isolation": {
+    "separate_credentials_per_environment": true,
+    "cross_env_connectivity_default": "deny"
+  },
+  "secret_naming_convention": {
+    "pattern": "GOVAI_{ENV}_{TENANT}_{SECRET_NAME}",
+    "rotation_days_recommended": 90
+  },
+  "data_replication_rules": {
+    "cross_region_copy_requires_classification_review": true,
+    "customer_keys_per_region": true
+  },
+  "promotion_requirements": [
+    "policy_signoff_recorded",
+    "evidence_bundle_present_for_release_candidate",
+    "no_open_break_glass_sessions"
+  ]
+}

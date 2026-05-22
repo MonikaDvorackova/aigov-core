@@ -1,0 +1,41 @@
+# Example operator layout: place this file inside your GovAI clone or copy next to a
+# checkout of the upstream repository. Build context points at ../../../rust from
+# examples/adoption/self-hosted-enterprise/; adjust if you relocate the file.
+#
+# Not production-hardened — see docs/hosted-backend-deployment.md and
+# docs/security/secure-deployment-checklist.md before production use.
+
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: govai
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - govai-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d govai"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  govai-audit:
+    build:
+      context: ../../../rust
+      dockerfile: Dockerfile
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      AIGOV_BIND: "0.0.0.0:8088"
+      GOVAI_AUTO_MIGRATE: "true"
+      DATABASE_URL: "postgres://postgres:postgres@db:5432/govai"
+      GOVAI_API_KEYS: "${GOVAI_API_KEYS:-change-me-dev-only}"
+    ports:
+      - "8088:8088"
+
+volumes:
+  govai-postgres-data:

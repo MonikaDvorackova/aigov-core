@@ -1,0 +1,54 @@
+{
+  "schema_version": "1.0.0",
+  "model_id": "govai.enterprise.delegated_administration.v1",
+  "summary": "Scoped administrators, time-bound elevation, and break-glass patterns for regulated tenants.",
+  "delegation_scopes": [
+    {
+      "scope_id": "nonprod_only",
+      "description": "Grants admin actions only in development and staging environment tags.",
+      "allowed_environment_tags": [
+        "development",
+        "staging"
+      ]
+    },
+    {
+      "scope_id": "read_export_only",
+      "description": "May request exports already permitted by policy; cannot widen policy.",
+      "allowed_actions": [
+        "compliance.read_summary",
+        "evidence.export"
+      ]
+    },
+    {
+      "scope_id": "integration_limited",
+      "description": "Webhook URLs and integration credentials in non-production only.",
+      "allowed_actions": [
+        "integration.manage_webhooks"
+      ],
+      "allowed_environment_tags": [
+        "development",
+        "staging"
+      ]
+    }
+  ],
+  "max_scope_duration_hours": 8,
+  "break_glass_roles": [
+    {
+      "role_id": "platform_break_glass_operator",
+      "requires": [
+        "mfa",
+        "ticket_reference",
+        "peer_approval"
+      ],
+      "max_session_minutes": 60
+    }
+  ],
+  "attestation_required": true,
+  "delegation_audit_events": [
+    "delegation.granted",
+    "delegation.revoked",
+    "delegation.scope_elevated",
+    "break_glass.started",
+    "break_glass.ended"
+  ]
+}

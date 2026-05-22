@@ -1,0 +1,26 @@
+{
+  "schema_version": "govai.standards.governance_evidence_pack.v1",
+  "pack_id": "pack.demo",
+  "tenant_scope": "tenant.demo",
+  "run_id": "00000000-0000-4000-8000-000000000001",
+  "artifacts": [
+    {
+      "artifact_id": "art.policy",
+      "artifact_type": "capability_policy",
+      "uri": "https://example.invalid/pol.demo.json",
+      "content_digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "evidence_type": "GOVERNED",
+      "control_refs": ["ctrl.logging.1"],
+      "ai_act_refs": ["Art.12(1)"]
+    }
+  ],
+  "digest_manifest": {
+    "entries": [
+      {
+        "artifact_id": "art.policy",
+        "content_digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      }
+    ]
+  },
+  "pack_digest": "sha256:22daf2bd765040980deb23b55f2f80cb9b566547ca440b321f892d552338679d"
+}

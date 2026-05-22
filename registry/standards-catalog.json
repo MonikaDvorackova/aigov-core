@@ -1,0 +1,40 @@
+{
+  "catalog_kind": "govai_standards_catalog",
+  "schema_version": "1",
+  "standards": [
+    {
+      "artifact_type": "governance_decision_trace",
+      "documentation_paths": [
+        "docs/standards/interchange-specification.md",
+        "docs/standards/registry.md"
+      ],
+      "id": "std.governance_decision_trace.v1",
+      "interchange_schema_version": "govai.standards.governance_decision_trace.v1",
+      "json_schema_path": "schemas/governance-decision-trace.schema.json",
+      "python_validator_hint": "aigov_py.standards.decision_trace.validate_governance_decision_trace_document"
+    },
+    {
+      "artifact_type": "governance_evidence_pack",
+      "documentation_paths": [
+        "docs/standards/interchange-specification.md",
+        "docs/standards/registry.md"
+      ],
+      "id": "std.governance_evidence_pack.v1",
+      "interchange_schema_version": "govai.standards.governance_evidence_pack.v1",
+      "json_schema_path": "schemas/governance-evidence-pack.schema.json",
+      "python_validator_hint": "aigov_py.standards.evidence_pack.validate_governance_evidence_pack_document"
+    },
+    {
+      "artifact_type": "governance_policy_module",
+      "documentation_paths": [
+        "docs/standards/interchange-specification.md",
+        "docs/standards/registry.md"
+      ],
+      "id": "std.governance_policy_module.v1",
+      "interchange_schema_version": "govai.standards.governance_policy_module.v1",
+      "json_schema_path": "schemas/governance-policy-module.schema.json",
+      "python_validator_hint": "aigov_py.standards.policy_module.validate_governance_policy_module_document"
+    }
+  ],
+  "summary": "Versioned interchange standards for GovAI governance JSON artefacts. Each entry maps an interchange schema version to an on-disk JSON Schema and documentation paths for external implementers."
+}

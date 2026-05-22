@@ -1,0 +1,374 @@
+{
+  "dataset_governance": {
+    "ai_system_id": "aigov_poc",
+    "dataset": "iris",
+    "dataset_fingerprint": "c45a292b1d906e5d24213ec35f8123803f1b362a5a5ce5a857e242e1e34a5362",
+    "dataset_governance_commitment": "6cedeca7debccd0deae7954eb2a109f9da73a069c82929b211b6b782bb4b268a",
+    "dataset_governance_id": "dataset_iris_v1",
+    "dataset_id": "dataset_iris_v1",
+    "dataset_version": "v1",
+    "governance_status": "governed",
+    "intended_use": "Proof-of-concept governance demo (classification on Iris features).",
+    "limitations": "Synthetic demo dataset; not representative of real-world populations.",
+    "quality_summary": "Rows=150, Features=4, Classes=3, Balanced labels; fingerprinted for traceability.",
+    "source": "sklearn.datasets.load_iris()"
+  },
+  "evaluation": {
+    "ai_system_id": "aigov_poc",
+    "dataset_id": "dataset_iris_v1",
+    "event_id": "5d89412d-f8cb-42e4-8dd9-630eb77e1b75",
+    "metric": "accuracy",
+    "model_version_id": "model_version_01_local-govai-check-test",
+    "passed": true,
+    "threshold": 0.8,
+    "ts_utc": "2026-04-28T14:10:42.603452Z",
+    "value": 0.9666666666666668
+  },
+  "events": [
+    {
+      "actor": "monika",
+      "environment": "dev",
+      "event_id": "f03b8008-7218-4d3e-a342-e15b81c62799",
+      "event_type": "run_started",
+      "payload": {
+        "ai_system_id": "aigov_poc",
+        "dataset_id": "dataset_iris_v1",
+        "model_version_id": "model_version_01_local-govai-check-test",
+        "purpose": "poc_train_pending_approval",
+        "risk_id": "risk_01_local-govai-check-test"
+      },
+      "run_id": "local-govai-check-test",
+      "system": "aigov_poc",
+      "ts_utc": "2026-04-28T14:10:42.375488Z"
+    },
+    {
+      "actor": "monika",
+      "environment": "dev",
+      "event_id": "f75e90eb-5cd5-4d1b-977e-aafcdfdc5be6",
+      "event_type": "data_registered",
+      "payload": {
+        "ai_system_id": "aigov_poc",
+        "dataset": "iris",
+        "dataset_fingerprint": "c45a292b1d906e5d24213ec35f8123803f1b362a5a5ce5a857e242e1e34a5362",
+        "dataset_governance_commitment": "6cedeca7debccd0deae7954eb2a109f9da73a069c82929b211b6b782bb4b268a",
+        "dataset_governance_id": "dataset_iris_v1",
+        "dataset_id": "dataset_iris_v1",
+        "dataset_version": "v1",
+        "governance_status": "governed",
+        "intended_use": "Proof-of-concept governance demo (classification on Iris features).",
+        "limitations": "Synthetic demo dataset; not representative of real-world populations.",
+        "n_features": 4,
+        "n_rows": 150,
+        "quality_summary": "Rows=150, Features=4, Classes=3, Balanced labels; fingerprinted for traceability.",
+        "source": "sklearn.datasets.load_iris()",
+        "target_names": [
+          "setosa",
+          "versicolor",
+          "virginica"
+        ]
+      },
+      "run_id": "local-govai-check-test",
+      "system": "aigov_poc",
+      "ts_utc": "2026-04-28T14:10:42.557602Z"
+    },
+    {
+      "actor": "monika",
+      "environment": "dev",
+      "event_id": "070c4532-f31a-42a7-97b0-4a5fb8f359c6",
+      "event_type": "model_trained",
+      "payload": {
+        "ai_system_id": "aigov_poc",
+        "artifact_path": "python/artifacts/model_local-govai-check-test.joblib",
+        "artifact_sha256": "PENDING",
+        "dataset_id": "dataset_iris_v1",
+        "model_type": "LogisticRegression",
+        "model_version_id": "model_version_01_local-govai-check-test",
+        "training_params": {
+          "C": 1.0,
+          "class_weight": null,
+          "dual": false,
+          "fit_intercept": true,
+          "intercept_scaling": 1,
+          "l1_ratio": 0.0,
+          "max_iter": 200,
+          "n_jobs": null,
+          "penalty": "deprecated",
+          "random_state": null,
+          "solver": "lbfgs",
+          "tol": 0.0001,
+          "verbose": 0,
+          "warm_start": false
+        }
+      },
+      "run_id": "local-govai-check-test",
+      "system": "aigov_poc",
+      "ts_utc": "2026-04-28T14:10:42.600090Z"
+    },
+    {
+      "actor": "monika",
+      "environment": "dev",
+      "event_id": "5d89412d-f8cb-42e4-8dd9-630eb77e1b75",
+      "event_type": "evaluation_reported",
+      "payload": {
+        "ai_system_id": "aigov_poc",
+        "dataset_id": "dataset_iris_v1",
+        "metric": "accuracy",
+        "model_version_id": "model_version_01_local-govai-check-test",
+        "passed": true,
+        "threshold": 0.8,
+        "value": 0.9666666666666668
+      },
+      "run_id": "local-govai-check-test",
+      "system": "aigov_poc",
+      "ts_utc": "2026-04-28T14:10:42.603452Z"
+    },
+    {
+      "actor": "monika",
+      "environment": "dev",
+      "event_id": "64aebd07-05c7-4e40-b135-c2b8adb4c9a6",
+      "event_type": "model_trained",
+      "payload": {
+        "ai_system_id": "aigov_poc",
+        "artifact_path": "python/artifacts/model_local-govai-check-test.joblib",
+        "artifact_sha256": "073c78a764001792ad9c4428bc0bdee1cea782d0f13dc32e95c66206772ae360",
+        "dataset_id": "dataset_iris_v1",
+        "model_type": "LogisticRegression",
+        "model_version_id": "model_version_01_local-govai-check-test",
+        "training_params": {
+          "C": 1.0,
+          "class_weight": null,
+          "dual": false,
+          "fit_intercept": true,
+          "intercept_scaling": 1,
+          "l1_ratio": 0.0,
+          "max_iter": 200,
+          "n_jobs": null,
+          "penalty": "deprecated",
+          "random_state": null,
+          "solver": "lbfgs",
+          "tol": 0.0001,
+          "verbose": 0,
+          "warm_start": false
+        }
+      },
+      "run_id": "local-govai-check-test",
+      "system": "aigov_poc",
+      "ts_utc": "2026-04-28T14:10:42.608589Z"
+    },
+    {
+      "actor": "monika",
+      "environment": "dev",
+      "event_id": "720fd622-e5e3-4daa-a447-e3da1e144af8",
+      "event_type": "risk_recorded",
+      "payload": {
+        "ai_system_id": "aigov_poc",
+        "assessment_id": "assessment_01_local-govai-check-test",
+        "dataset_governance_commitment": "6cedeca7debccd0deae7954eb2a109f9da73a069c82929b211b6b782bb4b268a",
+        "dataset_id": "dataset_iris_v1",
+        "likelihood": 0.3,
+        "mitigation": "Establish evaluation threshold and require human promotion approval.",
+        "model_version_id": "model_version_01_local-govai-check-test",
+        "owner": "risk_owner",
+        "risk_class": "high",
+        "risk_id": "risk_01_local-govai-check-test",
+        "severity": 4.0,
+        "status": "submitted"
+      },
+      "run_id": "local-govai-check-test",
+      "system": "aigov_poc",
+      "ts_utc": "2026-04-28T14:10:42.612518Z"
+    },
+    {
+      "actor": "monika",
+      "environment": "dev",
+      "event_id": "0486a2f3-4315-42ba-9cb0-62e49f4dda74",
+      "event_type": "risk_mitigated",
+      "payload": {
+        "ai_system_id": "aigov_poc",
+        "assessment_id": "assessment_01_local-govai-check-test",
+        "dataset_governance_commitment": "6cedeca7debccd0deae7954eb2a109f9da73a069c82929b211b6b782bb4b268a",
+        "dataset_id": "dataset_iris_v1",
+        "mitigation": "Mitigation applied: restrict intended use to the governed demo scope + enforce passed evaluation gate.",
+        "model_version_id": "model_version_01_local-govai-check-test",
+        "risk_id": "risk_01_local-govai-check-test",
+        "status": "mitigated"
+      },
+      "run_id": "local-govai-check-test",
+      "system": "aigov_poc",
+      "ts_utc": "2026-04-28T14:10:42.615344Z"
+    },
+    {
+      "actor": "monika",
+      "environment": "dev",
+      "event_id": "e43a797b-de0d-4ef6-a8f0-84c5fa02fed8",
+      "event_type": "risk_reviewed",
+      "payload": {
+        "ai_system_id": "aigov_poc",
+        "assessment_id": "assessment_01_local-govai-check-test",
+        "dataset_governance_commitment": "6cedeca7debccd0deae7954eb2a109f9da73a069c82929b211b6b782bb4b268a",
+        "dataset_id": "dataset_iris_v1",
+        "decision": "approve",
+        "justification": "Dataset governance commitment verified; evaluation threshold and human oversight requested before promotion.",
+        "model_version_id": "model_version_01_local-govai-check-test",
+        "reviewer": "risk_officer",
+        "risk_id": "risk_01_local-govai-check-test"
+      },
+      "run_id": "local-govai-check-test",
+      "system": "aigov_poc",
+      "ts_utc": "2026-04-28T14:10:42.618311Z"
+    },
+    {
+      "actor": "monika",
+      "environment": "dev",
+      "event_id": "ha_local-govai-check-test",
+      "event_type": "human_approved",
+      "payload": {
+        "ai_system_id": "aigov_poc",
+        "approver": "compliance_officer",
+        "assessment_id": "assessment_01_local-govai-check-test",
+        "dataset_governance_commitment": "6cedeca7debccd0deae7954eb2a109f9da73a069c82929b211b6b782bb4b268a",
+        "dataset_id": "dataset_iris_v1",
+        "decision": "approve",
+        "justification": "metrics meet threshold and dataset governance commitment verified",
+        "model_version_id": "model_version_01_local-govai-check-test",
+        "risk_id": "risk_01_local-govai-check-test",
+        "scope": "model_promoted"
+      },
+      "run_id": "local-govai-check-test",
+      "system": "aigov_poc",
+      "ts_utc": "2026-04-28T14:10:42.890888Z"
+    },
+    {
+      "actor": "monika",
+      "environment": "dev",
+      "event_id": "mp_after_approval_local-govai-check-test",
+      "event_type": "model_promoted",
+      "payload": {
+        "ai_system_id": "aigov_poc",
+        "approved_human_event_id": "ha_local-govai-check-test",
+        "artifact_path": "python/artifacts/model_local-govai-check-test.joblib",
+        "artifact_sha256": "073c78a764001792ad9c4428bc0bdee1cea782d0f13dc32e95c66206772ae360",
+        "assessment_id": "assessment_01_local-govai-check-test",
+        "dataset_governance_commitment": "6cedeca7debccd0deae7954eb2a109f9da73a069c82929b211b6b782bb4b268a",
+        "dataset_id": "dataset_iris_v1",
+        "model_version_id": "model_version_01_local-govai-check-test",
+        "promotion_reason": "approved_by_human",
+        "risk_id": "risk_01_local-govai-check-test"
+      },
+      "run_id": "local-govai-check-test",
+      "system": "aigov_poc",
+      "ts_utc": "2026-04-28T14:10:44.092774Z"
+    }
+  ],
+  "human_approval": {
+    "ai_system_id": "aigov_poc",
+    "approval_event_id": "ha_local-govai-check-test",
+    "approver": "compliance_officer",
+    "assessment_id": "assessment_01_local-govai-check-test",
+    "dataset_governance_commitment": "6cedeca7debccd0deae7954eb2a109f9da73a069c82929b211b6b782bb4b268a",
+    "dataset_id": "dataset_iris_v1",
+    "decision": "approve",
+    "justification": "metrics meet threshold and dataset governance commitment verified",
+    "model_version_id": "model_version_01_local-govai-check-test",
+    "risk_id": "risk_01_local-govai-check-test",
+    "ts_utc": "2026-04-28T14:10:42.890888Z"
+  },
+  "identifiers": {
+    "ai_system_id": "aigov_poc",
+    "dataset_id": "dataset_iris_v1",
+    "model_version_id": "model_version_01_local-govai-check-test",
+    "primary_risk_id": "risk_01_local-govai-check-test",
+    "risk_ids": [
+      "risk_01_local-govai-check-test"
+    ]
+  },
+  "log_path": "rust/audit_log__default.jsonl",
+  "model_artifact_path": "python/artifacts/model_local-govai-check-test.joblib",
+  "model_version": {
+    "ai_system_id": "aigov_poc",
+    "artifact_path": "python/artifacts/model_local-govai-check-test.joblib",
+    "artifact_sha256": "073c78a764001792ad9c4428bc0bdee1cea782d0f13dc32e95c66206772ae360",
+    "dataset_id": "dataset_iris_v1",
+    "model_type": "LogisticRegression",
+    "model_version_id": "model_version_01_local-govai-check-test",
+    "promotion_reason": "approved_by_human",
+    "trained_ts_utc": "2026-04-28T14:10:42.608589Z",
+    "training_params": {
+      "C": 1.0,
+      "class_weight": null,
+      "dual": false,
+      "fit_intercept": true,
+      "intercept_scaling": 1,
+      "l1_ratio": 0.0,
+      "max_iter": 200,
+      "n_jobs": null,
+      "penalty": "deprecated",
+      "random_state": null,
+      "solver": "lbfgs",
+      "tol": 0.0001,
+      "verbose": 0,
+      "warm_start": false
+    }
+  },
+  "ok": true,
+  "policy_version": "v0.5_dev",
+  "promotion": {
+    "ai_system_id": "aigov_poc",
+    "approved_human_event_id": "ha_local-govai-check-test",
+    "artifact_path": "python/artifacts/model_local-govai-check-test.joblib",
+    "artifact_sha256": "073c78a764001792ad9c4428bc0bdee1cea782d0f13dc32e95c66206772ae360",
+    "assessment_id": "assessment_01_local-govai-check-test",
+    "dataset_governance_commitment": "6cedeca7debccd0deae7954eb2a109f9da73a069c82929b211b6b782bb4b268a",
+    "dataset_id": "dataset_iris_v1",
+    "model_version_id": "model_version_01_local-govai-check-test",
+    "promotion_event_id": "mp_after_approval_local-govai-check-test",
+    "promotion_reason": "approved_by_human",
+    "risk_id": "risk_01_local-govai-check-test",
+    "ts_utc": "2026-04-28T14:10:44.092774Z"
+  },
+  "risk_register": {
+    "risks": [
+      {
+        "ai_system_id": "aigov_poc",
+        "assessment_id": "assessment_01_local-govai-check-test",
+        "dataset_governance_commitment": "6cedeca7debccd0deae7954eb2a109f9da73a069c82929b211b6b782bb4b268a",
+        "dataset_id": "dataset_iris_v1",
+        "history": [
+          {
+            "event_id": "720fd622-e5e3-4daa-a447-e3da1e144af8",
+            "event_type": "risk_recorded",
+            "ts_utc": "2026-04-28T14:10:42.612518Z"
+          },
+          {
+            "event_id": "0486a2f3-4315-42ba-9cb0-62e49f4dda74",
+            "event_type": "risk_mitigated",
+            "ts_utc": "2026-04-28T14:10:42.615344Z"
+          },
+          {
+            "event_id": "e43a797b-de0d-4ef6-a8f0-84c5fa02fed8",
+            "event_type": "risk_reviewed",
+            "ts_utc": "2026-04-28T14:10:42.618311Z"
+          }
+        ],
+        "latest_review": {
+          "decision": "approve",
+          "justification": "Dataset governance commitment verified; evaluation threshold and human oversight requested before promotion.",
+          "reviewer": "risk_officer",
+          "risk_review_event_id": "e43a797b-de0d-4ef6-a8f0-84c5fa02fed8",
+          "ts_utc": "2026-04-28T14:10:42.618311Z"
+        },
+        "likelihood": 0.3,
+        "mitigation": "Mitigation applied: restrict intended use to the governed demo scope + enforce passed evaluation gate.",
+        "model_version_id": "model_version_01_local-govai-check-test",
+        "owner": null,
+        "risk_class": "high",
+        "risk_id": "risk_01_local-govai-check-test",
+        "severity": 4.0,
+        "status": "mitigated"
+      }
+    ]
+  },
+  "run_id": "local-govai-check-test",
+  "schema_version": "aigov.bundle.v1",
+  "bundle_sha256": "3a18c9d176c4a3b5660231a9001d7eeb69995d5d5e1dc05eb95a61ad12292fe6"
+}

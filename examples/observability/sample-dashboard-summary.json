@@ -1,0 +1,28 @@
+{
+  "dashboard_id": "local-runtime-observability",
+  "description": "Local dashboard summary derived from sample-runtime-events.jsonl.",
+  "generated_from": "examples/observability/sample-runtime-events.jsonl",
+  "metrics": [
+    {
+      "id": "runtime_evaluations_total",
+      "value": 1
+    },
+    {
+      "id": "runtime_blocked_verdict_rate",
+      "value": 100
+    },
+    {
+      "id": "runtime_evaluation_latency_p95_ms",
+      "value": 42
+    },
+    {
+      "id": "audit_trace_correlated_events_total",
+      "value": 4
+    },
+    {
+      "id": "governance_incidents_total",
+      "value": 1
+    }
+  ],
+  "version": "1.0.0"
+}

@@ -1,0 +1,54 @@
+{
+  "version": 1,
+  "description": "Independent oracle for artifact-bundle replay (Experiment 2). Verdicts align with the closed-schema decision gate under file-derived digest and pack predicates.",
+  "scenarios": [
+    {
+      "scenario_name": "valid_complete_trace",
+      "expected_verdict": "VALID",
+      "injected_violation": false,
+      "should_pass": true
+    },
+    {
+      "scenario_name": "digest_mismatch_events_only",
+      "expected_verdict": "BLOCKED",
+      "injected_violation": true,
+      "should_pass": false
+    },
+    {
+      "scenario_name": "digest_mismatch_export_only",
+      "expected_verdict": "BLOCKED",
+      "injected_violation": true,
+      "should_pass": false
+    },
+    {
+      "scenario_name": "missing_evidence_pack",
+      "expected_verdict": "BLOCKED",
+      "injected_violation": true,
+      "should_pass": false
+    },
+    {
+      "scenario_name": "failed_compliance_evaluation",
+      "expected_verdict": "INVALID",
+      "injected_violation": true,
+      "should_pass": false
+    },
+    {
+      "scenario_name": "missing_approval_record",
+      "expected_verdict": "BLOCKED",
+      "injected_violation": true,
+      "should_pass": false
+    },
+    {
+      "scenario_name": "reordered_required_events",
+      "expected_verdict": "VALID",
+      "injected_violation": false,
+      "should_pass": true
+    },
+    {
+      "scenario_name": "policy_version_mismatch",
+      "expected_verdict": "BLOCKED",
+      "injected_violation": true,
+      "should_pass": false
+    }
+  ]
+}

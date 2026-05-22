@@ -1,0 +1,43 @@
+policy:
+  id: "ai-act-high-risk"
+  name: "EU AI Act — High-Risk (example mapping)"
+  version: "0.1.0"
+
+requirements:
+  - code: "AIACT.HR.01"
+    description: "AI discovery scan must be completed and recorded for this run."
+    required_evidence:
+      - ai_discovery_completed
+
+  - code: "AIACT.HR.02"
+    description: "Model registration and usage policy must exist before relying on hosted/OpenAI usage."
+    required_evidence:
+      - model_registered
+      - usage_policy_defined
+
+  - code: "AIACT.HR.03"
+    description: "Model training must be evidenced for the model version being promoted."
+    required_evidence:
+      - model_trained
+
+  - code: "AIACT.HR.04"
+    description: "Evaluation metrics must be reported as evidence before promotion."
+    required_evidence:
+      - evaluation_reported
+
+  - code: "AIACT.HR.05"
+    description: "A risk record must exist and be reviewed."
+    required_evidence:
+      - risk_recorded
+      - risk_reviewed
+
+  - code: "AIACT.HR.06"
+    description: "Human approval must be recorded before promotion."
+    required_evidence:
+      - human_approved
+
+  - code: "AIACT.HR.07"
+    description: "Promotion intent must be recorded as evidence (promotion is only accepted when prerequisites are satisfied)."
+    required_evidence:
+      - model_promoted
+

@@ -1,0 +1,13 @@
+schema_version: aigov.aiact_mappings.v1
+mappings:
+  - requirement_id: AIACT.HRA.ART_10.2.C
+    control_id: CTRL.DATA.LINEAGE.V1
+    mapping_strength: REQUIRED
+    applicability_risk_classes: [HIGH]
+    rationale: Dataset identity + digest lineage provides a concrete evidence anchor for data governance traceability.
+
+  - requirement_id: AIACT.HRA.ART_12.1
+    control_id: CTRL.GOV.AUDIT.REASON_CODES.V1
+    mapping_strength: RECOMMENDED
+    applicability_risk_classes: [HIGH]
+    rationale: A stable reason-code namespace improves log interpretability and readiness reporting.

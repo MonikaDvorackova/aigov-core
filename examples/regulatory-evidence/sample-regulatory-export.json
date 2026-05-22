@@ -1,0 +1,28 @@
+{
+  "export_kind": "govai_regulatory_evidence_sample",
+  "generated_by": "examples/regulatory-evidence/sample-regulatory-export.json (hand-authored structural analogue)",
+  "manifest_path": "docs/regulatory/regulatory-evidence-manifest.json",
+  "notes": "This JSON illustrates the kind of structured payload integrations may derive from validators; Markdown export is produced by scripts/generate_regulatory_evidence_export.py.",
+  "obligations_index": "docs/regulatory/ai-act-obligations.json",
+  "sample_obligations": [
+    {
+      "article_reference": "Article 9",
+      "category": "risk_management",
+      "evidence_paths": [
+        "docs/regulatory/risk-management-system.md"
+      ],
+      "id": "ai_act_article_9_risk_management_system",
+      "title": "Risk management system"
+    },
+    {
+      "article_reference": "Article 11",
+      "category": "technical_documentation",
+      "evidence_paths": [
+        "docs/regulatory/technical-documentation.md"
+      ],
+      "id": "ai_act_article_11_technical_documentation",
+      "title": "Technical documentation"
+    }
+  ],
+  "version": 1
+}

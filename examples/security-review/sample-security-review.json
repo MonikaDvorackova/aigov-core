@@ -1,0 +1,25 @@
+{
+  "description": "Illustrative shape for enterprise security review automation; values are examples only.",
+  "expected_security_trust_fields": [
+    "checked_paths",
+    "checks",
+    "failures",
+    "min_bytes_threshold",
+    "ok",
+    "score",
+    "version",
+    "warnings"
+  ],
+  "expected_trust_manifest_validation_fields": [
+    "checked_paths",
+    "errors",
+    "failures",
+    "manifest_path",
+    "ok",
+    "resolved_document_paths",
+    "version",
+    "warnings"
+  ],
+  "notes": "Run scripts/security_trust_check.py --json and scripts/validate_trust_manifest.py --json for live payloads.",
+  "repository_phase": "phase8_enterprise_security_trust"
+}

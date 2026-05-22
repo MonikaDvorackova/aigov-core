@@ -1,0 +1,59 @@
+{
+  "captured_at": "2026-05-12T16:00:00Z",
+  "diagnostics": {
+    "checks": [
+      {
+        "detail": "Guardrail pack version pinned and checksum recorded",
+        "name": "guardrail_pack_pinned",
+        "ok": true
+      },
+      {
+        "detail": "Human review queue depth within SLO for staging",
+        "name": "human_review_queue_depth",
+        "ok": true
+      },
+      {
+        "detail": "Override playbook artifact present at configured path",
+        "name": "override_playbook_presence",
+        "ok": true
+      },
+      {
+        "detail": "Break-glass drill completed within the last 30 days",
+        "name": "break_glass_drill_recency",
+        "ok": true
+      }
+    ],
+    "failure_count": 0,
+    "summary": "Staging window runtime safety preflight: guardrails active, escalation queues healthy, human supervisors staffed, override drill current.",
+    "warning_count": 0
+  },
+  "environment": "staging",
+  "escalation": {
+    "high_risk_sessions_escalated": 2,
+    "median_queue_wait_minutes": 8,
+    "pending_human_review_count": 0,
+    "sla_breaches_observed": 0
+  },
+  "guardrails": {
+    "content_filter_interventions": 4,
+    "guardrail_latency_p95_ms": 52,
+    "policy_denies_without_override": 6,
+    "prompt_injection_blocks_observed": 9,
+    "tool_allowlist_violations_blocked": 0
+  },
+  "human_oversight": {
+    "active_supervisors_count": 4,
+    "attribution_chain_complete_percent": 99,
+    "dual_control_sessions_completed": 1,
+    "human_review_coverage_percent": 100
+  },
+  "override_readiness": {
+    "audit_trail_export_latency_p95_seconds": 3,
+    "emergency_break_glass_last_drill_days_ago": 18,
+    "override_playbook_version_present": true,
+    "rollback_procedure_documented": true
+  },
+  "schema_version": 1,
+  "snapshot_id": "phase21_sample_runtime_safety_001",
+  "window_minutes": 60
+}

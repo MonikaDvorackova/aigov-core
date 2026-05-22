@@ -1,0 +1,361 @@
+# -----------------------------------------------------------------------------
+# THIS IS A SYNTHETIC SMOKE TEST ONLY — NOT A PRODUCTION COMPLIANCE GATE
+#
+# Manual workflow_dispatch harness: scripted evidence (NOT CI-generated artefacts).
+# Validates hosted connectivity / policy DEMO sequence; does NOT prove artefact-bound
+# continuity (events_content_sha256 vs CI manifest).
+#
+# Production artefact-bound validation: `.github/workflows/compliance.yml` → job
+# `govai-compliance-gate` (`submit-evidence-pack` + `verify-evidence-pack`).
+# -----------------------------------------------------------------------------
+#
+# Required configuration (manual runs only — Settings → Secrets and variables → Actions):
+# - Variables:
+#   - GOVAI_AUDIT_BASE_URL — audit / ledger base URL
+# - Secrets:
+#   - GOVAI_API_KEY — Bearer token for the audit API
+#
+name: govai-smoke
+
+on:
+  workflow_dispatch:
+    inputs:
+      govai_run_id:
+        description: "Optional GovAI evidence run UUID"
+        required: false
+        type: string
+        default: ""
+
+jobs:
+  govai-synthetic-smoke:
+    runs-on: ubuntu-latest
+    env:
+      GOVAI_AUDIT_BASE_URL: ${{ vars.GOVAI_AUDIT_BASE_URL }}
+      GOVAI_API_KEY: ${{ secrets.GOVAI_API_KEY }}
+      GOVAI_PROJECT: github-actions
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install GovAI CLI
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install --upgrade pip
+          python -m pip install -e ./python
+          govai --help >/dev/null
+
+      - name: Resolve GOVAI_RUN_ID
+        id: run
+        env:
+          DISPATCH_GOVAI_RUN_ID: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.govai_run_id || '' }}
+          VAR_GOVAI_RUN_ID: ""
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          UPSTREAM="${UPSTREAM_GOVAI_RUN_ID:-}"
+          EFFECTIVE=""
+
+          if [ -n "${UPSTREAM}" ]; then
+            EFFECTIVE="${UPSTREAM}"
+          elif [ -n "${DISPATCH_GOVAI_RUN_ID}" ]; then
+            EFFECTIVE="${DISPATCH_GOVAI_RUN_ID}"
+          elif [ "${GITHUB_EVENT_NAME:-}" = "workflow_dispatch" ] && [ -n "${VAR_GOVAI_RUN_ID}" ]; then
+            EFFECTIVE="${VAR_GOVAI_RUN_ID}"
+          else
+            seed="${GITHUB_REPOSITORY:-}:${GITHUB_RUN_ID:-}:${GITHUB_RUN_ATTEMPT:-}:${GITHUB_SHA:-}"
+            EFFECTIVE="$(printf '%s' "${seed}" | sha256sum | cut -d' ' -f1)"
+          fi
+
+          echo "Effective GOVAI_RUN_ID=${EFFECTIVE}"
+          echo "Effective GOVAI_PROJECT=${GOVAI_PROJECT:-}"
+
+          {
+            echo "effective<<__GOVAI_RUN_ID__"
+            printf '%s\n' "${EFFECTIVE}"
+            echo "__GOVAI_RUN_ID__"
+          } >> "${GITHUB_OUTPUT}"
+
+      - name: Synthetic evidence replay (hosted smoke only — NOT production artefacts)
+        env:
+          GOVAI_AUDIT_BASE_URL: ${{ vars.GOVAI_AUDIT_BASE_URL }}
+          GOVAI_API_KEY: ${{ secrets.GOVAI_API_KEY }}
+          GOVAI_RUN_ID: ${{ steps.run.outputs.effective }}
+          GOVAI_PROJECT: github-actions
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [ -z "${GOVAI_AUDIT_BASE_URL:-}" ]; then
+            echo "::error::Missing required configuration: GOVAI_AUDIT_BASE_URL"
+            echo "::error::Fix: Set repository Variable GOVAI_AUDIT_BASE_URL."
+            exit 1
+          fi
+
+          if [ -z "${GOVAI_API_KEY:-}" ]; then
+            echo "::error::Missing required configuration: GOVAI_API_KEY"
+            echo "::error::Fix: Set repository Secret GOVAI_API_KEY."
+            exit 1
+          fi
+
+          if [ -z "${GOVAI_RUN_ID:-}" ]; then
+            echo "::error::Missing GOVAI_RUN_ID"
+            exit 1
+          fi
+
+          ts="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+
+          ai_system_id="expense-ai"
+          dataset_id="expense_dataset_v1"
+          dataset_commitment="basic_compliance"
+
+          model_version_id="mv_${GOVAI_RUN_ID}"
+          assessment_id="asmt_${GOVAI_RUN_ID}"
+          risk_id="risk_${GOVAI_RUN_ID}"
+          artifact_path="artifacts/model_${GOVAI_RUN_ID}.joblib"
+
+          EVENT_SUFFIX="${GOVAI_RUN_ID}_${GITHUB_RUN_ID:-0}_${GITHUB_RUN_ATTEMPT:-0}"
+
+          human_event_id="evt_ci_human_approved_${EVENT_SUFFIX}"
+
+          post_ev () {
+            local name="$1"
+            local body="$2"
+            local response
+            response="$(mktemp)"
+            local body_file
+            body_file="$(mktemp)"
+            local status
+
+            printf '%s' "${body}" > "${body_file}"
+
+            echo ""
+            echo "============================================================"
+            echo "Posting evidence: ${name}"
+            echo "run_id=${GOVAI_RUN_ID}"
+            echo "X-GovAI-Project=${GOVAI_PROJECT}"
+            echo "ts_utc=${ts}"
+            echo "Body:"
+            printf '%s\n' "${body}"
+            echo "------------------------------------------------------------"
+
+            status="$(
+              curl -sS -o "${response}" -w "%{http_code}" \
+                -X POST "${GOVAI_AUDIT_BASE_URL%/}/evidence" \
+                -H "Authorization: Bearer ${GOVAI_API_KEY}" \
+                -H "X-GovAI-Project: ${GOVAI_PROJECT}" \
+                -H "Content-Type: application/json" \
+                --data "${body}"
+            )"
+
+            echo "Response (HTTP ${status}):"
+            cat "${response}"
+
+            if [ "${status}" -ge 200 ] && [ "${status}" -lt 300 ]; then
+              rm -f "${body_file}"
+              return 0
+            fi
+            if [ "${status}" = "409" ]; then
+              export EVIDENCE_POST_HTTP_STATUS="${status}"
+              export EVIDENCE_POST_RESPONSE_PATH="${response}"
+              export EVIDENCE_POST_BODY_PATH="${body_file}"
+              # shellcheck disable=SC2310
+              if python <<'PY'
+import json
+import os
+from pathlib import Path
+
+from aigov_py.evidence_artifact_gate import is_duplicate_event_id_idempotent_acceptance
+
+status_code = int(os.environ["EVIDENCE_POST_HTTP_STATUS"])
+resp_txt = Path(os.environ["EVIDENCE_POST_RESPONSE_PATH"]).read_text(encoding="utf-8")
+submitted = json.loads(Path(os.environ["EVIDENCE_POST_BODY_PATH"]).read_text(encoding="utf-8"))
+raise SystemExit(
+    0 if is_duplicate_event_id_idempotent_acceptance(status_code, resp_txt, submitted) else 1
+)
+PY
+              then
+                echo "idempotent duplicate accepted"
+                rm -f "${body_file}"
+                return 0
+              fi
+            fi
+            rm -f "${body_file}"
+            echo "::error::Evidence POST failed with HTTP ${status}"
+            exit 1
+          }
+
+          # Required VALID sequence (strict, same run_id + project context):
+          # 1) ai_discovery_reported
+          # 2) evaluation_reported (passed=true)
+          # 3) risk_reviewed (decision=approve)
+          # 4) human_approved (decision=approve)
+          # 5) model_promoted (references approved_human_event_id)
+
+          post_ev "ai_discovery_reported" "$(cat <<EOF
+          {
+            "event_id": "evt_ci_ai_discovery_reported_${EVENT_SUFFIX}",
+            "event_type": "ai_discovery_reported",
+            "ts_utc": "${ts}",
+            "actor": "ci",
+            "system": "github_actions",
+            "run_id": "${GOVAI_RUN_ID}",
+            "payload": {
+              "openai": false,
+              "transformers": false,
+              "model_artifacts": false
+            }
+          }
+          EOF
+          )"
+
+          post_ev "evaluation_reported" "$(cat <<EOF
+          {
+            "event_id": "evt_ci_evaluation_reported_${EVENT_SUFFIX}",
+            "event_type": "evaluation_reported",
+            "ts_utc": "${ts}",
+            "actor": "ci",
+            "system": "github_actions",
+            "run_id": "${GOVAI_RUN_ID}",
+            "payload": {
+              "ai_system_id": "${ai_system_id}",
+              "dataset_id": "${dataset_id}",
+              "model_version_id": "${model_version_id}",
+              "metric": "accuracy",
+              "value": 0.95,
+              "threshold": 0.8,
+              "passed": true
+            }
+          }
+          EOF
+          )"
+
+          post_ev "risk_reviewed" "$(cat <<EOF
+          {
+            "event_id": "evt_ci_risk_reviewed_${EVENT_SUFFIX}",
+            "event_type": "risk_reviewed",
+            "ts_utc": "${ts}",
+            "actor": "ci",
+            "system": "github_actions",
+            "run_id": "${GOVAI_RUN_ID}",
+            "payload": {
+              "ai_system_id": "${ai_system_id}",
+              "dataset_id": "${dataset_id}",
+              "model_version_id": "${model_version_id}",
+              "risk_id": "${risk_id}",
+              "assessment_id": "${assessment_id}",
+              "dataset_governance_commitment": "${dataset_commitment}",
+              "decision": "approve",
+              "reviewer": "risk_officer",
+              "justification": "ci: approve risk for demo promotion"
+            }
+          }
+          EOF
+          )"
+
+          post_ev "human_approved" "$(cat <<EOF
+          {
+            "event_id": "${human_event_id}",
+            "event_type": "human_approved",
+            "ts_utc": "${ts}",
+            "actor": "ci",
+            "system": "github_actions",
+            "run_id": "${GOVAI_RUN_ID}",
+            "payload": {
+              "scope": "model_promoted",
+              "decision": "approve",
+              "approver": "compliance_officer",
+              "justification": "ci: approve demo promotion",
+              "assessment_id": "${assessment_id}",
+              "risk_id": "${risk_id}",
+              "dataset_governance_commitment": "${dataset_commitment}",
+              "ai_system_id": "${ai_system_id}",
+              "dataset_id": "${dataset_id}",
+              "model_version_id": "${model_version_id}"
+            }
+          }
+          EOF
+          )"
+
+          post_ev "model_promoted" "$(cat <<EOF
+          {
+            "event_id": "evt_ci_model_promoted_${EVENT_SUFFIX}",
+            "event_type": "model_promoted",
+            "ts_utc": "${ts}",
+            "actor": "ci",
+            "system": "github_actions",
+            "run_id": "${GOVAI_RUN_ID}",
+            "payload": {
+              "artifact_path": "${artifact_path}",
+              "promotion_reason": "ci_demo",
+              "assessment_id": "${assessment_id}",
+              "risk_id": "${risk_id}",
+              "dataset_governance_commitment": "${dataset_commitment}",
+              "approved_human_event_id": "${human_event_id}",
+              "ai_system_id": "${ai_system_id}",
+              "dataset_id": "${dataset_id}",
+              "model_version_id": "${model_version_id}"
+            }
+          }
+          EOF
+          )"
+
+      - name: Synthetic smoke govai check (VALID expected — NOT production gate)
+        env:
+          GOVAI_AUDIT_BASE_URL: ${{ vars.GOVAI_AUDIT_BASE_URL }}
+          GOVAI_API_KEY: ${{ secrets.GOVAI_API_KEY }}
+          GOVAI_RUN_ID: ${{ steps.run.outputs.effective }}
+          GOVAI_PROJECT: github-actions
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [ -z "${GOVAI_AUDIT_BASE_URL:-}" ]; then
+            echo "::error::Missing required configuration: GOVAI_AUDIT_BASE_URL"
+            exit 1
+          fi
+
+          if [ -z "${GOVAI_API_KEY:-}" ]; then
+            echo "::error::Missing required configuration: GOVAI_API_KEY"
+            exit 1
+          fi
+
+          if [ -z "${GOVAI_RUN_ID:-}" ]; then
+            echo "::error::Missing required configuration: GOVAI_RUN_ID"
+            exit 1
+          fi
+
+          echo "Synthetic smoke only — not artefact-bound. Effective GOVAI_RUN_ID=${GOVAI_RUN_ID}"
+          echo "Effective GOVAI_PROJECT=${GOVAI_PROJECT:-}"
+
+          set +e
+          out="$(govai --project "${GOVAI_PROJECT}" check --run-id "${GOVAI_RUN_ID}" 2>&1)"
+          code="$?"
+          set -e
+
+          printf '%s\n' "${out}"
+
+          first="$(printf '%s\n' "${out}" | head -n 1 | tr -d '\r\n' | xargs)"
+
+          if [ "${code}" -eq 0 ] && [ "${first}" = "VALID" ]; then
+            exit 0
+          fi
+
+          echo "GovAI explain:"
+          govai --project "${GOVAI_PROJECT}" explain --run-id "${GOVAI_RUN_ID}" || true
+
+          echo "GovAI compliance summary:"
+          curl -sS \
+            -H "Authorization: Bearer ${GOVAI_API_KEY}" \
+            -H "X-GovAI-Project: ${GOVAI_PROJECT}" \
+            "${GOVAI_AUDIT_BASE_URL%/}/compliance-summary?run_id=${GOVAI_RUN_ID}" || true
+
+          echo "::error::Synthetic smoke govai check failed (verdict=${first:-unknown}); this workflow is not the production artefact gate."
+          exit 1

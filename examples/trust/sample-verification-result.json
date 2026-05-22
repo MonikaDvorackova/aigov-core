@@ -1,0 +1,8 @@
+{
+  "document_role": "verification_result",
+  "signature_checks_status": "passed",
+  "trust_chain_id": "govai.example.trust-chain.v1",
+  "verification_id": "govai.example.verification.v1",
+  "verification_profile_id": "govai.verification.v1",
+  "version": 1
+}

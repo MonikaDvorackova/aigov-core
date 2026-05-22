@@ -1,0 +1,47 @@
+{
+  "artifacts": [
+    {
+      "description": "Phase 16 machine-readable integration manifest validated by scripts/validate_developer_integrations_manifest.py.",
+      "kind": "json_manifest",
+      "path": "docs/integrations/developer-integrations-manifest.json"
+    },
+    {
+      "description": "Developer integrations diagnostics script invoked by Makefile target developer-integrations.",
+      "kind": "python_script",
+      "path": "scripts/developer_integrations_check.py"
+    }
+  ],
+  "commands": [
+    {
+      "argv": [
+        "make",
+        "gate"
+      ],
+      "description": "Documentation report heading gate required before merge.",
+      "id": "doc_gate"
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/validate_developer_integrations_manifest.py",
+        "--json"
+      ],
+      "description": "Validate developer-integrations-manifest.json and emit deterministic JSON on stdout.",
+      "id": "validate_integration_manifest"
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/validate_automation_pack.py",
+        "--pack",
+        "examples/integrations/sample-automation-pack.json"
+      ],
+      "description": "Validate this automation pack file structure and artifact paths.",
+      "id": "validate_self_pack"
+    }
+  ],
+  "name": "Sample GovAI automation pack",
+  "pack_id": "govai_sample_automation_pack",
+  "schema_version": "1",
+  "summary": "Executable-oriented metadata for CI and local automation. Validators check argv shape and that declared artifact paths exist; they do not run commands."
+}

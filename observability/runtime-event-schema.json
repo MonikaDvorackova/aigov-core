@@ -1,0 +1,130 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "GovAI runtime governance observability event contract. Local validation is implemented by scripts/observability_check.py using the Python standard library.",
+  "properties": {
+    "audit_trace_id": {
+      "description": "Stable audit trace correlation identifier for the related GovAI evidence bundle or exported trace.",
+      "minLength": 1,
+      "type": "string"
+    },
+    "component": {
+      "description": "Runtime component emitting the event.",
+      "enum": [
+        "runtime_gateway",
+        "policy_evaluator",
+        "audit_exporter",
+        "operator_tooling"
+      ],
+      "type": "string"
+    },
+    "diagnostic_code": {
+      "description": "Optional short machine-readable diagnostic code.",
+      "minLength": 1,
+      "type": "string"
+    },
+    "event_name": {
+      "description": "Canonical runtime observability event name.",
+      "enum": [
+        "govai.runtime.evaluation.started",
+        "govai.runtime.evaluation.completed",
+        "govai.runtime.policy.missing",
+        "govai.runtime.audit_trace.linked",
+        "govai.runtime.operator.override_requested",
+        "govai.runtime.incident.detected"
+      ],
+      "type": "string"
+    },
+    "event_time": {
+      "description": "UTC timestamp in RFC3339 form.",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$",
+      "type": "string"
+    },
+    "event_version": {
+      "const": "1.0.0",
+      "description": "Version of this event contract.",
+      "type": "string"
+    },
+    "incident_class": {
+      "description": "Incident class identifier from observability/incident-taxonomy.json when applicable.",
+      "minLength": 1,
+      "type": "string"
+    },
+    "latency_ms": {
+      "description": "Runtime evaluation latency in milliseconds.",
+      "minimum": 0,
+      "type": "integer"
+    },
+    "message": {
+      "description": "Human-readable local diagnostic message without secrets or personal data.",
+      "minLength": 1,
+      "type": "string"
+    },
+    "policy_id": {
+      "description": "Policy identifier used for the runtime governance evaluation.",
+      "minLength": 1,
+      "type": "string"
+    },
+    "recommended_action": {
+      "description": "Operator-facing next action.",
+      "minLength": 1,
+      "type": "string"
+    },
+    "run_id": {
+      "description": "GovAI run identifier used to join runtime telemetry to audit evidence.",
+      "minLength": 1,
+      "type": "string"
+    },
+    "severity": {
+      "description": "Operational severity. These labels do not change compliance verdict semantics.",
+      "enum": [
+        "debug",
+        "info",
+        "warning",
+        "error",
+        "critical"
+      ],
+      "type": "string"
+    },
+    "source": {
+      "description": "Local source of the event.",
+      "enum": [
+        "local_sample",
+        "runtime_gateway",
+        "operator_cli",
+        "dashboard_fixture"
+      ],
+      "type": "string"
+    },
+    "tenant_id": {
+      "description": "Tenant correlation identifier. Use opaque IDs only.",
+      "minLength": 1,
+      "type": "string"
+    },
+    "verdict": {
+      "description": "Observed compliance verdict when an event reports an existing GovAI decision. This field is observational only.",
+      "enum": [
+        "VALID",
+        "INVALID",
+        "BLOCKED"
+      ],
+      "type": "string"
+    }
+  },
+  "required": [
+    "event_name",
+    "event_version",
+    "event_time",
+    "severity",
+    "run_id",
+    "tenant_id",
+    "policy_id",
+    "audit_trace_id",
+    "source",
+    "message"
+  ],
+  "schema_id": "govai.runtime_event",
+  "title": "GovAI Runtime Observability Event",
+  "type": "object",
+  "version": "1.0.0"
+}

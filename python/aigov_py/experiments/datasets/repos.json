@@ -1,0 +1,362 @@
+[
+  {
+    "name": "transformers",
+    "repo_url": "https://github.com/huggingface/transformers",
+    "selection_reason": "Large ML library; GitHub Actions test/lint matrix.",
+    "ml_ai_relevance": true,
+    "github_actions_present": true,
+    "native_ci_command_hint": null,
+    "notes": "Curated public repo; not a random or population sample."
+  },
+  {
+    "name": "pytorch",
+    "repo_url": "https://github.com/pytorch/pytorch",
+    "selection_reason": "Core training framework; extensive CI, not decision-ledger aware.",
+    "ml_ai_relevance": true,
+    "github_actions_present": true,
+    "native_ci_command_hint": null,
+    "notes": "Curated public repo; not a random or population sample."
+  },
+  {
+    "name": "scikit-learn",
+    "repo_url": "https://github.com/scikit-learn/scikit-learn",
+    "selection_reason": "Classic ML; Azure Pipelines / GHA mix historically.",
+    "ml_ai_relevance": true,
+    "github_actions_present": true,
+    "native_ci_command_hint": null,
+    "notes": "Curated public repo; not a random or population sample."
+  },
+  {
+    "name": "tensorflow",
+    "repo_url": "https://github.com/tensorflow/tensorflow",
+    "selection_reason": "Deep learning framework; internal-style CI mirrors.",
+    "ml_ai_relevance": true,
+    "github_actions_present": true,
+    "native_ci_command_hint": null,
+    "notes": "Curated public repo; not a random or population sample."
+  },
+  {
+    "name": "mlflow",
+    "repo_url": "https://github.com/mlflow/mlflow",
+    "selection_reason": "Experiment tracking; Python/R CI.",
+    "ml_ai_relevance": true,
+    "github_actions_present": true,
+    "native_ci_command_hint": null,
+    "notes": "Curated public repo; not a random or population sample."
+  },
+  {
+    "name": "langchain",
+    "repo_url": "https://github.com/langchain-ai/langchain",
+    "selection_reason": "LLM orchestration; monorepo CI.",
+    "ml_ai_relevance": true,
+    "github_actions_present": true,
+    "native_ci_command_hint": null,
+    "notes": "Curated public repo; not a random or population sample."
+  },
+  {
+    "name": "openai-python",
+    "repo_url": "https://github.com/openai/openai-python",
+    "selection_reason": "Official OpenAI SDK.",
+    "ml_ai_relevance": true,
+    "github_actions_present": true,
+    "native_ci_command_hint": null,
+    "notes": "Curated public repo; not a random or population sample."
+  },
+  {
+    "name": "anthropic-sdk-python",
+    "repo_url": "https://github.com/anthropics/anthropic-sdk-python",
+    "selection_reason": "Anthropic API client.",
+    "ml_ai_relevance": true,
+    "github_actions_present": true,
+    "native_ci_command_hint": null,
+    "notes": "Curated public repo; not a random or population sample."
+  },
+  {
+    "name": "ray",
+    "repo_url": "https://github.com/ray-project/ray",
+    "selection_reason": "Distributed compute / RL / tuning.",
+    "ml_ai_relevance": true,
+    "github_actions_present": true,
+    "native_ci_command_hint": null,
+    "notes": "Curated public repo; not a random or population sample."
+  },
+  {
+    "name": "airflow",
+    "repo_url": "https://github.com/apache/airflow",
+    "selection_reason": "Workflow orchestration; CI often validates packaging and selective artifact checks.",
+    "ml_ai_relevance": true,
+    "github_actions_present": true,
+    "native_ci_command_hint": null,
+    "notes": "Curated public repo; not a random or population sample."
+  },
+  {
+    "name": "kubeflow-pipelines",
+    "repo_url": "https://github.com/kubeflow/pipelines",
+    "selection_reason": "ML pipelines on Kubernetes.",
+    "ml_ai_relevance": true,
+    "github_actions_present": true,
+    "native_ci_command_hint": null,
+    "notes": "Curated public repo; not a random or population sample."
+  },
+  {
+    "name": "pandas",
+    "repo_url": "https://github.com/pandas-dev/pandas",
+    "selection_reason": "Tabular data stack.",
+    "ml_ai_relevance": true,
+    "github_actions_present": true,
+    "native_ci_command_hint": null,
+    "notes": "Curated public repo; not a random or population sample."
+  },
+  {
+    "name": "polars",
+    "repo_url": "https://github.com/pola-rs/polars",
+    "selection_reason": "DataFrame engine (Rust core).",
+    "ml_ai_relevance": true,
+    "github_actions_present": true,
+    "native_ci_command_hint": null,
+    "notes": "Curated public repo; not a random or population sample."
+  },
+  {
+    "name": "duckdb",
+    "repo_url": "https://github.com/duckdb/duckdb",
+    "selection_reason": "Analytical SQL engine.",
+    "ml_ai_relevance": true,
+    "github_actions_present": true,
+    "native_ci_command_hint": null,
+    "notes": "Curated public repo; not a random or population sample."
+  },
+  {
+    "name": "vllm",
+    "repo_url": "https://github.com/vllm-project/vllm",
+    "selection_reason": "LLM inference serving.",
+    "ml_ai_relevance": true,
+    "github_actions_present": true,
+    "native_ci_command_hint": null,
+    "notes": "Curated public repo; not a random or population sample."
+  },
+  {
+    "name": "llama.cpp",
+    "repo_url": "https://github.com/ggerganov/llama.cpp",
+    "selection_reason": "Local LLM runtime; multi-platform builds.",
+    "ml_ai_relevance": true,
+    "github_actions_present": true,
+    "native_ci_command_hint": null,
+    "notes": "Curated public repo; not a random or population sample."
+  },
+  {
+    "name": "xgboost",
+    "repo_url": "https://github.com/dmlc/xgboost",
+    "selection_reason": "Gradient boosting.",
+    "ml_ai_relevance": true,
+    "github_actions_present": true,
+    "native_ci_command_hint": null,
+    "notes": "Curated public repo; not a random or population sample."
+  },
+  {
+    "name": "lightgbm",
+    "repo_url": "https://github.com/microsoft/LightGBM",
+    "selection_reason": "Microsoft gradient boosting.",
+    "ml_ai_relevance": true,
+    "github_actions_present": true,
+    "native_ci_command_hint": null,
+    "notes": "Curated public repo; not a random or population sample."
+  },
+  {
+    "name": "apache-arrow",
+    "repo_url": "https://github.com/apache/arrow",
+    "selection_reason": "Columnar in-memory format.",
+    "ml_ai_relevance": true,
+    "github_actions_present": true,
+    "native_ci_command_hint": null,
+    "notes": "Curated public repo; not a random or population sample."
+  },
+  {
+    "name": "delta-rs",
+    "repo_url": "https://github.com/delta-io/delta-rs",
+    "selection_reason": "Delta Lake Rust/Python.",
+    "ml_ai_relevance": true,
+    "github_actions_present": true,
+    "native_ci_command_hint": null,
+    "notes": "Curated public repo; not a random or population sample."
+  },
+  {
+    "name": "streamlit",
+    "repo_url": "https://github.com/streamlit/streamlit",
+    "selection_reason": "Python app framework for ML demos.",
+    "ml_ai_relevance": true,
+    "github_actions_present": true,
+    "native_ci_command_hint": null,
+    "notes": "Curated public repo; not a random or population sample."
+  },
+  {
+    "name": "gradio",
+    "repo_url": "https://github.com/gradio-app/gradio",
+    "selection_reason": "UI for ML models.",
+    "ml_ai_relevance": true,
+    "github_actions_present": true,
+    "native_ci_command_hint": null,
+    "notes": "Curated public repo; not a random or population sample."
+  },
+  {
+    "name": "jupyter",
+    "repo_url": "https://github.com/jupyter/notebook",
+    "selection_reason": "Notebook server.",
+    "ml_ai_relevance": true,
+    "github_actions_present": true,
+    "native_ci_command_hint": null,
+    "notes": "Curated public repo; not a random or population sample."
+  },
+  {
+    "name": "jupyterlab",
+    "repo_url": "https://github.com/jupyterlab/jupyterlab",
+    "selection_reason": "IDE-style notebooks.",
+    "ml_ai_relevance": true,
+    "github_actions_present": true,
+    "native_ci_command_hint": null,
+    "notes": "Curated public repo; not a random or population sample."
+  },
+  {
+    "name": "huggingface-datasets",
+    "repo_url": "https://github.com/huggingface/datasets",
+    "selection_reason": "Dataset loading / Arrow-backed.",
+    "ml_ai_relevance": true,
+    "github_actions_present": true,
+    "native_ci_command_hint": null,
+    "notes": "Curated public repo; not a random or population sample."
+  },
+  {
+    "name": "accelerate",
+    "repo_url": "https://github.com/huggingface/accelerate",
+    "selection_reason": "Distributed training helper.",
+    "ml_ai_relevance": true,
+    "github_actions_present": true,
+    "native_ci_command_hint": null,
+    "notes": "Curated public repo; not a random or population sample."
+  },
+  {
+    "name": "peft",
+    "repo_url": "https://github.com/huggingface/peft",
+    "selection_reason": "Parameter-efficient fine-tuning.",
+    "ml_ai_relevance": true,
+    "github_actions_present": true,
+    "native_ci_command_hint": null,
+    "notes": "Curated public repo; not a random or population sample."
+  },
+  {
+    "name": "onnx",
+    "repo_url": "https://github.com/onnx/onnx",
+    "selection_reason": "Model interchange format.",
+    "ml_ai_relevance": true,
+    "github_actions_present": true,
+    "native_ci_command_hint": null,
+    "notes": "Curated public repo; not a random or population sample."
+  },
+  {
+    "name": "ruff",
+    "repo_url": "https://github.com/astral-sh/ruff",
+    "selection_reason": "Python linter (high-velocity CI).",
+    "ml_ai_relevance": true,
+    "github_actions_present": true,
+    "native_ci_command_hint": null,
+    "notes": "Curated public repo; not a random or population sample."
+  },
+  {
+    "name": "uv",
+    "repo_url": "https://github.com/astral-sh/uv",
+    "selection_reason": "Python package installer / resolver.",
+    "ml_ai_relevance": true,
+    "github_actions_present": true,
+    "native_ci_command_hint": null,
+    "notes": "Curated public repo; not a random or population sample."
+  },
+  {
+    "name": "prefect",
+    "repo_url": "https://github.com/PrefectHQ/prefect",
+    "selection_reason": "Workflow orchestration with artifact lineage hooks in CI for some releases.",
+    "ml_ai_relevance": true,
+    "github_actions_present": true,
+    "native_ci_command_hint": null,
+    "notes": "Curated public repo; not a random or population sample."
+  },
+  {
+    "name": "triton",
+    "repo_url": "https://github.com/triton-lang/triton",
+    "selection_reason": "GPU compiler stack for neural network kernels; ML infrastructure.",
+    "ml_ai_relevance": true,
+    "github_actions_present": true,
+    "native_ci_command_hint": null,
+    "notes": "Curated public repo; not a random or population sample."
+  },
+  {
+    "name": "safetensors",
+    "repo_url": "https://github.com/huggingface/safetensors",
+    "selection_reason": "Safe tensor storage for ML model weights.",
+    "ml_ai_relevance": true,
+    "github_actions_present": true,
+    "native_ci_command_hint": null,
+    "notes": "Curated public repo; not a random or population sample."
+  },
+  {
+    "name": "bitsandbytes",
+    "repo_url": "https://github.com/bitsandbytes-foundation/bitsandbytes",
+    "selection_reason": "Quantization for neural network training/inference.",
+    "ml_ai_relevance": true,
+    "github_actions_present": true,
+    "native_ci_command_hint": null,
+    "notes": "Curated public repo; not a random or population sample."
+  },
+  {
+    "name": "optuna",
+    "repo_url": "https://github.com/optuna/optuna",
+    "selection_reason": "Hyperparameter optimization for ML experiments.",
+    "ml_ai_relevance": true,
+    "github_actions_present": true,
+    "native_ci_command_hint": null,
+    "notes": "Curated public repo; not a random or population sample."
+  },
+  {
+    "name": "keras",
+    "repo_url": "https://github.com/keras-team/keras",
+    "selection_reason": "High-level deep learning API.",
+    "ml_ai_relevance": true,
+    "github_actions_present": true,
+    "native_ci_command_hint": null,
+    "notes": "Curated public repo; not a random or population sample."
+  },
+  {
+    "name": "jax",
+    "repo_url": "https://github.com/jax-ml/jax",
+    "selection_reason": "Composable numerical computing for ML research.",
+    "ml_ai_relevance": true,
+    "github_actions_present": true,
+    "native_ci_command_hint": null,
+    "notes": "Curated public repo; not a random or population sample."
+  },
+  {
+    "name": "sentence-transformers",
+    "repo_url": "https://github.com/UKPLab/sentence-transformers",
+    "selection_reason": "Semantic embeddings and NLP ML.",
+    "ml_ai_relevance": true,
+    "github_actions_present": true,
+    "native_ci_command_hint": null,
+    "notes": "Curated public repo; not a random or population sample."
+  },
+  {
+    "name": "llama-index",
+    "repo_url": "https://github.com/run-llama/llama_index",
+    "selection_reason": "LLM data framework and RAG tooling.",
+    "ml_ai_relevance": true,
+    "github_actions_present": true,
+    "native_ci_command_hint": null,
+    "notes": "Curated public repo; not a random or population sample."
+  },
+  {
+    "name": "modal-client",
+    "repo_url": "https://github.com/modal-labs/modal-client",
+    "selection_reason": "Python client for serverless ML workloads.",
+    "ml_ai_relevance": true,
+    "github_actions_present": true,
+    "native_ci_command_hint": null,
+    "notes": "Curated public repo; not a random or population sample."
+  }
+]

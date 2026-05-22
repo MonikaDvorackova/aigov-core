@@ -1,0 +1,41 @@
+{
+  "artifact_version": "1",
+  "bundle_id": "govai-autonomous-governance",
+  "description": "Lightweight field contract hints for repository validators (not a formal JSON Schema draft).",
+  "entities": {
+    "approval_boundaries": {
+      "required_fields": [
+        "artifact_version",
+        "bundle_id",
+        "delegated_approval_allowed",
+        "human_approval_required_when"
+      ]
+    },
+    "autonomy_limits": {
+      "required_fields": [
+        "artifact_version",
+        "bundle_id",
+        "max_actions_per_minute",
+        "max_session_duration_minutes",
+        "max_tool_calls_per_session"
+      ]
+    },
+    "delegation_boundaries": {
+      "required_fields": [
+        "allowed_delegation_edges",
+        "artifact_version",
+        "bundle_id",
+        "forbidden_delegation_edges"
+      ]
+    },
+    "intervention_points": {
+      "required_fields": ["artifact_version", "bundle_id", "intervention_points"]
+    },
+    "manifest": {
+      "required_fields": ["artifact_version", "artefacts", "bundle_id"]
+    },
+    "role_models": {
+      "required_fields": ["artifact_version", "bundle_id", "roles"]
+    }
+  }
+}

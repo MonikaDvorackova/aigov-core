@@ -1,0 +1,20 @@
+{
+  "canonical_payload_digest_hex": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "document_role": "signed_evidence_pack",
+  "evidence_pack_ref": {
+    "digest_alg": "SHA-384",
+    "kind": "govai_evidence_pack",
+    "run_id": "00000000-0000-4000-8000-000000000001"
+  },
+  "pack_id": "govai.example.signed-pack.v1",
+  "payload_digest_alg": "SHA-384",
+  "signatures": [
+    {
+      "algorithm_id": "es384-p384",
+      "kid": "govai-signing-example",
+      "signature_format": "detached-jws"
+    }
+  ],
+  "signing_profile_id": "govai.signing.v1",
+  "version": 1
+}

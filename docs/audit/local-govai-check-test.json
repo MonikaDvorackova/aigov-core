@@ -1,0 +1,24 @@
+{
+  "run_id": "local-govai-check-test",
+  "bundle_sha256": "3a18c9d176c4a3b5660231a9001d7eeb69995d5d5e1dc05eb95a61ad12292fe6",
+  "policy_version": "v0.5_dev",
+  "identifiers": {
+    "ai_system_id": "aigov_poc",
+    "dataset_id": "dataset_iris_v1",
+    "model_version_id": "model_version_01_local-govai-check-test",
+    "primary_risk_id": "risk_01_local-govai-check-test",
+    "risk_ids": [
+      "risk_01_local-govai-check-test"
+    ]
+  },
+  "generated_ts_utc": "2026-04-28T14:10:45.162331Z",
+  "evidence_chain_head_sha256": null,
+  "hashes": {
+    "evidence_sha256": "59ae2162d7a0f38b5584c45c4acad658ac03bc5944eb1d3f217bc4de6631f7f9",
+    "report_sha256": "ae1ba48644696f3474384ac1541536d174ad3d09800b1a523357e1c56395d843"
+  },
+  "paths": {
+    "evidence_json": "docs/evidence/local-govai-check-test.json",
+    "report_md": "docs/reports/local-govai-check-test.md"
+  }
+}

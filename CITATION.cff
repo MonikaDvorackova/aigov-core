@@ -1,0 +1,17 @@
+cff-version: "1.2.0"
+title: "GovAI Compliance Engine"
+message: "If you use this software, please cite it using these metadata."
+type: software
+authors:
+  - family-names: "Dvorackova"
+    given-names: "Monika"
+repository-code: "https://github.com/MonikaDvorackova/aigov-compliance-engine"
+url: "https://github.com/MonikaDvorackova/aigov-compliance-engine"
+license: "LicenseRef-Proprietary"
+version: "0.2.1"
+date-released: "2026-05-11"
+keywords:
+  - "AI governance"
+  - "audit evidence"
+  - "compliance"
+  - "deterministic validation"

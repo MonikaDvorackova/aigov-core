@@ -1,0 +1,50 @@
+# =============================================================================
+# Adoption kit — copy this tree to your repository ROOT to activate workflows.
+# GitHub only runs workflows from /.github/workflows/ at the repository root.
+# =============================================================================
+# Default job: validates sample-evidence.json syntax (no secrets, no network).
+#
+# Optional hosted gate: set repository variable GOVAI_ADOPTION_ENABLE_HOSTED_GATE=true
+# and configure vars GOVAI_RUN_ID, GOVAI_AUDIT_BASE_URL + secret GOVAI_API_KEY.
+# Then add a job that produces artefacts/ for the composite action (see docs/github-action.md).
+# =============================================================================
+
+name: govai-adoption-kit-ci
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "sample-evidence.json"
+      - ".github/workflows/govai-check.yml"
+
+jobs:
+  validate-sample-evidence-json:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate sample-evidence.json (syntax only; no secrets)
+        run: python3 -m json.tool sample-evidence.json >/dev/null
+
+  # Optional: full artefact-bound gate — requires GOVAI_* configuration (off by default).
+  govai-hosted-gate:
+    needs: validate-sample-evidence-json
+    if: ${{ vars.GOVAI_ADOPTION_ENABLE_HOSTED_GATE == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        continue-on-error: true
+        with:
+          name: evidence_packs
+          path: artefacts
+
+      - name: Artefact-bound GovAI gate
+        uses: MonikaDvorackova/aigov-compliance-engine@v1
+        with:
+          run_id: ${{ vars.GOVAI_RUN_ID }}
+          artifacts_path: artefacts
+          base_url: ${{ vars.GOVAI_AUDIT_BASE_URL }}
+          api_key: ${{ secrets.GOVAI_API_KEY }}

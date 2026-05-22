@@ -1,0 +1,22 @@
+{
+  "analysis_notes": "Replace placeholders before preregistration; align hypotheses with research/experimental-design.json.",
+  "hypotheses": [
+    {
+      "id": "H1",
+      "statement": "At a pinned commit, auditability benchmark scenarios complete without regression drift."
+    }
+  ],
+  "measures": [
+    {
+      "id": "M1",
+      "name": "Deterministic benchmark pass",
+      "type": "boolean"
+    }
+  ],
+  "plan_id": "sample-govai-experimental-plan",
+  "protocol_version": "0.1.0",
+  "references": {
+    "experimental_design_doc": "docs/research/experimental-design.md",
+    "research_manifest": "research/research-manifest.json"
+  }
+}

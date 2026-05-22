@@ -1,0 +1,144 @@
+{
+  "schema_version": "1.0.0",
+  "workflow_id": "govai.conformity.assessment_workflow.v1",
+  "summary": "Operator-facing workflow for preparing an EU AI Act conformity assessment dossier (Article 43) using GovAI exports as supporting technical evidence. GovAI does not perform the legal assessment; this workflow structures the steps a provider follows internally before involving a notified body where one is required.",
+  "applicability": {
+    "system_categories": [
+      "high_risk_ai_system_annex_iii",
+      "high_risk_ai_system_annex_i_safety_component"
+    ],
+    "assessment_modules": [
+      "internal_production_control",
+      "type_examination_with_quality_management_system"
+    ],
+    "out_of_scope_notes": [
+      "Prohibited AI practices under Article 5 are out of scope; this workflow assumes the system is not prohibited.",
+      "General-purpose AI obligations follow separate provider obligations and are not modeled here."
+    ]
+  },
+  "workflow_phases": [
+    {
+      "phase_id": "scoping",
+      "title": "System scoping and classification",
+      "objectives": [
+        "Confirm intended purpose and reasonably foreseeable use.",
+        "Classify the system against Annex III categories and Article 6 conditions.",
+        "Decide whether internal production control or third-party assessment applies."
+      ],
+      "inputs": [
+        "intended_purpose_statement",
+        "system_architecture_summary",
+        "data_sources_and_lineage"
+      ],
+      "outputs": [
+        "classification_record",
+        "applicable_module_decision"
+      ],
+      "human_approvals": [
+        "regulatory_owner",
+        "product_owner"
+      ]
+    },
+    {
+      "phase_id": "dossier_preparation",
+      "title": "Technical documentation (Annex IV) preparation",
+      "objectives": [
+        "Assemble the elements required by Annex IV.",
+        "Reference GovAI evidence exports where they add traceability."
+      ],
+      "inputs": [
+        "annex_iv_section_drafts",
+        "model_cards_and_evaluation_reports",
+        "risk_management_records"
+      ],
+      "outputs": [
+        "annex_iv_dossier",
+        "evidence_export_attachments"
+      ],
+      "human_approvals": [
+        "regulatory_owner",
+        "engineering_owner"
+      ]
+    },
+    {
+      "phase_id": "internal_control_review",
+      "title": "Internal production control review",
+      "objectives": [
+        "Verify quality management system coverage of the system.",
+        "Confirm risk management lifecycle is current.",
+        "Resolve documentation gaps before declaration."
+      ],
+      "inputs": [
+        "quality_management_system_records",
+        "risk_management_lifecycle_outputs"
+      ],
+      "outputs": [
+        "internal_review_minutes",
+        "gap_remediation_plan"
+      ],
+      "human_approvals": [
+        "quality_manager",
+        "regulatory_owner"
+      ]
+    },
+    {
+      "phase_id": "declaration_and_marking",
+      "title": "EU declaration of conformity and CE marking",
+      "objectives": [
+        "Issue the EU declaration of conformity when criteria are met.",
+        "Apply CE marking as required by the legal framework.",
+        "Register the system in the EU database where applicable."
+      ],
+      "inputs": [
+        "internal_review_minutes",
+        "notified_body_certificate_if_applicable"
+      ],
+      "outputs": [
+        "eu_declaration_of_conformity",
+        "ce_marking_record",
+        "eu_database_registration_reference"
+      ],
+      "human_approvals": [
+        "legal_counsel",
+        "regulatory_owner"
+      ]
+    },
+    {
+      "phase_id": "change_control",
+      "title": "Substantial modification change control",
+      "objectives": [
+        "Detect substantial modifications that require reassessment.",
+        "Re-run scoping, dossier preparation, and internal control review where needed."
+      ],
+      "inputs": [
+        "change_request",
+        "model_or_data_change_report"
+      ],
+      "outputs": [
+        "substantial_modification_decision",
+        "updated_declaration_if_required"
+      ],
+      "human_approvals": [
+        "regulatory_owner",
+        "engineering_owner"
+      ]
+    }
+  ],
+  "audit_events": [
+    "conformity.scoping.recorded",
+    "conformity.dossier.frozen",
+    "conformity.internal_review.completed",
+    "conformity.declaration.issued",
+    "conformity.substantial_modification.flagged"
+  ],
+  "evidence_export_hooks": [
+    "scripts/generate_regulatory_evidence_export.py",
+    "scripts/validate_ai_act_obligations.py",
+    "scripts/validate_regulatory_evidence_manifest.py"
+  ],
+  "governance_boundaries": [
+    "GovAI does not issue EU declarations of conformity.",
+    "GovAI does not interact with notified bodies on behalf of providers.",
+    "Repository validators check structure and presence, not legal sufficiency."
+  ]
+}

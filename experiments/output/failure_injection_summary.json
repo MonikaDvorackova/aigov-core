@@ -1,0 +1,46 @@
+{
+  "experiment": "controlled_failure_injection",
+  "schema": "aigov.failure_injection_summary.v1",
+  "total_runs": 2200,
+  "replicates_per_scenario": 100,
+  "scenario_count": 22,
+  "overall": {
+    "total_runs": 2200,
+    "baseline_1_false_negative_rate": 1.0,
+    "baseline_2_false_negative_rate": 0.6470588235294118,
+    "gate_detection_rate": 1.0,
+    "valid_retention_rate": 1.0,
+    "false_blocking_rate": 0.0,
+    "verdict_classification_accuracy": 1.0,
+    "invalid_vs_blocked_match_rate": 1.0,
+    "artifact_continuity_failure_detection_rate": 1.0,
+    "digest_mismatch_detection_rate": 1.0,
+    "approval_ordering_violation_detection_rate": 1.0,
+    "replicates_per_scenario": 100,
+    "scenario_count": 22,
+    "ablations": {
+      "full_gate": {
+        "verdict_classification_accuracy": 1.0
+      },
+      "no_digest_checks": {
+        "verdict_classification_accuracy": 0.9090909090909091
+      },
+      "no_export_digest_check": {
+        "verdict_classification_accuracy": 0.9545454545454546
+      },
+      "no_artifact_bound_verification": {
+        "verdict_classification_accuracy": 0.9545454545454546
+      },
+      "no_approval_check": {
+        "verdict_classification_accuracy": 0.8181818181818182
+      },
+      "no_trace_consistency": {
+        "verdict_classification_accuracy": 0.9090909090909091
+      },
+      "no_policy_version_check": {
+        "verdict_classification_accuracy": 0.9545454545454546
+      }
+    }
+  },
+  "rubric_path": "scenario_rubric.json"
+}

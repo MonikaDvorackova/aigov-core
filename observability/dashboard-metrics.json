@@ -1,0 +1,72 @@
+{
+  "description": "Dashboard-ready GovAI runtime observability metrics. These definitions are local examples and do not require external telemetry services.",
+  "metrics": [
+    {
+      "description": "Total runtime governance evaluations observed over the dashboard window.",
+      "event_names": [
+        "govai.runtime.evaluation.completed"
+      ],
+      "id": "runtime_evaluations_total",
+      "recommended_dimensions": [
+        "tenant_id",
+        "policy_id",
+        "verdict"
+      ],
+      "unit": "count"
+    },
+    {
+      "description": "Percentage of runtime governance evaluations with observed BLOCKED verdicts.",
+      "event_names": [
+        "govai.runtime.evaluation.completed"
+      ],
+      "id": "runtime_blocked_verdict_rate",
+      "recommended_dimensions": [
+        "tenant_id",
+        "policy_id"
+      ],
+      "unit": "percent"
+    },
+    {
+      "description": "Runtime governance evaluation latency percentile for operator dashboards.",
+      "event_names": [
+        "govai.runtime.evaluation.completed"
+      ],
+      "id": "runtime_evaluation_latency_p95_ms",
+      "recommended_dimensions": [
+        "tenant_id",
+        "policy_id",
+        "component"
+      ],
+      "unit": "milliseconds"
+    },
+    {
+      "description": "Count of runtime events that include an audit_trace_id and can be joined to audit evidence.",
+      "event_names": [
+        "govai.runtime.audit_trace.linked",
+        "govai.runtime.evaluation.completed",
+        "govai.runtime.incident.detected"
+      ],
+      "id": "audit_trace_correlated_events_total",
+      "recommended_dimensions": [
+        "tenant_id",
+        "run_id",
+        "policy_id"
+      ],
+      "unit": "count"
+    },
+    {
+      "description": "Governance incidents grouped by incident class and severity.",
+      "event_names": [
+        "govai.runtime.incident.detected"
+      ],
+      "id": "governance_incidents_total",
+      "recommended_dimensions": [
+        "incident_class",
+        "severity",
+        "tenant_id"
+      ],
+      "unit": "count"
+    }
+  ],
+  "version": "1.0.0"
+}

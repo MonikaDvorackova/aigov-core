@@ -1,0 +1,27 @@
+schema_version: aigov.rbac_permissions.v1
+
+permissions:
+  - permission_id: policy.activate
+    description: Activate a policy bundle for a tenant/project runtime.
+  - permission_id: policy.rollback
+    description: Roll back an active policy bundle to a prior known version.
+
+  - permission_id: override.approve
+    description: Approve a requested governance override (metadata only).
+  - permission_id: override.revoke
+    description: Revoke a previously approved override (metadata only).
+
+  - permission_id: dataset.approve
+    description: Approve a dataset for use under a given governance scope (metadata only).
+
+  - permission_id: audit.export
+    description: Export audit artifacts (authorization metadata only; no export implementation).
+
+  - permission_id: rbac.manage
+    description: Manage RBAC roles and bindings for a tenant (metadata only).
+
+  - permission_id: runtime.evaluate
+    description: Trigger a runtime evaluation (no enforcement semantics change in this phase).
+  - permission_id: runtime.read
+    description: Read runtime evaluation results and policy status.
+

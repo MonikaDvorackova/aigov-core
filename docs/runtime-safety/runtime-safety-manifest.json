@@ -1,0 +1,228 @@
+{
+  "boundaries": {
+    "billing": "no_billing_or_usage_semantics_in_runtime_safety_tooling",
+    "data": "offline_snapshots_only_no_live_evidence_payloads",
+    "enforcement": "no_runtime_enforcement_semantics_changes",
+    "ledger": "no_ledger_writes_or_mutations",
+    "summary": "Phase 21 runtime safety tooling reads manifests and snapshots to emit deterministic diagnostics and reports; it does not modify enforcement verdict semantics, billing, ledger storage, or database schemas."
+  },
+  "escalation_signals": [
+    {
+      "guide": "docs/runtime-safety/escalation-policies.md",
+      "id": "high_risk_sessions_escalated",
+      "summary": "Count of sessions routed to human review due to elevated risk scoring during the observation window."
+    },
+    {
+      "guide": "docs/runtime-safety/escalation-policies.md",
+      "id": "pending_human_review_count",
+      "summary": "Open items awaiting human decision before automation may continue."
+    },
+    {
+      "guide": "docs/runtime-safety/escalation-policies.md",
+      "id": "sla_breaches_observed",
+      "summary": "Human-in-the-loop SLA breaches detected for review or escalation queues."
+    },
+    {
+      "guide": "docs/runtime-safety/escalation-policies.md",
+      "id": "median_queue_wait_minutes",
+      "summary": "Median minutes a high-risk item waited before first human touch."
+    }
+  ],
+  "guardrail_signals": [
+    {
+      "guide": "docs/runtime-safety/guardrails-architecture.md",
+      "id": "prompt_injection_blocks_observed",
+      "summary": "Count of prompt-injection class interactions blocked by upstream guardrails."
+    },
+    {
+      "guide": "docs/runtime-safety/guardrails-architecture.md",
+      "id": "tool_allowlist_violations_blocked",
+      "summary": "Tool calls blocked because they violated allowlist or capability policy."
+    },
+    {
+      "guide": "docs/runtime-safety/guardrails-architecture.md",
+      "id": "policy_denies_without_override",
+      "summary": "Policy denies that completed without a privileged override path."
+    },
+    {
+      "guide": "docs/runtime-safety/guardrails-architecture.md",
+      "id": "content_filter_interventions",
+      "summary": "Content safety interventions applied before model output reached callers."
+    },
+    {
+      "guide": "docs/runtime-safety/guardrails-architecture.md",
+      "id": "guardrail_latency_p95_ms",
+      "summary": "P95 latency contribution of guardrail checks on the request path in milliseconds."
+    }
+  ],
+  "human_oversight_signals": [
+    {
+      "guide": "docs/runtime-safety/human-oversight.md",
+      "id": "human_review_coverage_percent",
+      "summary": "Percentage of high-risk decisions that received human review within the window."
+    },
+    {
+      "guide": "docs/runtime-safety/human-oversight.md",
+      "id": "dual_control_sessions_completed",
+      "summary": "Sessions completed under dual-control attestation requirements."
+    },
+    {
+      "guide": "docs/runtime-safety/human-oversight.md",
+      "id": "attribution_chain_complete_percent",
+      "summary": "Percentage of decisions with complete actor and reason attribution metadata."
+    },
+    {
+      "guide": "docs/runtime-safety/human-oversight.md",
+      "id": "active_supervisors_count",
+      "summary": "Distinct human supervisors available for escalation during the window."
+    }
+  ],
+  "non_goals": [
+    "Phase 21 does not introduce billing, ledger, or database migration changes.",
+    "Phase 21 does not redefine VALID, INVALID, or BLOCKED verdict semantics.",
+    "Runtime safety snapshots are operator evidence aids, not legal conformity statements."
+  ],
+  "override_readiness_signals": [
+    {
+      "guide": "docs/runtime-safety/override-governance.md",
+      "id": "override_playbook_version_present",
+      "summary": "Whether a versioned emergency override playbook artifact is registered for the environment."
+    },
+    {
+      "guide": "docs/runtime-safety/override-governance.md",
+      "id": "emergency_break_glass_last_drill_days_ago",
+      "summary": "Days since the last documented break-glass drill; staleness increases operational risk."
+    },
+    {
+      "guide": "docs/runtime-safety/override-governance.md",
+      "id": "audit_trail_export_latency_p95_seconds",
+      "summary": "P95 seconds to export an immutable audit slice needed for incident review."
+    },
+    {
+      "guide": "docs/runtime-safety/override-governance.md",
+      "id": "rollback_procedure_documented",
+      "summary": "Whether rollback steps after an override are documented and discoverable to operators."
+    }
+  ],
+  "referenced_documents": [
+    {
+      "path": "docs/runtime-safety/README.md",
+      "role": "runtime_safety_index"
+    },
+    {
+      "path": "docs/runtime-safety/guardrails-architecture.md",
+      "role": "guardrails_architecture"
+    },
+    {
+      "path": "docs/runtime-safety/human-oversight.md",
+      "role": "human_oversight_guide"
+    },
+    {
+      "path": "docs/runtime-safety/escalation-policies.md",
+      "role": "escalation_policies"
+    },
+    {
+      "path": "docs/runtime-safety/override-governance.md",
+      "role": "override_governance"
+    },
+    {
+      "path": "docs/runtime-safety/runtime-risk-management.md",
+      "role": "runtime_risk_management"
+    },
+    {
+      "path": "docs/runtime-safety/safety-monitoring.md",
+      "role": "safety_monitoring"
+    },
+    {
+      "path": "docs/runtime-safety/runtime-safety-report.md",
+      "role": "report_generator_guide"
+    }
+  ],
+  "referenced_examples": [
+    {
+      "path": "examples/runtime-safety/README.md",
+      "role": "example_index"
+    },
+    {
+      "path": "examples/runtime-safety/sample-runtime-safety-snapshot.json",
+      "role": "sample_runtime_safety_snapshot"
+    },
+    {
+      "path": "examples/runtime-safety/run-runtime-safety-check.sh",
+      "role": "shell_driver_check"
+    },
+    {
+      "path": "examples/runtime-safety/run-runtime-safety-score.sh",
+      "role": "shell_driver_score"
+    },
+    {
+      "path": "examples/runtime-safety/run-runtime-safety-report.sh",
+      "role": "shell_driver_report"
+    }
+  ],
+  "required_checks": [
+    "make runtime-safety",
+    "make runtime-safety-manifest",
+    "make runtime-safety-snapshot",
+    "make runtime-safety-score",
+    "make runtime-safety-report",
+    "make runtime-safety-check"
+  ],
+  "runtime_safety_probes": [
+    {
+      "command": "python3 scripts/validate_runtime_safety_manifest.py --json",
+      "description": "Schema and reference path validation for the runtime safety manifest.",
+      "name": "validate_runtime_safety_manifest"
+    },
+    {
+      "command": "python3 scripts/validate_runtime_safety_snapshot.py --input examples/runtime-safety/sample-runtime-safety-snapshot.json --json",
+      "description": "Schema validation for a single runtime safety snapshot payload.",
+      "name": "validate_runtime_safety_snapshot"
+    },
+    {
+      "command": "python3 scripts/runtime_safety_score.py --input examples/runtime-safety/sample-runtime-safety-snapshot.json",
+      "description": "Deterministic guardrail, escalation, human oversight, and override readiness scoring.",
+      "name": "runtime_safety_score"
+    },
+    {
+      "command": "python3 scripts/runtime_safety_check.py --json",
+      "description": "Aggregated runtime safety diagnostics across manifest, snapshot, Makefile wiring, and documentation paths.",
+      "name": "runtime_safety_check"
+    },
+    {
+      "command": "python3 scripts/generate_runtime_safety_report.py --input examples/runtime-safety/sample-runtime-safety-snapshot.json",
+      "description": "Deterministic Markdown human oversight report assembled from a single snapshot.",
+      "name": "generate_runtime_safety_report"
+    }
+  ],
+  "score_weights": {
+    "escalation": 25,
+    "guardrail": 30,
+    "human_oversight": 25,
+    "override_readiness": 20
+  },
+  "snapshot_schema": {
+    "required_collections": [
+      "guardrails",
+      "escalation",
+      "human_oversight",
+      "override_readiness",
+      "diagnostics"
+    ],
+    "required_keys": [
+      "schema_version",
+      "snapshot_id",
+      "captured_at",
+      "environment",
+      "window_minutes",
+      "guardrails",
+      "escalation",
+      "human_oversight",
+      "override_readiness",
+      "diagnostics"
+    ],
+    "summary": "Runtime safety snapshots are JSON objects describing guardrail telemetry, escalation queues, human oversight coverage, override readiness signals, and diagnostic checks for offline scoring; they are not ledger entries."
+  },
+  "summary": "Runtime safety manifest for GovAI Phase 21: machine-readable index of guardrails, escalation, human oversight, override readiness, and assurance reporting. Operators use it to compute deterministic scores and generate oversight reports without changing runtime enforcement, billing, ledger, or schema semantics.",
+  "version": 1
+}

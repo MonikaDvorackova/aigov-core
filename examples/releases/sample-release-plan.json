@@ -1,0 +1,19 @@
+{
+  "approval_roles": ["maintainer", "security_delegate"],
+  "candidate_ref": "origin/staging",
+  "changelog_cut": true,
+  "notes_template": "docs/releases/release-notes-template.md",
+  "post_release_tasks": [
+    "Announce tag in maintainer channel",
+    "Verify GitHub Release assets",
+    "Open follow-up issues for deferred items"
+  ],
+  "pre_tag_checks": [
+    "make release-readiness-check",
+    "cargo test --manifest-path rust/Cargo.toml",
+    "cd python && python -m pytest tests/test_validate_release_manifest.py tests/test_validate_changelog.py tests/test_generate_release_notes.py tests/test_release_readiness_report.py"
+  ],
+  "release_type": "MINOR",
+  "target_version": "1.0.0",
+  "title": "Sample GovAI release plan (documentation-only illustration)"
+}

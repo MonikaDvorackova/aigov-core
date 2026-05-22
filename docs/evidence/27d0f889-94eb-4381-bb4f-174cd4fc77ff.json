@@ -1,0 +1,107 @@
+{
+  "events": [
+    {
+      "actor": "monika",
+      "event_id": "b7ee2ccd-5cc5-48c3-9d41-ceb41dc11217",
+      "event_type": "run_started",
+      "payload": {
+        "purpose": "poc_train_pending_approval"
+      },
+      "run_id": "27d0f889-94eb-4381-bb4f-174cd4fc77ff",
+      "system": "aigov_poc",
+      "ts_utc": "2026-01-31T16:14:12.738675Z"
+    },
+    {
+      "actor": "monika",
+      "event_id": "2beecab4-1d38-4bab-b30b-b7d2b3a50e5d",
+      "event_type": "data_registered",
+      "payload": {
+        "dataset": "iris",
+        "dataset_fingerprint": "523290e5e80d443207b3d2a2223ac767a9751b305d036cfe3a129e6c59921808",
+        "n_features": 4,
+        "n_rows": 150,
+        "target_names": [
+          "setosa",
+          "versicolor",
+          "virginica"
+        ]
+      },
+      "run_id": "27d0f889-94eb-4381-bb4f-174cd4fc77ff",
+      "system": "aigov_poc",
+      "ts_utc": "2026-01-31T16:14:12.747160Z"
+    },
+    {
+      "actor": "monika",
+      "event_id": "9bdf6cce-ce1d-423f-8b3e-96d5a13c06c5",
+      "event_type": "model_trained",
+      "payload": {
+        "model_type": "LogisticRegression",
+        "params": {
+          "C": 1.0,
+          "class_weight": null,
+          "dual": false,
+          "fit_intercept": true,
+          "intercept_scaling": 1,
+          "l1_ratio": 0.0,
+          "max_iter": 200,
+          "n_jobs": null,
+          "penalty": "deprecated",
+          "random_state": null,
+          "solver": "lbfgs",
+          "tol": 0.0001,
+          "verbose": 0,
+          "warm_start": false
+        }
+      },
+      "run_id": "27d0f889-94eb-4381-bb4f-174cd4fc77ff",
+      "system": "aigov_poc",
+      "ts_utc": "2026-01-31T16:14:12.778666Z"
+    },
+    {
+      "actor": "monika",
+      "event_id": "fbe307a8-33c8-405c-baf8-b61d06f2a171",
+      "event_type": "evaluation_reported",
+      "payload": {
+        "metric": "accuracy",
+        "passed": true,
+        "threshold": 0.8,
+        "value": 0.9666666666666668
+      },
+      "run_id": "27d0f889-94eb-4381-bb4f-174cd4fc77ff",
+      "system": "aigov_poc",
+      "ts_utc": "2026-01-31T16:14:12.780273Z"
+    },
+    {
+      "actor": "monika",
+      "event_id": "ha_27d0f889-94eb-4381-bb4f-174cd4fc77ff",
+      "event_type": "human_approved",
+      "payload": {
+        "approver": "compliance_officer",
+        "decision": "approve",
+        "justification": "metrics meet threshold and dataset fingerprint verified",
+        "scope": "model_promoted"
+      },
+      "run_id": "27d0f889-94eb-4381-bb4f-174cd4fc77ff",
+      "system": "aigov_poc",
+      "ts_utc": "2026-01-31T16:16:48.229471Z"
+    },
+    {
+      "actor": "monika",
+      "event_id": "mp_after_approval_27d0f889-94eb-4381-bb4f-174cd4fc77ff",
+      "event_type": "model_promoted",
+      "payload": {
+        "artifact_path": "python/artifacts/model_27d0f889-94eb-4381-bb4f-174cd4fc77ff.joblib",
+        "promotion_reason": "approved_by_human"
+      },
+      "run_id": "27d0f889-94eb-4381-bb4f-174cd4fc77ff",
+      "system": "aigov_poc",
+      "ts_utc": "2026-01-31T16:16:57.827911Z"
+    }
+  ],
+  "log_path": "rust/audit_log.jsonl",
+  "model_artifact_path": "python/artifacts/model_27d0f889-94eb-4381-bb4f-174cd4fc77ff.joblib",
+  "ok": true,
+  "policy_version": "v0.4_human_approval",
+  "run_id": "27d0f889-94eb-4381-bb4f-174cd4fc77ff",
+  "bundle_sha256": "a89e83a264871d13bf5e51635ff3d650287418f45ed8c387c258baadb4bb9ade"
+}

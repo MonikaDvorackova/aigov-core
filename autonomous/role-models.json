@@ -1,0 +1,26 @@
+{
+  "artifact_version": "1",
+  "bundle_id": "govai-autonomous-governance",
+  "roles": [
+    {
+      "authority_scope": "read_only_tools",
+      "description": "Narrow executor that may invoke read-only retrieval and formatting tools.",
+      "role_id": "executor_readonly"
+    },
+    {
+      "authority_scope": "scoped_write_with_approval",
+      "description": "May propose state-changing actions; human approval required before commit.",
+      "role_id": "executor_scoped_write"
+    },
+    {
+      "authority_scope": "orchestration_and_delegation",
+      "description": "Plans work, assigns sub-tasks, and enforces delegation edges; may not bypass approval gateways.",
+      "role_id": "supervisor"
+    },
+    {
+      "authority_scope": "policy_and_risk_oversight",
+      "description": "Human or human-equivalent approver for high-impact classes; audit owner.",
+      "role_id": "governance_officer"
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "schema_version": "govai.standards.capability_policy.v1",
+  "policy_id": "pol.demo",
+  "tenant_scope": "tenant.demo",
+  "capabilities": [
+    {
+      "capability_id": "cap.read_docs",
+      "name": "Read documentation",
+      "description": "Read-only access to internal docs index.",
+      "risk_class": "LIMITED",
+      "allowed_tools": ["mcp_linear_read", "mcp_docs_read"],
+      "constraints": [
+        {
+          "constraint_type": "rate_limit",
+          "constraint_ref": "rl.docs.v1"
+        }
+      ],
+      "evidence_requirements": ["ev.docs.access_log"],
+      "ai_act_refs": ["Art.12(1)"]
+    }
+  ]
+}

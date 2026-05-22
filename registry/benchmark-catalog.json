@@ -1,0 +1,18 @@
+{
+  "benchmarks": [
+    {
+      "documentation_paths": [
+        "benchmarks/README.md",
+        "benchmarks/auditability-failures/README.md"
+      ],
+      "id": "bench.auditability_failures.v1",
+      "name": "Auditability failure catalogue",
+      "readme_path": "benchmarks/auditability-failures/README.md",
+      "runner_path": "benchmarks/auditability-failures/run_benchmark.py",
+      "scenarios_path": "benchmarks/auditability-failures/scenarios.json"
+    }
+  ],
+  "catalog_kind": "govai_benchmark_catalog",
+  "schema_version": "1",
+  "summary": "Local, deterministic benchmark metadata for GovAI auditability teaching and regression checks. Benchmarks listed here do not invoke production verdict engines and do not change compliance-summary semantics."
+}

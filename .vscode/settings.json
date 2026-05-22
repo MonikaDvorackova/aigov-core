@@ -1,0 +1,26 @@
+{
+    "python.defaultInterpreterPath": "${workspaceFolder}/python/.venv/bin/python",
+    "python.terminal.activateEnvironment": true,
+  
+    "cSpell.enabled": true,
+    "cSpell.enabledFileTypes": {
+      "**/*.md": true,
+      "**/*.txt": true,
+  
+      "**/*.py": false,
+      "**/*.rs": false,
+      "**/*.js": false,
+      "**/*.ts": false,
+      "**/*.tsx": false,
+      "**/*.json": false,
+      "**/*.yaml": false,
+      "**/*.yml": false,
+      "**/*.toml": false,
+      "**/Makefile": false
+    },
+  
+    "rust-analyzer.linkedProjects": [
+      "rust/Cargo.toml"
+    ]
+  }
+  

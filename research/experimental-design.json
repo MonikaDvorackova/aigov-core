@@ -1,0 +1,27 @@
+{
+  "analysis_plan_summary": "Report benchmark coverage counts and deterministic regression pass/fail; avoid claiming hosted ledger equivalence from local benchmarks alone.",
+  "artifact_id": "govai-research-experimental-design",
+  "cross_references": {
+    "benchmark_methodology": "research/benchmark-methodology.json",
+    "citation_metadata": "research/citation-metadata.json",
+    "reproducibility_checklist": "research/reproducibility-checklist.json",
+    "research_manifest": "research/research-manifest.json",
+    "threats_to_validity": "research/threats-to-validity.json"
+  },
+  "documentation_anchor": "docs/research/experimental-design.md",
+  "primary_hypotheses": [
+    {
+      "hypothesis_id": "govai-hyp-benchmark-determinism",
+      "statement": "Given a pinned commit, the auditability failure catalogue runner produces identical scenario outcomes across repeated executions on the same Python version."
+    },
+    {
+      "hypothesis_id": "govai-hyp-manifest-validation",
+      "statement": "Research manifest validation succeeds on the canonical committed JSON bundle without network access."
+    }
+  ],
+  "preregistration_anchor": "docs/research/experimental-design.md",
+  "schema_version": 1,
+  "stable_package_urn": "urn:govai:research:package:1",
+  "study_design": "observational_replication_with_local_deterministic_tools",
+  "title": "GovAI experimental design"
+}

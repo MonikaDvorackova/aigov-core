@@ -1,0 +1,47 @@
+{
+  "catalog_kind": "govai_capability_taxonomy",
+  "categories": [
+    {
+      "description": "Meaningful human control, escalation paths, and role definitions for decisions that materially affect deployments, data subjects, or safety.",
+      "documentation_paths": [
+        "docs/registry/capability-taxonomy.md"
+      ],
+      "id": "human_oversight",
+      "label": "Human oversight"
+    },
+    {
+      "description": "Post-deployment monitoring, incident feedback loops, and change management tied to model and system behaviour in production.",
+      "documentation_paths": [
+        "docs/registry/capability-taxonomy.md"
+      ],
+      "id": "post_market_monitoring",
+      "label": "Post-market monitoring"
+    },
+    {
+      "description": "Robustness, security, and resilience expectations for models and systems, including adversarial and misuse-aware controls where applicable.",
+      "documentation_paths": [
+        "docs/registry/capability-taxonomy.md"
+      ],
+      "id": "robustness",
+      "label": "Robustness and security"
+    },
+    {
+      "description": "Risk registers, mitigation evidence, and governance gates aligned to organizational risk appetite for AI deployments.",
+      "documentation_paths": [
+        "docs/registry/capability-taxonomy.md"
+      ],
+      "id": "risk_management",
+      "label": "Risk management"
+    },
+    {
+      "description": "Technical and organisational measures that support audit trails, lineage, and reproducible decision records.",
+      "documentation_paths": [
+        "docs/registry/capability-taxonomy.md"
+      ],
+      "id": "traceability",
+      "label": "Traceability and record-keeping"
+    }
+  ],
+  "schema_version": "1",
+  "summary": "GovAI capability taxonomy for cataloguing policy packs and submissions against governance themes. Entries are stable identifiers for documentation and registry cross-references; they do not imply legal compliance or runtime verdict behaviour."
+}

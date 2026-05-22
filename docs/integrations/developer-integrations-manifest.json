@@ -1,0 +1,173 @@
+{
+  "automation_packs": [
+    {
+      "id": "sample-automation-pack",
+      "path": "examples/integrations/sample-automation-pack.json",
+      "summary": "Reference automation pack demonstrating commands, argv validation, and on-disk artifact checks for CI and local tooling."
+    }
+  ],
+  "authentication_model": {
+    "summary": "GovAI integrations use bearer tokens (GOVAI_API_KEY) against the audit HTTP API, optional X-GovAI-Project metadata, and operator-managed API keys. MCP and IDE bridges read local config only; secrets never ship in manifests."
+  },
+  "ci_cd_model": {
+    "summary": "Repository Makefile targets and GitHub Actions emit deterministic JSON and Markdown artifacts. Developer integrations checks aggregate diagnostics, manifest validation, automation pack validation, and summary generation before the documentation gate."
+  },
+  "developer_workflows": [
+    "Clone from staging, run python venv setup under python/, start docker compose for local audit, use make developer-integrations-platform-check before PR.",
+    "Run examples/integrations shell drivers to reproduce validators without memorizing argv.",
+    "Use docs/integrations/github-actions.md for CI wiring and docs/integrations/cli-workflows.md for govai CLI patterns."
+  ],
+  "integration_program": {
+    "summary": "Developer integrations and automation platform: machine-readable manifest, automation packs, validators, diagnostics, documentation, and CI artifacts for GovAI adoption without changing runtime enforcement."
+  },
+  "local_tooling": {
+    "summary": "Stdlib Python scripts under scripts/ validate manifests and packs; Makefile exposes developer-integrations, manifest validation, automation-pack targets, and developer-integrations-platform-check. No network calls in validators."
+  },
+  "non_goals": [
+    "No hosted billing or ledger mutations from these validators.",
+    "No automatic execution of automation pack commands during validation (structure and artifact paths only).",
+    "No certification or legal compliance claims from documentation or manifests."
+  ],
+  "referenced_documents": [
+    {
+      "path": "docs/integrations/README.md",
+      "title": "Developer integrations index"
+    },
+    {
+      "path": "docs/integrations/github-actions.md",
+      "title": "GitHub Actions integration"
+    },
+    {
+      "path": "docs/integrations/cli-workflows.md",
+      "title": "CLI workflows"
+    },
+    {
+      "path": "docs/integrations/mcp-integration.md",
+      "title": "MCP integration"
+    },
+    {
+      "path": "docs/integrations/cursor-plugin.md",
+      "title": "Cursor plugin"
+    },
+    {
+      "path": "docs/integrations/api-examples.md",
+      "title": "API examples"
+    },
+    {
+      "path": "docs/integrations/automation-packs.md",
+      "title": "Automation packs"
+    },
+    {
+      "path": "docs/integrations/authentication.md",
+      "title": "Authentication"
+    },
+    {
+      "path": "docs/integrations/local-tooling.md",
+      "title": "Local tooling"
+    },
+    {
+      "path": "docs/integrations/troubleshooting.md",
+      "title": "Troubleshooting"
+    },
+    {
+      "path": "docs/integrations/integration-matrix.md",
+      "title": "Integration matrix"
+    },
+    {
+      "path": "docs/integrations/python-sdk.md",
+      "title": "Python SDK"
+    },
+    {
+      "path": "docs/integrations/typescript-sdk.md",
+      "title": "TypeScript client (monorepo)"
+    },
+    {
+      "path": "docs/integrations/openai-integration.md",
+      "title": "OpenAI integration"
+    },
+    {
+      "path": "docs/integrations/langchain-integration.md",
+      "title": "LangChain integration"
+    },
+    {
+      "path": "docs/integrations/mlflow-integration.md",
+      "title": "MLflow integration"
+    },
+    {
+      "path": "docs/integrations/opentelemetry-integration.md",
+      "title": "OpenTelemetry integration"
+    },
+    {
+      "path": "docs/integrations/webhooks-and-connectors.md",
+      "title": "Webhooks and connectors"
+    },
+    {
+      "path": "docs/integrations/sdk-roadmap.md",
+      "title": "SDK roadmap"
+    }
+  ],
+  "referenced_examples": [
+    {
+      "path": "examples/integrations/README.md",
+      "title": "Integrations examples index"
+    },
+    {
+      "path": "examples/integrations/run-developer-integrations-check.sh",
+      "title": "Run developer integrations diagnostics"
+    },
+    {
+      "path": "examples/integrations/run-automation-pack-validation.sh",
+      "title": "Run automation pack validation"
+    },
+    {
+      "path": "examples/integrations/run-automation-pack-summary.sh",
+      "title": "Generate automation pack summary"
+    },
+    {
+      "path": "examples/integrations/sample-github-action.yml",
+      "title": "Sample GitHub Action workflow"
+    },
+    {
+      "path": "examples/integrations/sample-cli-workflow.sh",
+      "title": "Sample CLI workflow script"
+    },
+    {
+      "path": "examples/integrations/sample-automation-pack.json",
+      "title": "Sample automation pack manifest"
+    },
+    {
+      "path": "examples/integrations/python-sdk/README.md",
+      "title": "Python SDK example"
+    },
+    {
+      "path": "examples/integrations/typescript-sdk/README.md",
+      "title": "TypeScript HTTP scaffold example"
+    }
+  ],
+  "required_checks": [
+    "make developer-integrations",
+    "make developer-integrations-manifest",
+    "make automation-pack",
+    "make automation-pack-summary",
+    "make developer-integrations-platform-check",
+    "make gate"
+  ],
+  "supported_integrations": [
+    {
+      "id": "http_audit_api",
+      "summary": "Primary integration via OpenAPI v1: POST /evidence, GET /compliance-summary, exports and health endpoints."
+    },
+    {
+      "id": "python_sdk",
+      "summary": "In-repo GovAIClient and govai CLI under python/ for typed HTTP and CI gates."
+    },
+    {
+      "id": "github_actions",
+      "summary": "Workflow steps invoking Makefile targets and stdlib validators with JSON artifacts uploaded to CI."
+    },
+    {
+      "id": "mcp_cursor",
+      "summary": "Local MCP bridge and Cursor plugin pack for agent-assisted development against the same gates."
+    }
+  ]
+}

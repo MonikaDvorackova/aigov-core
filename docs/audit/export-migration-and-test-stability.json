@@ -1,0 +1,22 @@
+{
+  "run_id": "export-migration-and-test-stability",
+  "bundle_sha256": "4bdfdc0a94adbd4a5550136eb95f761c2384e67c1a1fffc8a864339ede5384fb",
+  "policy_version": "v0.5_dev",
+  "identifiers": {
+    "ai_system_id": "govai",
+    "dataset_id": "export-migration-test",
+    "model_version_id": null,
+    "primary_risk_id": null,
+    "risk_ids": []
+  },
+  "generated_ts_utc": "2026-04-24T15:17:43.828572Z",
+  "evidence_chain_head_sha256": null,
+  "hashes": {
+    "evidence_sha256": "e633d5f5a70795de9750a5c3336fe0b5b20ffa29a9b9baaae0db72e0c3795f08",
+    "report_sha256": "3ecaffb47f38f9843418fcefc2cb14ca70d548b67b5d69c2bde005544b41cb7a"
+  },
+  "paths": {
+    "evidence_json": "docs/evidence/export-migration-and-test-stability.json",
+    "report_md": "docs/reports/export-migration-and-test-stability.md"
+  }
+}

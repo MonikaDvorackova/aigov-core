@@ -1,0 +1,65 @@
+{
+  "description": "Local-only GovAI runtime observability event examples. Values are synthetic fixtures for validation and dashboard design.",
+  "examples": [
+    {
+      "audit_trace_id": "audit-trace-local-001",
+      "component": "runtime_gateway",
+      "event_name": "govai.runtime.evaluation.started",
+      "event_time": "2026-05-13T08:00:00Z",
+      "event_version": "1.0.0",
+      "message": "Runtime governance evaluation started for local sample run.",
+      "policy_id": "policy.runtime.eu-ai-act-basic",
+      "run_id": "run-local-phase17-001",
+      "severity": "info",
+      "source": "local_sample",
+      "tenant_id": "tenant-local-demo"
+    },
+    {
+      "audit_trace_id": "audit-trace-local-001",
+      "component": "policy_evaluator",
+      "event_name": "govai.runtime.evaluation.completed",
+      "event_time": "2026-05-13T08:00:01Z",
+      "event_version": "1.0.0",
+      "latency_ms": 42,
+      "message": "Runtime governance evaluation completed with an observed BLOCKED verdict.",
+      "policy_id": "policy.runtime.eu-ai-act-basic",
+      "run_id": "run-local-phase17-001",
+      "severity": "warning",
+      "source": "local_sample",
+      "tenant_id": "tenant-local-demo",
+      "verdict": "BLOCKED"
+    },
+    {
+      "audit_trace_id": "audit-trace-local-001",
+      "component": "audit_exporter",
+      "diagnostic_code": "AUDIT_TRACE_LINKED",
+      "event_name": "govai.runtime.audit_trace.linked",
+      "event_time": "2026-05-13T08:00:02Z",
+      "event_version": "1.0.0",
+      "message": "Runtime event correlated with the local audit trace export.",
+      "policy_id": "policy.runtime.eu-ai-act-basic",
+      "recommended_action": "Open the matching audit export before incident triage.",
+      "run_id": "run-local-phase17-001",
+      "severity": "info",
+      "source": "local_sample",
+      "tenant_id": "tenant-local-demo"
+    },
+    {
+      "audit_trace_id": "audit-trace-local-002",
+      "component": "operator_tooling",
+      "diagnostic_code": "POLICY_CONTEXT_MISSING",
+      "event_name": "govai.runtime.incident.detected",
+      "event_time": "2026-05-13T08:05:00Z",
+      "event_version": "1.0.0",
+      "incident_class": "governance_policy_gap",
+      "message": "Operator sample detected a missing policy context for a runtime governance request.",
+      "policy_id": "policy.runtime.eu-ai-act-basic",
+      "recommended_action": "Classify as a governance incident and confirm the audit trace before escalation.",
+      "run_id": "run-local-phase17-002",
+      "severity": "error",
+      "source": "local_sample",
+      "tenant_id": "tenant-local-demo"
+    }
+  ],
+  "version": "1.0.0"
+}

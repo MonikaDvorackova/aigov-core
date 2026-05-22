@@ -1,0 +1,48 @@
+[package]
+name = "aigov_audit"
+version = "0.2.1"
+edition = "2021"
+
+[features]
+# Default builds intentionally exclude cloud immutable backends to keep
+# the dependency tree minimal and security scans deterministic.
+default = []
+
+[[bin]]
+name = "portable_evidence_digest_once"
+path = "src/bin/portable_evidence_digest_once.rs"
+
+[dependencies]
+axum = "0.7"
+tokio = { version = "1", features = ["full"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+uuid = { version = "1", features = ["v4", "serde"] }
+chrono = { version = "0.4", features = ["serde"] }
+
+reqwest = { version = "0.12", features = ["json", "rustls-tls"] }
+jsonwebtoken = "9"
+once_cell = "1"
+
+sqlx = { version = "0.8.6", features = ["runtime-tokio", "postgres", "uuid", "chrono", "tls-rustls", "migrate"] }
+sha2 = "0.10"
+hex = "0.4"
+hmac = "0.12"
+subtle = "2.6"
+base64 = "0.22"
+urlencoding = "2.1"
+ed25519-dalek = { version = "2", features = ["pkcs8"] }
+governor = "0.7"
+rand = "0.8"
+
+[dev-dependencies]
+hmac = "0.12"
+sha2 = "0.10"
+hex = "0.4"
+http-body-util = "0.1"
+tower = { version = "0.5", features = ["util"] }
+tempfile = "3"
+base64 = "0.22"
+rand = "0.8"
+rsa = "0.9"

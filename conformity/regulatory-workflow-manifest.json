@@ -1,0 +1,42 @@
+{
+  "schema_version": "1.0.0",
+  "summary": "Machine-readable index for EU AI Act conformity automation and regulatory workflows: conformity assessment, technical documentation (Annex IV), risk management lifecycle, post-market monitoring, serious incident reporting, and the obligations-to-controls mapping. This bundle documents operator workflows and audit expectations; it does not change runtime verdict semantics, Rust enforcement, or database migrations.",
+  "artifacts": {
+    "ai_act_control_mapping": "conformity/ai-act-control-mapping.json",
+    "conformity_assessment_workflow": "conformity/conformity-assessment-workflow.json",
+    "incident_reporting_workflow": "conformity/incident-reporting-workflow.json",
+    "post_market_monitoring_workflow": "conformity/post-market-monitoring-workflow.json",
+    "risk_management_workflow": "conformity/risk-management-workflow.json",
+    "technical_documentation_workflow": "conformity/technical-documentation-workflow.json"
+  },
+  "documentation_index": [
+    "docs/conformity/README.md",
+    "docs/conformity/overview.md",
+    "docs/conformity/conformity-assessment-workflow.md",
+    "docs/conformity/ai-act-control-mapping.md",
+    "docs/conformity/technical-documentation-workflow.md",
+    "docs/conformity/risk-management-workflow.md",
+    "docs/conformity/post-market-monitoring-workflow.md",
+    "docs/conformity/incident-reporting-workflow.md"
+  ],
+  "example_paths": [
+    "examples/conformity/README.md",
+    "examples/conformity/sample-conformity-assessment-snapshot.json",
+    "examples/conformity/run-conformity-workflow-check.sh"
+  ],
+  "regulatory_references": [
+    "docs/regulatory/ai-act-obligations.json",
+    "docs/regulatory/ai-act-mapping.md",
+    "docs/regulatory/conformity-assessment.md",
+    "docs/regulatory/technical-documentation.md",
+    "docs/regulatory/risk-management-system.md",
+    "docs/regulatory/post-market-monitoring.md",
+    "docs/regulatory/high-risk-system-obligations.md"
+  ],
+  "non_goals": [
+    "Does not certify conformity with the EU AI Act; conformity assessment is the responsibility of qualified assessors and notified bodies where applicable.",
+    "Does not assign legal liability or substitute for legal counsel.",
+    "Does not modify compliance verdict labels, Rust runtime enforcement, or database migrations.",
+    "Does not replace operator-owned record-keeping, registration with EU databases, or notified body procedures."
+  ]
+}

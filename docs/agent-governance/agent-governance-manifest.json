@@ -1,0 +1,164 @@
+{
+  "boundaries": {
+    "billing": "no_billing_controls_in_phase22_tooling",
+    "data": "delegation_snapshots_and_manifests_only_no_runtime_evidence_payloads",
+    "enforcement": "no_runtime_enforcement_semantics_changes",
+    "ledger": "no_ledger_writes_or_mutations",
+    "summary": "Phase 22 agent governance tooling reads the governance manifest and delegation snapshots to emit deterministic diagnostics, scores, and Markdown reports; it does not modify runtime enforcement, billing, ledger storage, or database schemas."
+  },
+  "governance_dimensions": [
+    {
+      "guide": "docs/agent-governance/delegation-policies.md",
+      "id": "delegation_policies",
+      "summary": "Documents how principals constrain delegated capabilities, scopes, and depth for autonomous and multi-agent workflows."
+    },
+    {
+      "guide": "docs/agent-governance/approval-chains.md",
+      "id": "approval_chains",
+      "summary": "Describes human-in-the-loop and automated approval steps required before high-impact agent actions."
+    },
+    {
+      "guide": "docs/agent-governance/multi-agent-orchestration.md",
+      "id": "multi_agent_orchestration",
+      "summary": "Covers orchestrator patterns, fan-out/fan-in delegation, and correlation identifiers across agent graphs."
+    },
+    {
+      "guide": "docs/agent-governance/override-governance.md",
+      "id": "override_governance",
+      "summary": "Defines emergency override, break-glass, and documentation requirements for policy bypass attempts."
+    },
+    {
+      "guide": "docs/agent-governance/agent-accountability.md",
+      "id": "agent_accountability",
+      "summary": "Maps agent identities to accountable owners, retention expectations, and audit artefact exports."
+    },
+    {
+      "guide": "docs/agent-governance/delegation-risk-management.md",
+      "id": "delegation_risk_management",
+      "summary": "Risk taxonomy for delegation sprawl, privilege escalation, and cross-tenant leakage in agent systems."
+    }
+  ],
+  "governance_probes": [
+    {
+      "command": "python3 scripts/validate_agent_governance_manifest.py --json",
+      "description": "Schema and reference path validation for this manifest.",
+      "name": "validate_agent_governance_manifest"
+    },
+    {
+      "command": "python3 scripts/validate_agent_delegation_snapshot.py --input examples/agent-governance/sample-agent-delegation-snapshot.json --json",
+      "description": "Schema validation for a single agent delegation snapshot payload.",
+      "name": "validate_agent_delegation_snapshot"
+    },
+    {
+      "command": "python3 scripts/agent_governance_score.py --input examples/agent-governance/sample-agent-delegation-snapshot.json --json",
+      "description": "Deterministic delegation, approval-chain, override, and auditability scoring with risk_level, findings, and recommendations.",
+      "name": "agent_governance_score"
+    },
+    {
+      "command": "python3 scripts/agent_governance_check.py --json",
+      "description": "Aggregated agent governance diagnostics across manifest, snapshot, Makefile wiring, and documentation paths.",
+      "name": "agent_governance_check"
+    },
+    {
+      "command": "python3 scripts/generate_agent_governance_report.py --input examples/agent-governance/sample-agent-delegation-snapshot.json",
+      "description": "Deterministic Markdown multi-agent governance report assembled from a single delegation snapshot.",
+      "name": "generate_agent_governance_report"
+    }
+  ],
+  "non_goals": [
+    "Phase 22 does not introduce billing controls, ledger telemetry, or schema migrations.",
+    "Phase 22 does not redefine VALID / INVALID / BLOCKED verdict semantics or hosted audit enforcement.",
+    "Delegation snapshots are operator-supplied attestations and are not legal certifications."
+  ],
+  "referenced_documents": [
+    {
+      "path": "docs/agent-governance/README.md",
+      "role": "agent_governance_index"
+    },
+    {
+      "path": "docs/agent-governance/delegation-policies.md",
+      "role": "delegation_policies"
+    },
+    {
+      "path": "docs/agent-governance/approval-chains.md",
+      "role": "approval_chains"
+    },
+    {
+      "path": "docs/agent-governance/multi-agent-orchestration.md",
+      "role": "multi_agent_orchestration"
+    },
+    {
+      "path": "docs/agent-governance/override-governance.md",
+      "role": "override_governance"
+    },
+    {
+      "path": "docs/agent-governance/agent-accountability.md",
+      "role": "agent_accountability"
+    },
+    {
+      "path": "docs/agent-governance/delegation-risk-management.md",
+      "role": "delegation_risk_management"
+    },
+    {
+      "path": "docs/agent-governance/agent-governance-report.md",
+      "role": "report_generator_notes"
+    }
+  ],
+  "referenced_examples": [
+    {
+      "path": "examples/agent-governance/README.md",
+      "role": "examples_index"
+    },
+    {
+      "path": "examples/agent-governance/run-agent-governance-check.sh",
+      "role": "driver_check"
+    },
+    {
+      "path": "examples/agent-governance/run-agent-governance-score.sh",
+      "role": "driver_score"
+    },
+    {
+      "path": "examples/agent-governance/run-agent-governance-report.sh",
+      "role": "driver_report"
+    },
+    {
+      "path": "examples/agent-governance/sample-agent-delegation-snapshot.json",
+      "role": "canonical_snapshot"
+    }
+  ],
+  "required_checks": [
+    "make agent-governance",
+    "make agent-governance-manifest",
+    "make agent-delegation-snapshot",
+    "make agent-governance-score",
+    "make agent-governance-report",
+    "make agent-governance-check"
+  ],
+  "score_weights": {
+    "approval_chain": 30,
+    "auditability": 20,
+    "delegation": 30,
+    "override": 20
+  },
+  "snapshot_schema": {
+    "required_collections": [
+      "approval_chain",
+      "auditability",
+      "delegation",
+      "override_governance"
+    ],
+    "required_keys": [
+      "approval_chain",
+      "auditability",
+      "captured_at",
+      "delegation",
+      "environment",
+      "override_governance",
+      "schema_version",
+      "snapshot_id"
+    ],
+    "summary": "Agent delegation snapshots capture a single observation window for multi-agent delegation graphs, approvals, overrides, and auditability signals used by offline scoring and reporting."
+  },
+  "summary": "Phase 22 agent governance manifest indexes delegation policies, approval chains, orchestration guidance, override governance, accountability, and risk management documentation alongside deterministic validators, scoring, diagnostics, and Markdown report generation for autonomous and multi-agent control platforms.",
+  "version": 1
+}

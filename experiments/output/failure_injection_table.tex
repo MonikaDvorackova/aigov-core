@@ -1,0 +1,28 @@
+\begin{tabular}{lrrrr}
+\toprule
+Scenario & B1 FN & B2 FN & Gate det. & Val. retain. \\
+\midrule
+valid\_complete\_trace & --- & --- & --- & 1.000 \\
+noisy\_but\_valid\_metadata & --- & --- & --- & 1.000 \\
+unknown\_optional\_metadata & --- & --- & --- & 1.000 \\
+reordered\_required\_events & --- & --- & --- & 1.000 \\
+duplicated\_evidence\_event\_idempotent & --- & --- & --- & 1.000 \\
+missing\_audit\_evidence & 1.000 & 0.000 & 1.000 & --- \\
+missing\_ai\_discovery\_output & 1.000 & 1.000 & 1.000 & --- \\
+missing\_evidence\_pack & 1.000 & 1.000 & 1.000 & --- \\
+partial\_evidence\_bundle & 1.000 & 0.000 & 1.000 & --- \\
+failed\_compliance\_evaluation & 1.000 & 0.000 & 1.000 & --- \\
+inconsistent\_evaluation\_result & 1.000 & 1.000 & 1.000 & --- \\
+missing\_approval\_record & 1.000 & 0.000 & 1.000 & --- \\
+stale\_approval & 1.000 & 1.000 & 1.000 & --- \\
+approval\_recorded\_before\_evaluation & 1.000 & 1.000 & 1.000 & --- \\
+invalid\_approval\_state & 1.000 & 0.000 & 1.000 & --- \\
+inconsistent\_run\_context & 1.000 & 1.000 & 1.000 & --- \\
+wrong\_run\_id & 1.000 & 1.000 & 1.000 & --- \\
+unavailable\_audit\_run & 1.000 & 0.000 & 1.000 & --- \\
+digest\_mismatch\_events\_only & 1.000 & 1.000 & 1.000 & --- \\
+digest\_mismatch\_export\_only & 1.000 & 1.000 & 1.000 & --- \\
+policy\_version\_mismatch & 1.000 & 1.000 & 1.000 & --- \\
+duplicated\_evidence\_event\_conflicting & 1.000 & 1.000 & 1.000 & --- \\
+\bottomrule
+\end{tabular}

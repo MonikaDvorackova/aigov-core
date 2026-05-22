@@ -1,0 +1,31 @@
+{
+  "documentation_paths": [
+    "docs/research/README.md",
+    "docs/research/benchmark-methodology.md",
+    "docs/research/citation-guide.md",
+    "docs/research/experimental-design.md",
+    "docs/research/open-science-principles.md",
+    "docs/research/publication-strategy.md",
+    "docs/research/reproducibility.md",
+    "docs/research/threats-to-validity.md"
+  ],
+  "example_paths": [
+    "examples/research/README.md",
+    "examples/research/run-research-package-check.sh",
+    "examples/research/sample-experimental-plan.json"
+  ],
+  "issued_at": "2026-05-13T00:00:00Z",
+  "manifest_artifact_id": "govai-research-manifest",
+  "package_id": "govai-research-academic-publication",
+  "package_version": "1.0.0",
+  "research_artifacts": {
+    "benchmark_methodology": "research/benchmark-methodology.json",
+    "citation_metadata": "research/citation-metadata.json",
+    "experimental_design": "research/experimental-design.json",
+    "reproducibility_checklist": "research/reproducibility-checklist.json",
+    "threats_to_validity": "research/threats-to-validity.json"
+  },
+  "research_readme_path": "research/README.md",
+  "schema_version": 1,
+  "stable_package_urn": "urn:govai:research:package:1"
+}

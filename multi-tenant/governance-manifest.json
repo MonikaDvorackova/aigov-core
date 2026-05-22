@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0.0",
+  "summary": "Machine-readable index for enterprise multi-tenant governance: isolation models, RBAC hierarchies, delegated administration, environment segmentation, and separation-of-duties. This bundle documents operator contracts and audit expectations; it does not change runtime verdict semantics, Rust enforcement, or database migrations.",
+  "artifacts": {
+    "delegated_administration": "multi-tenant/delegated-administration.json",
+    "environment_segmentation": "multi-tenant/environment-segmentation.json",
+    "role_hierarchy": "multi-tenant/role-hierarchy.json",
+    "separation_of_duties": "multi-tenant/separation-of-duties.json",
+    "tenant_isolation": "multi-tenant/tenant-isolation-model.json"
+  },
+  "documentation_index": [
+    "docs/multi-tenant/README.md",
+    "docs/multi-tenant/overview.md",
+    "docs/multi-tenant/tenant-isolation-model.md",
+    "docs/multi-tenant/rbac-hierarchy.md",
+    "docs/multi-tenant/delegated-administration.md",
+    "docs/multi-tenant/environment-segmentation.md",
+    "docs/multi-tenant/separation-of-duties.md"
+  ],
+  "example_paths": [
+    "examples/multi-tenant/README.md",
+    "examples/multi-tenant/sample-tenant-governance-snapshot.json",
+    "examples/multi-tenant/run-multi-tenant-check.sh"
+  ],
+  "non_goals": [
+    "Does not replace server-owned API key and ledger isolation enforced by the audit service.",
+    "Does not assign legal liability or certification status.",
+    "Does not modify compliance verdict labels or promotion rules in product code."
+  ]
+}

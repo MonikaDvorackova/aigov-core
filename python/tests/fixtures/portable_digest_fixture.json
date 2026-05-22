@@ -1,0 +1,16 @@
+{
+  "ok": true,
+  "run_id": "rid-stable",
+  "events": [
+    {
+      "event_id": "evt-a",
+      "event_type": "ai_discovery_reported",
+      "ts_utc": "2021-06-07T08:09:10Z",
+      "actor": "actor_x",
+      "system": "sys_y",
+      "run_id": "rid-stable",
+      "environment": "staging",
+      "payload": {"openai": false, "transformers": true}
+    }
+  ]
+}

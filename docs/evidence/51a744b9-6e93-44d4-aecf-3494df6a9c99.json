@@ -1,0 +1,58 @@
+{
+  "run_id": "51a744b9-6e93-44d4-aecf-3494df6a9c99",
+  "created_ts_utc": "2026-02-03T18:01:54.128519Z",
+  "events": [
+    {
+      "id": "approve_started_51a744b9-6e93-44d4-aecf-3494df6a9c99_b680c6f1-ab56-471e-b7a5-e3b233b1be3c",
+      "type": "approve_started",
+      "ts_utc": "2026-02-03T18:01:54.128780Z",
+      "actor": "monika",
+      "system": "aigov_poc",
+      "run_id": "51a744b9-6e93-44d4-aecf-3494df6a9c99",
+      "payload": {
+        "ts_utc": "2026-02-03T18:01:54.128195Z",
+        "remote_event_id": "ha_51a744b9-6e93-44d4-aecf-3494df6a9c99_6591a4c7-c3ef-4b50-a5a5-18ff81e82120"
+      },
+      "prev_sha256": null,
+      "sha256": "4c6ea20fe658da882cec800f9c17f01e551e3e0ce142253a6172c0b29b64c946"
+    },
+    {
+      "id": "human_approved_51a744b9-6e93-44d4-aecf-3494df6a9c99_2cf644de-63bd-4ed1-8631-df17190ee6a3",
+      "type": "human_approved",
+      "ts_utc": "2026-02-03T18:01:54.159071Z",
+      "actor": "monika",
+      "system": "aigov_poc",
+      "run_id": "51a744b9-6e93-44d4-aecf-3494df6a9c99",
+      "payload": {
+        "ts_utc": "2026-02-03T18:01:54.128195Z",
+        "remote_event_id": "ha_51a744b9-6e93-44d4-aecf-3494df6a9c99_6591a4c7-c3ef-4b50-a5a5-18ff81e82120",
+        "request": {
+          "event_id": "ha_51a744b9-6e93-44d4-aecf-3494df6a9c99_6591a4c7-c3ef-4b50-a5a5-18ff81e82120",
+          "event_type": "human_approved",
+          "ts_utc": "2026-02-03T18:01:54.128195Z",
+          "actor": "monika",
+          "system": "aigov_poc",
+          "run_id": "51a744b9-6e93-44d4-aecf-3494df6a9c99",
+          "payload": {
+            "scope": "model_promoted",
+            "decision": "approve",
+            "approver": "compliance_officer",
+            "justification": "metrics meet threshold and dataset fingerprint verified"
+          }
+        },
+        "response": {
+          "ok": true,
+          "policy_version": "v0.4_human_approval",
+          "record_hash": "8bc9ebbb5b2757ce9c8f536754a9035f500e2a50c7daf01e4641a0955b811756"
+        }
+      },
+      "prev_sha256": "4c6ea20fe658da882cec800f9c17f01e551e3e0ce142253a6172c0b29b64c946",
+      "sha256": "9f45c243e9f57aaadc09f46cbc54778d33d5f3c3e5de513c7c76543be3f0e528"
+    }
+  ],
+  "chain": {
+    "algorithm": "event_hash_chain_v1",
+    "head_sha256": "9f45c243e9f57aaadc09f46cbc54778d33d5f3c3e5de513c7c76543be3f0e528",
+    "ts_utc": "2026-02-03T18:01:54.159129Z"
+  }
+}

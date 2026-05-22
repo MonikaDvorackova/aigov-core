@@ -1,0 +1,34 @@
+{
+  "approval_workflow": {
+    "referenced_document": "docs/releases/release-runbook.md",
+    "summary": "Maintainers integrate on staging, run release readiness gates, obtain human approval per docs/reports gate headings, then tag vX.Y.Z and publish GitHub Releases using the release notes template."
+  },
+  "compatibility_policy": "docs/releases/compatibility-policy.md",
+  "deprecation_policy": "docs/releases/deprecation-policy.md",
+  "non_goals": [
+    "This manifest does not authorize production promotions by itself.",
+    "Release documentation does not replace cargo test, pytest, or hosted audit verification when code changes.",
+    "The release subsystem does not mutate billing state, ledgers, or tenant isolation configuration.",
+    "This program does not perform network calls or publish to external channels automatically."
+  ],
+  "referenced_documents": [
+    {"path": "docs/releases/versioning-policy.md", "role": "versioning_policy"},
+    {"path": "docs/releases/THIS_PATH_IS_INVALID_FOR_TESTING_ONLY.md", "role": "broken_fixture"}
+  ],
+  "referenced_examples": [
+    {"path": "examples/releases/README.md", "role": "examples_index"}
+  ],
+  "release_cadence": "docs/releases/release-cadence.md",
+  "release_channels": ["Git annotated tags vX.Y.Z on promoted commits"],
+  "release_program": "GovAI OSS release engineering and version governance: machine-readable manifest, validators, deterministic release note generation, readiness reporting, Makefile gates, and CI JSON artefacts aligned with staging integration and promotion to main.",
+  "required_artifacts": [
+    {"path": "CHANGELOG.md", "role": "keep_a_changelog_root"}
+  ],
+  "required_checks": ["release-manifest"],
+  "rollback_policy": {
+    "referenced_document": "docs/releases/release-checklist.md",
+    "summary": "Rollback is documentation-first: revert offending commits on staging or main, restore prior tag only when policy allows, and publish a follow-up PATCH release; see release checklist failure modes and security release process for embargoed fixes."
+  },
+  "security_release_policy": "docs/releases/security-release-process.md",
+  "versioning_policy": "docs/releases/versioning-policy.md"
+}

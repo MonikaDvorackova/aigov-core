@@ -1,0 +1,45 @@
+{
+  "artifact_id": "govai-research-reproducibility-checklist",
+  "artifact_retention_policy": "Retain benchmark logs, manifest validation JSON, and git SHA for at least the peer-review window of the study.",
+  "checklist_sections": [
+    {
+      "items": [
+        "Clone the public repository at a tagged release or recorded commit SHA.",
+        "Record Python 3.x minor version and whether a virtualenv was used.",
+        "Set GOVAI_MODE=ci when reproducing CI-equivalent diagnostics unless the study protocol states otherwise."
+      ],
+      "section_id": "govai-repro-sec-environment",
+      "title": "Environment capture"
+    },
+    {
+      "items": [
+        "Run python3 scripts/validate_research_manifest.py --json and store stdout.",
+        "Run python3 scripts/research_package_check.py --json and store stdout.",
+        "Run make research-package-check and make academic-publication-check when validating publication readiness."
+      ],
+      "section_id": "govai-repro-sec-validation",
+      "title": "Validation commands"
+    }
+  ],
+  "checklist_version": "1.0.0",
+  "cross_references": {
+    "benchmark_methodology": "research/benchmark-methodology.json",
+    "citation_metadata": "research/citation-metadata.json",
+    "experimental_design": "research/experimental-design.json",
+    "research_manifest": "research/research-manifest.json",
+    "threats_to_validity": "research/threats-to-validity.json"
+  },
+  "environment_pins": [
+    {
+      "description": "Repository commit identifier (prefer signed tags for releases).",
+      "pin_id": "govai-repro-pin-commit"
+    },
+    {
+      "description": "Exact command block copied from docs/research/reproducibility.md for the replication cell.",
+      "pin_id": "govai-repro-pin-commands"
+    }
+  ],
+  "schema_version": 1,
+  "stable_package_urn": "urn:govai:research:package:1",
+  "title": "GovAI reproducibility checklist"
+}

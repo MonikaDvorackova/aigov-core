@@ -1,0 +1,133 @@
+{
+  "ai_act_mapping_scope": {
+    "deployment_contexts": [
+      "deployer_obligations_where_documentation_supports_operator_work",
+      "provider_obligations_where_govai_maps_to_technical_measures"
+    ],
+    "risk_focus": [
+      "high_risk_annex_iii_indicative_mapping_only"
+    ],
+    "summary": "This manifest indexes GovAI repository artefacts that help operators assemble technical evidence narratives aligned with EU AI Act themes. It does not assert legal conformity, CE marking, or Notified Body outcomes."
+  },
+  "evidence_themes": [
+    {
+      "guide": "docs/regulatory/risk-management-system.md",
+      "id": "risk_management",
+      "summary": "Maps continuous risk identification, mitigation, and residual risk documentation to repository guidance and audit evidence concepts."
+    },
+    {
+      "guide": "docs/regulatory/evidence-obligations.md",
+      "id": "data_governance",
+      "summary": "Cross-reference for training, validation, and testing data governance narratives captured in the evidence–obligations matrix."
+    },
+    {
+      "guide": "docs/regulatory/technical-documentation.md",
+      "id": "technical_documentation",
+      "summary": "Structured technical file expectations that parallel Annex IV style documentation without replacing legal templates."
+    },
+    {
+      "guide": "docs/regulatory/human-oversight.md",
+      "id": "human_oversight",
+      "summary": "Human-in-the-loop and override patterns described in product documentation for operator-run systems."
+    },
+    {
+      "guide": "docs/regulatory/conformity-assessment.md",
+      "id": "conformity_assessment",
+      "summary": "Explains how internal QA and external assessment workflows can reference GovAI exports as supplementary technical evidence."
+    },
+    {
+      "guide": "docs/regulatory/post-market-monitoring.md",
+      "id": "post_market_monitoring",
+      "summary": "Monitoring hooks via audit exports and operational telemetry boundaries documented for deployers."
+    }
+  ],
+  "non_goals": [
+    "GovAI does not provide legal advice, regulatory interpretation, or EU conformity decisions.",
+    "Validators and exports are technical scaffolding only; they do not replace Notified Body review or national authority submissions.",
+    "No runtime enforcement, billing, ledger, or database semantics are modified by this regulatory evidence layer."
+  ],
+  "obligations_index": "docs/regulatory/ai-act-obligations.json",
+  "operational_probes": [
+    {
+      "command": "python3 scripts/validate_regulatory_evidence_manifest.py --json",
+      "description": "Schema and path validation for this manifest.",
+      "name": "validate_regulatory_evidence_manifest"
+    },
+    {
+      "command": "python3 scripts/validate_ai_act_obligations.py --json",
+      "description": "Schema and path validation for the AI Act obligations index.",
+      "name": "validate_ai_act_obligations"
+    },
+    {
+      "command": "python3 scripts/regulatory_evidence_check.py --json",
+      "description": "Aggregated diagnostics (score, checks, failures, warnings, checked_paths).",
+      "name": "regulatory_evidence_check"
+    },
+    {
+      "command": "python3 scripts/generate_regulatory_evidence_export.py --manifest docs/regulatory/regulatory-evidence-manifest.json",
+      "description": "Deterministic regulator-facing Markdown bundle from the manifest.",
+      "name": "generate_regulatory_evidence_export"
+    }
+  ],
+  "referenced_documents": [
+    {
+      "path": "docs/regulatory/README.md",
+      "role": "regulatory_index"
+    },
+    {
+      "path": "docs/regulatory/ai-act-mapping.md",
+      "role": "ai_act_mapping_overview"
+    },
+    {
+      "path": "docs/regulatory/high-risk-system-obligations.md",
+      "role": "high_risk_obligations_overview"
+    },
+    {
+      "path": "docs/regulatory/conformity-assessment.md",
+      "role": "conformity_assessment"
+    },
+    {
+      "path": "docs/regulatory/evidence-obligations.md",
+      "role": "evidence_obligations_matrix"
+    },
+    {
+      "path": "docs/regulatory/technical-documentation.md",
+      "role": "technical_documentation"
+    },
+    {
+      "path": "docs/regulatory/human-oversight.md",
+      "role": "human_oversight"
+    },
+    {
+      "path": "docs/regulatory/risk-management-system.md",
+      "role": "risk_management_system"
+    },
+    {
+      "path": "docs/regulatory/post-market-monitoring.md",
+      "role": "post_market_monitoring"
+    },
+    {
+      "path": "docs/regulatory/regulator-export-guide.md",
+      "role": "regulator_export_guide"
+    }
+  ],
+  "referenced_examples": [
+    {
+      "path": "examples/regulatory-evidence/README.md",
+      "role": "example_driver"
+    },
+    {
+      "path": "examples/regulatory-evidence/sample-regulatory-export.json",
+      "role": "sample_structured_export"
+    }
+  ],
+  "required_checks": [
+    "make regulatory-manifest",
+    "make ai-act-obligations",
+    "make regulatory-evidence",
+    "make regulatory-export",
+    "make regulatory-check"
+  ],
+  "summary": "Regulatory evidence manifest for GovAI: machine-readable index of EU AI Act–oriented documentation, validators, diagnostics, and export tooling. Operators use it to assemble technical files alongside legal counsel; it remains non-authoritative for statutory compliance.",
+  "version": 1
+}

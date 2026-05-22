@@ -1,0 +1,5 @@
+{
+  "require_approval": true,
+  "block_if_missing_evidence": true,
+  "enforce_approver_allowlist": true
+}

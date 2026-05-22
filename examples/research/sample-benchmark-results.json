@@ -1,0 +1,44 @@
+{
+  "description": "Illustrative shape only; authoritative numbers are produced under benchmark-runs/latest/ after make empirical-evaluation-run.",
+  "empirical-evaluation-summary.json": {
+    "artifacts": [
+      "event-ingestion-benchmarks.json",
+      "export-benchmarks.json",
+      "failure-benchmarks.json",
+      "hash-chain-benchmarks.json",
+      "multi-tenant-benchmarks.json",
+      "storage-benchmarks.json"
+    ],
+    "environment": {
+      "GOVAI_EMPIRICAL_QUICK": "True"
+    },
+    "ok": true,
+    "total_seconds": 0.0,
+    "version": 1
+  },
+  "event-ingestion-benchmarks.json": {
+    "benchmark_category": "event_ingestion",
+    "ok": true,
+    "scenarios": [
+      {
+        "event_count": 1000,
+        "events_per_second": 0.0,
+        "payload_target_bytes": 1024,
+        "requests_per_second": 0.0,
+        "statistics_ms": {
+          "count": 1000,
+          "max_ms": 0.0,
+          "mean_ms": 0.0,
+          "median_ms": 0.0,
+          "min_ms": 0.0,
+          "p50_ms": 0.0,
+          "p95_ms": 0.0,
+          "p99_ms": 0.0,
+          "stdev_ms": 0.0
+        }
+      }
+    ],
+    "version": 1
+  },
+  "note": "Replace with real benchmark-runs/latest/*.json for manuscript tables."
+}

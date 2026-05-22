@@ -1,0 +1,50 @@
+{
+  "run_id": "product-positioning-and-onboarding",
+  "ts_utc": "2026-04-24T18:42:41Z",
+  "kind": "evidence",
+  "system": "ci_fallback",
+  "mode": "ci",
+  "policy_version": "v0.4_ci",
+  "events": [
+    {
+      "id": "genesis",
+      "event_id": "genesis",
+      "event_type": "evidence_genesis",
+      "run_id": "product-positioning-and-onboarding",
+      "ts_utc": "2026-04-24T18:42:41Z",
+      "type": "evidence_genesis",
+      "actor": "ci_fallback",
+      "system": "ci_fallback",
+      "payload": {
+        "source": "ci_fallback"
+      },
+      "prev_event_id": null,
+      "hash": "35850d360ebb1390dd6ec3707c9467f001ad4f88152bf44407d5fb295eda78b8"
+    },
+    {
+      "id": "ci_fallback_used",
+      "event_id": "ci_fallback_used",
+      "event_type": "ci_fallback_used",
+      "run_id": "product-positioning-and-onboarding",
+      "ts_utc": "2026-04-24T18:42:41Z",
+      "type": "ci_fallback_used",
+      "actor": "ci_fallback",
+      "system": "ci_fallback",
+      "payload": {
+        "source": "ci_fallback"
+      },
+      "prev_event_id": "genesis",
+      "hash": "4ce4feef12ba3fb9486b9ea300535bb2347c1090ff678be1b706dc26e35a23e7"
+    }
+  ],
+  "chain": {
+    "head": "ci_fallback_used",
+    "hash_alg": "sha256"
+  },
+  "chain_head": "ci_fallback_used",
+  "meta": {
+    "aigov_mode": "ci",
+    "source": "ci_fallback",
+    "warning": "CI fallback evidence. Forbidden in PROD."
+  }
+}

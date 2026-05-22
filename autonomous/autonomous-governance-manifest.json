@@ -1,0 +1,16 @@
+{
+  "artifact_version": "1",
+  "bundle_id": "govai-autonomous-governance",
+  "description": "Machine-readable index for autonomous and multi-agent governance artefacts (advisory; no runtime enforcement).",
+  "artefacts": {
+    "approval_boundaries": "autonomous/approval-boundaries.json",
+    "autonomy_limits": "autonomous/autonomy-limits.json",
+    "delegation_boundaries": "autonomous/delegation-boundaries.json",
+    "intervention_points": "autonomous/intervention-points.json",
+    "role_models": "autonomous/role-models.json"
+  },
+  "related_operator_docs": [
+    "docs/autonomous/README.md",
+    "docs/agent-governance/README.md"
+  ]
+}

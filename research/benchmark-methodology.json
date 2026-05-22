@@ -1,0 +1,52 @@
+{
+  "artifact_id": "govai-research-benchmark-methodology",
+  "benchmark_suite_ids": [
+    "auditability-failures-catalogue"
+  ],
+  "cross_references": {
+    "citation_metadata": "research/citation-metadata.json",
+    "experimental_design": "research/experimental-design.json",
+    "reproducibility_checklist": "research/reproducibility-checklist.json",
+    "research_manifest": "research/research-manifest.json",
+    "threats_to_validity": "research/threats-to-validity.json"
+  },
+  "evaluation_protocol_id": "govai-eval-protocol-auditability-benchmarks-v1",
+  "methodology_version": "1.0.0",
+  "primary_metrics": [
+    {
+      "description": "Count of named auditability scenarios exercised by the local stdlib runner.",
+      "metric_id": "govai-metric-scenario-coverage",
+      "unit": "count"
+    },
+    {
+      "description": "Whether benchmark outputs match pinned expected governance signals (deterministic regression).",
+      "metric_id": "govai-metric-deterministic-regression",
+      "unit": "boolean"
+    }
+  ],
+  "protocol_steps": [
+    {
+      "description": "Record git commit SHA, Python version, and GOVAI_MODE for the evaluation run.",
+      "order": 1,
+      "step_id": "govai-bm-step-environment-pin"
+    },
+    {
+      "description": "Run the auditability failure catalogue driver with stdlib only (no network).",
+      "order": 2,
+      "step_id": "govai-bm-step-execute-catalogue"
+    },
+    {
+      "description": "Archive stdout/stderr and the emitted JSON line for independent verification.",
+      "order": 3,
+      "step_id": "govai-bm-step-artifact-capture"
+    }
+  ],
+  "referenced_benchmark_paths": [
+    "benchmarks/README.md",
+    "benchmarks/auditability-failures/README.md",
+    "benchmarks/auditability-failures/run_benchmark.py"
+  ],
+  "schema_version": 1,
+  "stable_package_urn": "urn:govai:research:package:1",
+  "title": "GovAI benchmark methodology"
+}

@@ -1,0 +1,55 @@
+{
+  "run_id": "56e767ab-9914-4246-9de5-c96acd25e66e",
+  "ts_utc": "2026-02-06T08:33:00Z",
+  "system": "ci_fallback",
+  "kind": "evidence",
+  "mode": "ci",
+  "events": [
+    {
+      "id": "212f73efe1da3faa538fdca45d9c2e09e22e5e38960b15dcead1fae2a401a476",
+      "event_id": "212f73efe1da3faa538fdca45d9c2e09e22e5e38960b15dcead1fae2a401a476",
+      "run_id": "56e767ab-9914-4246-9de5-c96acd25e66e",
+      "ts_utc": "2026-02-06T08:33:00Z",
+      "type": "evidence_genesis",
+      "system": "ci_fallback",
+      "payload": {
+        "source": "ci_fallback",
+        "notes": "Genesis evidence event generated in CI to enable report preparation."
+      },
+      "prev": null,
+      "hash": "2c38af9993fad69a4609c3e88eabab3c1872a8bb585cb1603f5070bc5f8615fd",
+      "sha256": "2c38af9993fad69a4609c3e88eabab3c1872a8bb585cb1603f5070bc5f8615fd"
+    },
+    {
+      "id": "fde1f606f4992d1fc04f5da7605012a4c9eca7765916ef7a94ff072ab2563161",
+      "event_id": "fde1f606f4992d1fc04f5da7605012a4c9eca7765916ef7a94ff072ab2563161",
+      "run_id": "56e767ab-9914-4246-9de5-c96acd25e66e",
+      "ts_utc": "2026-02-06T08:33:00Z",
+      "type": "ci_fallback_used",
+      "system": "ci_fallback",
+      "payload": {
+        "source": "ci_fallback",
+        "notes": "CI fallback evidence used because real evidence was missing in repo."
+      },
+      "prev": "212f73efe1da3faa538fdca45d9c2e09e22e5e38960b15dcead1fae2a401a476",
+      "prev_event_id": "212f73efe1da3faa538fdca45d9c2e09e22e5e38960b15dcead1fae2a401a476",
+      "hash": "d38c7ce1694cf4384f252a0be7ee751cbdb1c77581d6b8eaa8ef795dccb66325",
+      "sha256": "d38c7ce1694cf4384f252a0be7ee751cbdb1c77581d6b8eaa8ef795dccb66325"
+    }
+  ],
+  "chain": {
+    "head": "fde1f606f4992d1fc04f5da7605012a4c9eca7765916ef7a94ff072ab2563161",
+    "head_event_id": "fde1f606f4992d1fc04f5da7605012a4c9eca7765916ef7a94ff072ab2563161",
+    "head_id": "fde1f606f4992d1fc04f5da7605012a4c9eca7765916ef7a94ff072ab2563161",
+    "head_hash": "d38c7ce1694cf4384f252a0be7ee751cbdb1c77581d6b8eaa8ef795dccb66325",
+    "hash_alg": "sha256"
+  },
+  "chain_head": "fde1f606f4992d1fc04f5da7605012a4c9eca7765916ef7a94ff072ab2563161",
+  "head": "fde1f606f4992d1fc04f5da7605012a4c9eca7765916ef7a94ff072ab2563161",
+  "head_event_id": "fde1f606f4992d1fc04f5da7605012a4c9eca7765916ef7a94ff072ab2563161",
+  "meta": {
+    "generated_by": "python/aigov_py/ci_fallback.py",
+    "source": "ci_fallback",
+    "warning": "This evidence was auto generated for CI. Replace with real evidence events for production use."
+  }
+}

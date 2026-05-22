@@ -1,0 +1,59 @@
+{
+  "schema_version": "1.0.0",
+  "model_id": "govai.enterprise.tenant_isolation.v1",
+  "summary": "Logical and operational tenant isolation: identity, data, network, and observability boundaries for GovAI-hosted and customer-managed control planes.",
+  "isolation_layers": [
+    {
+      "boundary": "identity",
+      "description": "Tenant identity is established server-side from credentials; client-supplied tenant labels are non-authoritative.",
+      "controls": [
+        "api_key_to_tenant_mapping",
+        "no_trust_in_client_tenant_header"
+      ]
+    },
+    {
+      "boundary": "data",
+      "description": "Ledger rows, exports, and billing artefacts are scoped by tenant identifier enforced in application logic.",
+      "controls": [
+        "row_level_tenant_key",
+        "export_scoped_by_run_and_tenant"
+      ]
+    },
+    {
+      "boundary": "network",
+      "description": "Optional private connectivity and egress allowlists segment operator networks from tenant workloads.",
+      "controls": [
+        "private_link_optional",
+        "egress_allowlist_recommended"
+      ]
+    },
+    {
+      "boundary": "observability",
+      "description": "Metrics and logs carry tenant dimensions only when policy allows; sampling must not leak cross-tenant payloads.",
+      "controls": [
+        "structured_tenant_dimension",
+        "payload_redaction_default"
+      ]
+    }
+  ],
+  "cross_tenant_denies": [
+    "cross_tenant_evidence_reads",
+    "cross_tenant_digest_replay",
+    "shared_cache_keys_without_namespace"
+  ],
+  "shared_services_policy": {
+    "allowed_shared_components": [
+      "cdn_static_assets",
+      "shared_observability_pipeline_with_tenant_dimension"
+    ],
+    "requires_tenant_namespace": true
+  },
+  "encryption_envelope": {
+    "at_rest": "operator_managed_kms_or_platform_default",
+    "in_transit": "tls_1_2_minimum"
+  },
+  "audit_scope_per_tenant": {
+    "export_boundary": "tenant_scoped_run_ids_only",
+    "admin_visibility": "break_glass_only_with_dual_control"
+  }
+}

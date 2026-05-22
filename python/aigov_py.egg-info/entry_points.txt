@@ -1,0 +1,2 @@
+[console_scripts]
+govai = aigov_py.cli:main

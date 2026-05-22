@@ -1,0 +1,15 @@
+{
+  "run_id": "72324020-9d0d-465b-b2d0-2b504ca24830",
+  "ts_utc": "2026-02-05T20:23:31Z",
+  "events": [],
+  "chain": {
+    "head": {
+      "id": "72324020-9d0d-465b-b2d0-2b504ca24830",
+      "prev": null,
+      "ts_utc": "2026-02-05T20:23:31Z",
+      "type": "genesis"
+    },
+    "events": []
+  },
+  "version": 1
+}

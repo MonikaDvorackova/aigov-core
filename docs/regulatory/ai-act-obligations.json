@@ -1,0 +1,117 @@
+{
+  "obligations": [
+    {
+      "article_reference": "Article 9",
+      "category": "risk_management",
+      "evidence_paths": [
+        "docs/regulatory/risk-management-system.md"
+      ],
+      "govai_mapping": "Continuous risk treatment is supported by policy-backed evidence and exportable audit trails; operators document residual risk outside GovAI.",
+      "id": "ai_act_article_9_risk_management_system",
+      "summary": "Providers of high-risk AI systems shall establish, implement, document, and maintain a risk management system applied throughout the entire lifecycle.",
+      "title": "Risk management system"
+    },
+    {
+      "article_reference": "Article 10",
+      "category": "data_governance",
+      "evidence_paths": [
+        "docs/regulatory/evidence-obligations.md"
+      ],
+      "govai_mapping": "Dataset and model lineage can be referenced in governance evidence packs; GovAI does not certify data quality legal sufficiency.",
+      "id": "ai_act_article_10_data_governance",
+      "summary": "Training, validation, and testing data shall be subject to appropriate governance practices relevant to the intended purpose of the high-risk AI system.",
+      "title": "Data and data governance"
+    },
+    {
+      "article_reference": "Article 11",
+      "category": "technical_documentation",
+      "evidence_paths": [
+        "docs/regulatory/technical-documentation.md"
+      ],
+      "govai_mapping": "Technical documentation packs can cite GovAI exports as append-only evidence of controls exercised during development and deployment preparation.",
+      "id": "ai_act_article_11_technical_documentation",
+      "summary": "High-risk AI systems shall be accompanied by technical documentation demonstrating compliance with the requirements set out in Title III, Chapter 2.",
+      "title": "Technical documentation"
+    },
+    {
+      "article_reference": "Article 12",
+      "category": "transparency",
+      "evidence_paths": [
+        "docs/regulatory/ai-act-mapping.md"
+      ],
+      "govai_mapping": "Transparency obligations for deployers intersect with logging and disclosure artefacts; mapping doc explains indicative alignment only.",
+      "id": "ai_act_article_12_record_keeping",
+      "summary": "Automatic recording of events (logs) shall be enabled by design over the lifetime of the high-risk AI system to the extent appropriate.",
+      "title": "Record-keeping"
+    },
+    {
+      "article_reference": "Article 14",
+      "category": "human_oversight",
+      "evidence_paths": [
+        "docs/regulatory/human-oversight.md"
+      ],
+      "govai_mapping": "Human approval gates in documentation mirror procedural oversight; runtime kill-switch and escalation remain operator-owned.",
+      "id": "ai_act_article_14_human_oversight",
+      "summary": "High-risk AI systems shall be designed and developed so that natural persons can effectively oversee their functioning during the period in which the AI system is in use.",
+      "title": "Human oversight"
+    },
+    {
+      "article_reference": "Article 15",
+      "category": "security",
+      "evidence_paths": [
+        "docs/regulatory/high-risk-system-obligations.md"
+      ],
+      "govai_mapping": "Accuracy, robustness, and cybersecurity are addressed in enterprise security docs; this file links high-risk themes to GovAI non-claims.",
+      "id": "ai_act_article_15_accuracy_robustness_cybersecurity",
+      "summary": "High-risk AI systems shall achieve an appropriate level of accuracy, robustness, and cybersecurity in light of their intended purpose.",
+      "title": "Accuracy, robustness and cybersecurity"
+    },
+    {
+      "article_reference": "Article 43",
+      "category": "conformity_assessment",
+      "evidence_paths": [
+        "docs/regulatory/conformity-assessment.md"
+      ],
+      "govai_mapping": "Conformity procedures remain with qualified assessors; GovAI supplies reproducible technical exports to attach to dossiers when counsel approves.",
+      "id": "ai_act_article_43_conformity_assessment",
+      "summary": "High-risk AI systems shall undergo the relevant conformity assessment procedure prior to being placed on the market or put into service.",
+      "title": "Conformity assessment"
+    },
+    {
+      "article_reference": "Article 72",
+      "category": "post_market",
+      "evidence_paths": [
+        "docs/regulatory/post-market-monitoring.md"
+      ],
+      "govai_mapping": "Post-market evidence can include recurring compliance summaries and incident exports where operators wire monitoring to GovAI-backed audit services.",
+      "id": "ai_act_article_72_post_market_monitoring_by_providers",
+      "summary": "Providers of high-risk AI systems shall establish and document a post-market monitoring system in a manner proportionate to the nature of the AI technologies.",
+      "title": "Post-market monitoring by providers"
+    },
+    {
+      "article_reference": "Annex IV",
+      "category": "technical_documentation",
+      "evidence_paths": [
+        "docs/regulatory/technical-documentation.md",
+        "docs/regulatory/regulator-export-guide.md"
+      ],
+      "govai_mapping": "Annex IV structure informs the export guide; generated Markdown is a convenience bundle, not a completed Annex IV submission.",
+      "id": "ai_act_annex_iv_technical_documentation_elements",
+      "summary": "Technical documentation shall contain the elements set out in Annex IV, where applicable to the AI system in question.",
+      "title": "Annex IV technical documentation elements"
+    },
+    {
+      "article_reference": "Article 26",
+      "category": "accountability",
+      "evidence_paths": [
+        "docs/regulatory/evidence-obligations.md"
+      ],
+      "govai_mapping": "Deployer obligations for monitoring and human oversight intersect with GovAI run lifecycle; matrix maps themes to repository artefacts.",
+      "id": "ai_act_article_26_deployer_obligations_monitoring",
+      "summary": "Deployers shall monitor the operation of the high-risk AI system in accordance with the instructions for use and perform human oversight as required.",
+      "title": "Deployer monitoring and oversight duties"
+    }
+  ],
+  "summary": "Structured index of indicative EU AI Act obligations referenced by GovAI regulatory documentation. Articles are cited for operator orientation; definitive legal obligations follow the Official Journal text and implementing acts.",
+  "version": 1
+}

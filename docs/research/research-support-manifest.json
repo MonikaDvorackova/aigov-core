@@ -1,0 +1,100 @@
+{
+  "bundles": {
+    "empirical_evaluation": [
+      "docs/research/empirical-evaluation.md",
+      "docs/research/load-testing-methodology.md",
+      "docs/research/performance-results.md",
+      "docs/research/storage-analysis.md",
+      "docs/research/scalability-analysis.md",
+      "docs/research/statistical-methodology.md",
+      "docs/research/benchmark-manifest.json",
+      "docs/reports/tenant_console_product_ops_package.md"
+    ],
+    "legal": [
+      "docs/legal/evidentiary-positioning.md",
+      "docs/legal/chain-of-custody.md",
+      "docs/legal/jurisdictional-limitations.md"
+    ],
+    "privacy": [
+      "docs/privacy/privacy-architecture.md",
+      "docs/privacy/data-minimization-patterns.md",
+      "docs/privacy/retention-policy-patterns.md"
+    ],
+    "provider_cooperation": [
+      "docs/standards/provider-cooperation-roadmap.md",
+      "docs/standards/attestation-api-concepts.md",
+      "docs/standards/fallback-strategies.md"
+    ],
+    "quantitative": [
+      "docs/research/quantitative-feasibility.md",
+      "docs/research/microbenchmarks.md"
+    ],
+    "scalability": [
+      "docs/operations/scalability-and-retention-patterns.md",
+      "docs/operations/evidence-tiering.md",
+      "docs/operations/compression-and-archival.md"
+    ],
+    "threat_model_docs": [
+      "docs/security/threat-matrix.md",
+      "docs/security/threat-model-summary.md"
+    ]
+  },
+  "documentation": [
+    "docs/research/quantitative-feasibility.md",
+    "docs/research/microbenchmarks.md",
+    "docs/research/empirical-evaluation.md",
+    "docs/research/load-testing-methodology.md",
+    "docs/research/performance-results.md",
+    "docs/research/storage-analysis.md",
+    "docs/research/scalability-analysis.md",
+    "docs/research/statistical-methodology.md",
+    "docs/research/benchmark-manifest.json",
+    "docs/reports/tenant_console_product_ops_package.md",
+    "docs/security/threat-matrix.md",
+    "docs/security/threat-model-summary.md",
+    "docs/legal/evidentiary-positioning.md",
+    "docs/legal/chain-of-custody.md",
+    "docs/legal/jurisdictional-limitations.md",
+    "docs/privacy/privacy-architecture.md",
+    "docs/privacy/data-minimization-patterns.md",
+    "docs/privacy/retention-policy-patterns.md",
+    "docs/standards/provider-cooperation-roadmap.md",
+    "docs/standards/attestation-api-concepts.md",
+    "docs/standards/fallback-strategies.md",
+    "docs/operations/scalability-and-retention-patterns.md",
+    "docs/operations/evidence-tiering.md",
+    "docs/operations/compression-and-archival.md"
+  ],
+  "examples": [
+    "examples/research/README.md",
+    "examples/research/run-microbenchmarks.sh",
+    "examples/research/run-empirical-evaluation.sh",
+    "examples/research/sample-benchmark-results.json",
+    "examples/security/README.md",
+    "examples/security/sample-threat-matrix.json",
+    "examples/privacy/README.md",
+    "examples/operations/README.md"
+  ],
+  "manifest_version": 2,
+  "schema_version": 1,
+  "scripts": [
+    "scripts/microbenchmark_audit_engine.py",
+    "scripts/threat_model_check.py",
+    "scripts/legal_positioning_check.py",
+    "scripts/privacy_architecture_check.py",
+    "scripts/provider_cooperation_check.py",
+    "scripts/scalability_patterns_check.py",
+    "scripts/research_support_check.py",
+    "scripts/manuscript_evidence_runner.py",
+    "scripts/empirical_benchmark_lib.py",
+    "scripts/run_event_ingestion_benchmarks.py",
+    "scripts/run_hash_chain_benchmarks.py",
+    "scripts/run_export_benchmarks.py",
+    "scripts/run_storage_benchmarks.py",
+    "scripts/run_multi_tenant_benchmarks.py",
+    "scripts/run_failure_benchmarks.py",
+    "scripts/run_full_empirical_evaluation.py",
+    "scripts/empirical_evaluation_check.py"
+  ],
+  "threat_matrix_sample": "examples/security/sample-threat-matrix.json"
+}

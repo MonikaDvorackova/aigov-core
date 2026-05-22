@@ -1,0 +1,41 @@
+{
+  "schema_version": "govai.npm.typescript_publishing.v1",
+  "package_directory": "typescript-sdk",
+  "package_json_path": "typescript-sdk/package.json",
+  "required_metadata_fields": [
+    "name",
+    "version",
+    "description",
+    "license",
+    "repository",
+    "keywords",
+    "files",
+    "main",
+    "types",
+    "exports",
+    "engines",
+    "publishConfig"
+  ],
+  "required_scripts": ["build", "test", "typecheck"],
+  "required_docs": [
+    "docs/releases/npm-typescript-publishing.md",
+    "docs/releases/npm-typescript-publishing-manifest.json",
+    "typescript-sdk/README.md"
+  ],
+  "expected_build_outputs": [
+    "typescript-sdk/dist/index.js",
+    "typescript-sdk/dist/index.d.ts"
+  ],
+  "forbidden_committed_secrets": [
+    ".npmrc",
+    "typescript-sdk/.npmrc"
+  ],
+  "secret_scan_globs": [
+    "typescript-sdk/**",
+    ".github/workflows/**"
+  ],
+  "audit_report_path": "docs/reports/npm-typescript-publishing-readiness-audit.md",
+  "publishing_doc_path": "docs/releases/npm-typescript-publishing.md",
+  "validator_script": "scripts/npm_typescript_publishing_check.py",
+  "npm_package_name": "@govai/functions-sdk"
+}

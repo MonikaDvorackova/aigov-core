@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "dataset_id": "ds-govai-sample-governance-001",
+  "dataset_version": "2026-05-01",
+  "snapshot_timestamp_utc": "2026-05-01T12:00:00Z",
+  "description": "Synthetic GovAI sample dataset used only for offline validators and deterministic CI artefacts.",
+  "owners": [
+    {
+      "id": "team-governance-sample",
+      "role": "data_owner"
+    }
+  ],
+  "sources": [
+    {
+      "uri": "s3://govai-sample-bucket/raw/corpus-a/",
+      "type": "object_store",
+      "registered": true,
+      "checksum_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    },
+    {
+      "uri": "https://registry.example.invalid/datasets/corpus-b/v3",
+      "type": "registry_uri",
+      "registered": true
+    }
+  ],
+  "transformations": [
+    {
+      "id": "tr-dedupe-01",
+      "kind": "deduplication",
+      "code_reference": "git:github.com/example/repo@abcdef1234567890:pipelines/dedupe.py"
+    },
+    {
+      "id": "tr-pii-mask-01",
+      "kind": "pii_redaction",
+      "code_reference": "git:github.com/example/repo@abcdef1234567890:pipelines/pii_mask.py"
+    }
+  ],
+  "lineage_edges": [
+    {
+      "from_dataset_id": "ds-upstream-corpus-a",
+      "relation": "derived_from"
+    },
+    {
+      "from_dataset_id": "ds-upstream-corpus-b",
+      "relation": "merged_with"
+    }
+  ],
+  "retention": {
+    "classification": "internal",
+    "retention_days": 365,
+    "legal_hold": false
+  },
+  "quality_metrics": {
+    "label_balance": 0.82,
+    "documented_limitations": true,
+    "human_review_sample_rate": 0.05
+  },
+  "governance": {
+    "approval_id": "appr-govai-sample-2026-001",
+    "approval_timestamp_utc": "2026-04-28T09:00:00Z"
+  }
+}

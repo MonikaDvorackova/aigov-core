@@ -1,0 +1,12 @@
+{
+  "name": "govai-check-action",
+  "private": true,
+  "type": "commonjs",
+  "scripts": {
+    "test:action": "node --test test/action.test.js",
+    "simulate:action": "node scripts/simulate-action.js",
+    "test": "npm run test --prefix dashboard && npm run test --prefix typescript-sdk",
+    "build": "npm run build --prefix dashboard && npm run build --prefix typescript-sdk"
+  }
+}
+

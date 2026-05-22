@@ -1,0 +1,101 @@
+{
+  "disclosure_policy_reference": "SECURITY.md",
+  "incident_response_statement": "Security incidents are triaged per docs/security/incident-response.md and private disclosure per SECURITY.md; operators preserve logs and rotate credentials before public disclosure.",
+  "ledger_durability_statement": "Append-oriented audit ledgers use tenant-scoped storage with integrity checks; durability and backup expectations are documented in docs/security/audit-ledger-security.md and are operator-owned outside this manifest.",
+  "operational_probes": [
+    {
+      "command": "python3 scripts/security_trust_check.py --json",
+      "description": "Structured security and trust diagnostics (docs, CI wiring, Makefile, examples).",
+      "name": "security_trust_check"
+    },
+    {
+      "command": "python3 scripts/validate_trust_manifest.py --json",
+      "description": "Validates this manifest and referenced trust document paths.",
+      "name": "validate_trust_manifest"
+    },
+    {
+      "command": "python3 scripts/trust_chain_check.py --json",
+      "description": "Validates cryptographic trust artefacts under trust/ and examples/trust/.",
+      "name": "trust_chain_check"
+    },
+    {
+      "command": "make enterprise-readiness-check",
+      "description": "Aggregated OSS gate including security-trust, trust-manifest, and OSS diagnostics checks.",
+      "name": "enterprise_readiness_check"
+    }
+  ],
+  "security_controls": [
+    {
+      "description": "Bearer API keys and secret injection patterns for deployments.",
+      "evidence": "docs/security/secrets-management.md",
+      "id": "secrets_and_keys"
+    },
+    {
+      "description": "Tenant boundaries for ledger-backed operations derive from server-side API key mapping.",
+      "evidence": "docs/security/tenant-isolation.md",
+      "id": "tenant_isolation"
+    },
+    {
+      "description": "Fail-closed governance when evidence, approvals, or integrity checks do not succeed.",
+      "evidence": "docs/security/security-overview.md",
+      "id": "fail_closed_governance"
+    },
+    {
+      "description": "Audit ledger integrity, export controls, and backup considerations.",
+      "evidence": "docs/security/audit-ledger-security.md",
+      "id": "audit_ledger_integrity"
+    }
+  ],
+  "tenant_isolation_statement": "Ledger tenant context for security-sensitive routes is resolved from server-side API key to tenant mapping (for example GOVAI_API_KEYS_JSON); client project headers are metadata and must not be treated as the sole isolation boundary. See docs/security/tenant-isolation.md and SECURITY.md.",
+  "trust_documents": [
+    {
+      "path": "docs/trust/trust-center.md",
+      "role": "trust_center_entrypoint"
+    },
+    {
+      "path": "docs/trust/compliance-mapping.md",
+      "role": "compliance_mapping"
+    },
+    {
+      "path": "docs/trust/responsible-disclosure.md",
+      "role": "disclosure_process"
+    },
+    {
+      "path": "docs/trust/enterprise-faq.md",
+      "role": "enterprise_faq"
+    },
+    {
+      "path": "docs/trust/immutable-trust-chain.md",
+      "role": "cryptographic_trust_chain"
+    },
+    {
+      "path": "docs/trust/evidence-signing.md",
+      "role": "evidence_signing"
+    },
+    {
+      "path": "docs/trust/key-rotation.md",
+      "role": "key_rotation_policy"
+    },
+    {
+      "path": "docs/trust/verification-workflows.md",
+      "role": "verification_workflows"
+    },
+    {
+      "path": "docs/trust/cross-organization-attestation.md",
+      "role": "cross_org_attestation"
+    },
+    {
+      "path": "docs/trust/private-key-governance.md",
+      "role": "private_key_governance"
+    },
+    {
+      "path": "docs/trust/supply-chain-integrity.md",
+      "role": "supply_chain_integrity"
+    },
+    {
+      "path": "docs/security/security-overview.md",
+      "role": "security_overview"
+    }
+  ],
+  "version": 1
+}

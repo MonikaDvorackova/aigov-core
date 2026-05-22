@@ -1,0 +1,38 @@
+{
+  "expected": {
+    "broken_digest_continuity": {
+      "primary_signal": "INVALID",
+      "rationale": "Digest lineage must be consistent for append-only audit replay."
+    },
+    "duplicate_event_id": {
+      "primary_signal": "INVALID",
+      "rationale": "Immutable identifiers cannot be duplicated without breaking ledger semantics."
+    },
+    "incomplete_evidence_pack": {
+      "primary_signal": "BLOCKED",
+      "rationale": "Export cannot represent a complete decision record until mandatory sections exist."
+    },
+    "invalid_evaluation": {
+      "primary_signal": "INVALID",
+      "rationale": "Evaluation artefacts that fail validation cannot support a VALID promotion."
+    },
+    "missing_approval": {
+      "primary_signal": "BLOCKED",
+      "rationale": "Human or role-gated approvals are prerequisites, not optional hints."
+    },
+    "missing_audit_context": {
+      "primary_signal": "BLOCKED",
+      "rationale": "Without audit context the decision is not reconstructable for oversight."
+    },
+    "missing_evidence": {
+      "primary_signal": "BLOCKED",
+      "rationale": "Evidence-first governance cannot emit VALID while required evidence is absent."
+    },
+    "tenant_isolation_spoofing": {
+      "primary_signal": "INVALID",
+      "rationale": "Cross-tenant references violate isolation guarantees."
+    }
+  },
+  "schema_version": 1,
+  "suite_id": "auditability-failures"
+}

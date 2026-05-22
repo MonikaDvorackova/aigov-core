@@ -1,0 +1,41 @@
+{
+  "schema_version": "1.0.0",
+  "model_id": "govai.enterprise.separation_of_duties.v1",
+  "summary": "Mutually exclusive role sets, dual control for sensitive actions, and minimum reviewer pools.",
+  "mutually_exclusive_roles": [
+    {
+      "id": "deploy_vs_audit",
+      "roles": [
+        "tenant_operator",
+        "tenant_auditor_readonly"
+      ],
+      "rationale": "Operators who deploy must not be sole approvers of audit conclusions for the same change window."
+    },
+    {
+      "id": "billing_vs_engineering_admin",
+      "roles": [
+        "tenant_billing_admin",
+        "tenant_admin"
+      ],
+      "rationale": "Engineering administrators who change integrations or environments should not be the same individuals who solely control commercial billing records."
+    },
+    {
+      "id": "platform_super_vs_support",
+      "roles": [
+        "platform_superadmin",
+        "platform_support_readonly"
+      ],
+      "rationale": "Support staff must not inherit destructive platform configuration rights by default."
+    }
+  ],
+  "sensitive_actions_require_dual_control": [
+    "environment.promote_production",
+    "policy.edit",
+    "break_glass.request"
+  ],
+  "reviewer_pool_min_size": 2,
+  "approval_storage": {
+    "requires_timestamped_record": true,
+    "retention_days_minimum": 365
+  }
+}

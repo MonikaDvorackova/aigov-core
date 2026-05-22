@@ -1,0 +1,111 @@
+{
+  "policy_intelligence_program": {
+    "summary": "GovAI policy intelligence describes how policy artifacts map to controls, how coverage is measured across repositories and CI, and how governance gaps are surfaced as deterministic scores and reports. The control plane is advisory documentation and offline tooling; it does not change audit verdict semantics or runtime enforcement.",
+    "version": "1",
+    "owner": "governance_engineering"
+  },
+  "coverage_model": {
+    "summary": "Policy coverage compares registered policy modules against reviewed versions and against policies that are actually enforced in CI via compliance-summary gating. Coverage is expressed as a single integer score for expansion planning, not as a legal attestation.",
+    "entrypoints": [
+      "docs/policy-intelligence/policy-coverage.md",
+      "docs/policy-intelligence/README.md"
+    ]
+  },
+  "maturity_model": {
+    "summary": "Control maturity uses a five-level ordinal (0–4) per control family, averaged across the snapshot for a portfolio-level maturity score. Maturity reflects documented practice and evidence attachment, not certification against external frameworks.",
+    "entrypoints": [
+      "docs/policy-intelligence/control-maturity.md"
+    ]
+  },
+  "gap_analysis_model": {
+    "summary": "Governance gap analysis aggregates per-control gap severity labels from structured snapshots. Severity feeds a bounded gap risk score used alongside coverage and maturity in reports and recommendations.",
+    "entrypoints": [
+      "docs/policy-intelligence/governance-gap-analysis.md"
+    ]
+  },
+  "risk_weighted_controls_model": {
+    "summary": "Risk-weighted controls combine gap severity with evidence presence so operators can prioritize remediation without implying automated enforcement changes.",
+    "entrypoints": [
+      "docs/policy-intelligence/risk-weighted-controls.md"
+    ]
+  },
+  "reporting_contract": {
+    "summary": "Reporting contracts require deterministic JSON from validators and scoring scripts and deterministic Markdown from the governance control report generator, suitable for CI artifacts and human review.",
+    "entrypoints": [
+      "docs/policy-intelligence/control-plane-reporting.md"
+    ]
+  },
+  "review_workflow": {
+    "summary": "Policy review workflow ties quarterly governance reviews, exception handling, and segregation-of-duties flags into the snapshot schema so diagnostics can detect documentation drift.",
+    "entrypoints": [
+      "docs/policy-intelligence/policy-review-workflow.md"
+    ]
+  },
+  "data_boundaries": {
+    "summary": "Policy intelligence outputs are advisory and offline. They do not mutate ledgers, billing, databases, or enforcement configuration; see governance non-goals for explicit exclusions.",
+    "entrypoints": [
+      "docs/policy-intelligence/governance-non-goals.md"
+    ]
+  },
+  "referenced_documents": [
+    {
+      "path": "docs/policy-intelligence/policy-intelligence-manifest.json",
+      "role": "canonical_machine_readable_policy_intelligence_index"
+    },
+    {
+      "path": "docs/policy-intelligence/README.md",
+      "role": "policy_intelligence_index"
+    },
+    {
+      "path": "docs/policy-intelligence/policy-coverage.md",
+      "role": "policy_coverage"
+    },
+    {
+      "path": "docs/policy-intelligence/control-maturity.md",
+      "role": "control_maturity"
+    },
+    {
+      "path": "docs/policy-intelligence/governance-gap-analysis.md",
+      "role": "governance_gap_analysis"
+    },
+    {
+      "path": "docs/policy-intelligence/risk-weighted-controls.md",
+      "role": "risk_weighted_controls"
+    },
+    {
+      "path": "docs/policy-intelligence/control-plane-reporting.md",
+      "role": "control_plane_reporting"
+    },
+    {
+      "path": "docs/policy-intelligence/policy-review-workflow.md",
+      "role": "policy_review_workflow"
+    },
+    {
+      "path": "docs/policy-intelligence/governance-non-goals.md",
+      "role": "governance_non_goals"
+    }
+  ],
+  "referenced_examples": [
+    {
+      "path": "examples/policy-intelligence/sample-governance-control-snapshot.json",
+      "role": "sample_governance_control_snapshot"
+    },
+    {
+      "path": "examples/policy-intelligence/README.md",
+      "role": "example_driver_readme"
+    }
+  ],
+  "required_checks": [
+    "scripts/validate_policy_intelligence_manifest.py",
+    "scripts/validate_governance_control_snapshot.py",
+    "scripts/policy_coverage_score.py",
+    "scripts/policy_intelligence_check.py",
+    "scripts/generate_governance_control_report.py"
+  ],
+  "non_goals": [
+    "Does not change runtime enforcement or audit verdict semantics.",
+    "Does not perform billing, metering, or subscription mutations.",
+    "Does not run database migrations or alter ledger state.",
+    "Does not certify legal or regulatory compliance from scores alone."
+  ]
+}

@@ -1,0 +1,56 @@
+schema_version: aigov.rbac_roles.v1
+
+roles:
+  - role_id: TENANT_ADMIN
+    name: Tenant admin
+    description: Full administrative control over tenant governance configuration and access.
+    allowed_scope_types: [tenant]
+    permissions:
+      - rbac.manage
+      - policy.activate
+      - policy.rollback
+      - override.approve
+      - override.revoke
+      - dataset.approve
+      - audit.export
+      - runtime.evaluate
+      - runtime.read
+
+  - role_id: GOVERNANCE_OWNER
+    name: Governance owner
+    description: Owns governance controls and approvals within a tenant.
+    allowed_scope_types: [tenant, team, project]
+    permissions:
+      - policy.activate
+      - policy.rollback
+      - override.approve
+      - override.revoke
+      - dataset.approve
+      - runtime.evaluate
+      - runtime.read
+
+  - role_id: APPROVER
+    name: Approver
+    description: Approves governance overrides and dataset approvals within an assigned scope.
+    allowed_scope_types: [tenant, team, project]
+    permissions:
+      - override.approve
+      - override.revoke
+      - dataset.approve
+      - runtime.read
+
+  - role_id: OPERATOR
+    name: Operator
+    description: Operates runtime workflows within an assigned scope, without administrative privileges.
+    allowed_scope_types: [tenant, team, project]
+    permissions:
+      - runtime.evaluate
+      - runtime.read
+
+  - role_id: AUDITOR_READONLY
+    name: Auditor (read-only)
+    description: Read-only audit access within an assigned scope (no export implementation yet).
+    allowed_scope_types: [tenant, team, project]
+    permissions:
+      - runtime.read
+

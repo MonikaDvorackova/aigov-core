@@ -1,0 +1,28 @@
+\begin{tabular}{llll}
+\toprule
+Scenario & Family & Invariant & Expected \\
+\midrule
+valid\_complete\_trace & none & --- & VALID \\
+noisy\_but\_valid\_metadata & none & --- & VALID \\
+unknown\_optional\_metadata & none & --- & VALID \\
+reordered\_required\_events & none & --- & VALID \\
+duplicated\_evidence\_event\_idempotent & none & --- & VALID \\
+missing\_audit\_evidence & evidence\_completeness & evidence\_complete & BLOCKED \\
+missing\_ai\_discovery\_output & evidence\_completeness & ai\_discovery\_present & BLOCKED \\
+missing\_evidence\_pack & artifact & evidence\_pack\_present & BLOCKED \\
+partial\_evidence\_bundle & artifact & partial\_bundle\_integrity & BLOCKED \\
+failed\_compliance\_evaluation & evaluation & evaluation\_result & INVALID \\
+inconsistent\_evaluation\_result & evaluation & evaluation\_internal\_consistent & BLOCKED \\
+missing\_approval\_record & approval & approval\_state & BLOCKED \\
+stale\_approval & approval & approval\_freshness & BLOCKED \\
+approval\_recorded\_before\_evaluation & approval & causal\_evaluation\_before\_approval & BLOCKED \\
+invalid\_approval\_state & approval & approval\_state & BLOCKED \\
+inconsistent\_run\_context & trace & trace\_consistent & BLOCKED \\
+wrong\_run\_id & trace & run\_id\_matches\_decision\_scope & BLOCKED \\
+unavailable\_audit\_run & availability & run\_available & BLOCKED \\
+digest\_mismatch\_events\_only & digest & events\_content\_sha256\_match & BLOCKED \\
+digest\_mismatch\_export\_only & digest & export\_digest\_match & BLOCKED \\
+policy\_version\_mismatch & policy & policy\_version\_match & BLOCKED \\
+duplicated\_evidence\_event\_conflicting & artifact & artifact\_bound\_verification & BLOCKED \\
+\bottomrule
+\end{tabular}

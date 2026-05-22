@@ -1,0 +1,27 @@
+{
+  "artifact_id": "govai-research-citation-metadata",
+  "bibtex_entry_type": "software",
+  "cross_references": {
+    "benchmark_methodology": "research/benchmark-methodology.json",
+    "experimental_design": "research/experimental-design.json",
+    "reproducibility_checklist": "research/reproducibility-checklist.json",
+    "research_manifest": "research/research-manifest.json",
+    "threats_to_validity": "research/threats-to-validity.json"
+  },
+  "preferred_citation": {
+    "cff_path": "CITATION.cff",
+    "repository_url": "https://github.com/MonikaDvorackova/aigov-compliance-engine",
+    "software_name": "GovAI (aigov-compliance-engine)",
+    "version_field": "package_version in research-manifest.json"
+  },
+  "related_identifiers": [
+    {
+      "identifier_id": "govai-cite-id-doi-reserved",
+      "note": "Assign a Zenodo DOI after archival upload; update this manifest in the same commit as the release tag.",
+      "type": "doi"
+    }
+  ],
+  "schema_version": 1,
+  "stable_package_urn": "urn:govai:research:package:1",
+  "title": "GovAI citation metadata"
+}

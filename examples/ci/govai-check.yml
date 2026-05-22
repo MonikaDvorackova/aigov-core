@@ -1,0 +1,35 @@
+# =============================================================================
+# EXAMPLE ONLY — NOT AN ACTIVE WORKFLOW IN THIS REPOSITORY
+# =============================================================================
+# GitHub only runs workflows from `.github/workflows/` in each repo. This file
+# is under `examples/ci/` for documentation; copy it (or merge the job) into
+# your downstream repo’s `.github/workflows/*.yml` when you are ready.
+#
+# Prerequisites: CI produces `evidence_digest_manifest.json` and `<run_id>.json`
+# in an artefact directory. Configure repository variable `GOVAI_RUN_ID` and
+# `GOVAI_AUDIT_BASE_URL`, and secret `GOVAI_API_KEY`. See docs/github-action.md.
+# =============================================================================
+
+name: govai-hosted-gate-example
+
+on:
+  workflow_dispatch:
+
+jobs:
+  govai-hosted-gate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: evidence_packs
+          path: artefacts
+
+      - name: Artefact-bound GovAI gate
+        uses: MonikaDvorackova/aigov-compliance-engine@v1
+        with:
+          run_id: ${{ vars.GOVAI_RUN_ID }}
+          artifacts_path: artefacts
+          base_url: ${{ vars.GOVAI_AUDIT_BASE_URL }}
+          api_key: ${{ secrets.GOVAI_API_KEY }}

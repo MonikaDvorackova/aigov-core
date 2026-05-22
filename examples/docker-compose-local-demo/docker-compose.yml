@@ -1,0 +1,39 @@
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: govai
+      POSTGRES_PASSWORD: govai
+      POSTGRES_DB: govai
+    ports:
+      - "5432:5432"
+    volumes:
+      - govai_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U govai -d govai"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  audit:
+    build:
+      context: ../..
+      dockerfile: rust/Dockerfile
+    environment:
+      DATABASE_URL: postgres://govai:govai@postgres:5432/govai
+      GOVAI_AUTO_MIGRATE: "true"
+      GOVAI_LEDGER_DIR: /var/lib/govai/ledger
+      GOVAI_API_KEYS_JSON: '{"demo-key":"demo-tenant"}'
+      AIGOV_BIND: 0.0.0.0:8088
+      PORT: "8088"
+    ports:
+      - "8088:8088"
+    volumes:
+      - govai_ledger_data:/var/lib/govai/ledger
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  govai_postgres_data:
+  govai_ledger_data:

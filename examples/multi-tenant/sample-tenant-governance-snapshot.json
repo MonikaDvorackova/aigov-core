@@ -1,0 +1,12 @@
+{
+  "references": {
+    "governance_manifest": "multi-tenant/governance-manifest.json",
+    "tenant_isolation": "multi-tenant/tenant-isolation-model.json"
+  },
+  "review_notes": "Illustrative snapshot for CI and documentation; not a live tenant configuration.",
+  "schema_version": "1.0.0",
+  "tenant": {
+    "display_name": "Example Org (documentation only)",
+    "tenant_id": "example-tenant-alpha"
+  }
+}

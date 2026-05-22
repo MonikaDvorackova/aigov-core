@@ -1,0 +1,40 @@
+{
+  "org_id": "org_govai_sample",
+  "snapshot_version": "2026-05-01",
+  "policy_inventory": {
+    "registered_policies_count": 24,
+    "reviewed_policies_count": 18,
+    "enforced_in_ci_count": 12
+  },
+  "governance_process": {
+    "quarterly_reviews_done_last_year": 3,
+    "exception_process_documented": true,
+    "segregation_of_duties": false
+  },
+  "controls": [
+    {
+      "control_id": "CTL-ACCESS-01",
+      "maturity_level": 3,
+      "gap_severity": "low",
+      "evidence_attached": true
+    },
+    {
+      "control_id": "CTL-AUDIT-02",
+      "maturity_level": 2,
+      "gap_severity": "medium",
+      "evidence_attached": true
+    },
+    {
+      "control_id": "CTL-DATA-03",
+      "maturity_level": 3,
+      "gap_severity": "none",
+      "evidence_attached": false
+    },
+    {
+      "control_id": "CTL-SUPPLY-04",
+      "maturity_level": 1,
+      "gap_severity": "high",
+      "evidence_attached": true
+    }
+  ]
+}

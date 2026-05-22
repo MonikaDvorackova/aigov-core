@@ -1,0 +1,21 @@
+{
+  "schema_version": "govai.sample.runtime_policy.v1",
+  "title": "Sample runtime policy checklist (documentation only)",
+  "description": "This file is not consumed by the Rust audit service. It documents how teams align local runtime controls with hosted evidence types.",
+  "controls": [
+    {
+      "control_id": "evidence.tool_invoked",
+      "summary": "Emit a structured tool_invoked event when external tools run.",
+      "required_fields": ["tool_name", "tool_input_digest"]
+    },
+    {
+      "control_id": "gateway.routing_metadata",
+      "summary": "Include correlation_id and upstream_model on routed LLM calls.",
+      "suggested_keys": ["correlation_id", "upstream_model", "gateway_route_id"]
+    }
+  ],
+  "references": [
+    "docs/runtime/runtime-policy-patterns.md",
+    "docs/runtime/python-sdk.md"
+  ]
+}

@@ -1,0 +1,5 @@
+metric,value
+total_runs,200
+verdict_classification_accuracy,1.0
+scenario_count,8
+replicates_per_scenario,25

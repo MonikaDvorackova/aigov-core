@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aigov.dev/schemas/govai.immutable_anchor.v1.schema.json",
+  "title": "GovAI Immutable Anchor (v1)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "created_at_utc", "tenant_id", "environment", "ledger", "checkpoint", "evidence_hashes", "policy", "ok"],
+  "properties": {
+    "schema": { "type": "string", "const": "govai.immutable_anchor.v1" },
+    "created_at_utc": { "type": "string", "minLength": 20, "maxLength": 40 },
+    "ok": { "type": "boolean" },
+    "tenant_id": { "type": "string", "minLength": 1, "maxLength": 128 },
+    "environment": { "type": "string", "enum": ["dev", "staging", "prod"] },
+    "ledger": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path_label", "chain_head_record_sha256"],
+      "properties": {
+        "path_label": { "type": "string", "minLength": 1, "maxLength": 512 },
+        "chain_head_record_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+      }
+    },
+    "checkpoint": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["run_id", "last_event_id", "events_content_sha256", "ts_utc"],
+      "properties": {
+        "run_id": { "type": "string", "minLength": 1, "maxLength": 256 },
+        "last_event_id": { "type": "string", "minLength": 1, "maxLength": 256 },
+        "events_content_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "ts_utc": { "type": "string", "minLength": 20, "maxLength": 40 }
+      }
+    },
+    "evidence_hashes": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["events_content_sha256"],
+      "properties": {
+        "events_content_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "bundle_sha256": { "type": ["string", "null"], "pattern": "^[a-f0-9]{64}$" }
+      }
+    },
+    "policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["policy_id", "version", "digest_sha256"],
+      "properties": {
+        "policy_id": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "version": { "type": "string", "minLength": 1, "maxLength": 64 },
+        "digest_sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+      }
+    },
+    "sigstore": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "properties": {
+        "rekor_entries": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1, "maxLength": 256 }
+        }
+      }
+    }
+  }
+}
+

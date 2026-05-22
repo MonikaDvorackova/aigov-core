@@ -1,0 +1,99 @@
+{
+  "schema_version": "1.0.0",
+  "workflow_id": "govai.conformity.incident_reporting_workflow.v1",
+  "summary": "Serious incident reporting workflow (Article 73) used by providers to triage, escalate, and notify competent authorities about events that meet the regulatory definition of a serious incident. GovAI exports can support the evidence package; the legal notification is operator-owned.",
+  "trigger_criteria": [
+    {
+      "criterion_id": "serious_harm_to_health",
+      "description": "Incident resulted in or could have resulted in serious physical or psychological harm to a person."
+    },
+    {
+      "criterion_id": "serious_disruption_of_critical_infrastructure",
+      "description": "Incident caused serious disruption to critical infrastructure as defined by EU or member state law."
+    },
+    {
+      "criterion_id": "fundamental_rights_violation",
+      "description": "Incident caused infringement of obligations under Union law intended to protect fundamental rights."
+    },
+    {
+      "criterion_id": "serious_damage_to_property_or_environment",
+      "description": "Incident caused serious damage to property or the environment attributable to the AI system."
+    }
+  ],
+  "workflow_steps": [
+    {
+      "step_id": "detect",
+      "title": "Detection and intake",
+      "actions": [
+        "Capture incident from monitoring, support, or external report.",
+        "Assign a unique incident reference.",
+        "Record initial timestamp, system version, and reporter."
+      ]
+    },
+    {
+      "step_id": "triage",
+      "title": "Severity triage",
+      "actions": [
+        "Evaluate against trigger criteria.",
+        "Confirm or rule out serious incident classification.",
+        "Engage regulatory owner if classification is uncertain."
+      ],
+      "human_approvals": [
+        "regulatory_owner"
+      ]
+    },
+    {
+      "step_id": "contain",
+      "title": "Containment and mitigation",
+      "actions": [
+        "Apply operational mitigations (pause, rollback, guardrail change).",
+        "Coordinate with deployers where applicable.",
+        "Document affected runs and timeframe."
+      ]
+    },
+    {
+      "step_id": "notify",
+      "title": "Authority notification",
+      "actions": [
+        "Prepare notification per Article 73 timelines.",
+        "Attach evidence including GovAI exports where helpful.",
+        "Send notification through the channel required by the competent authority."
+      ],
+      "deadlines": {
+        "default_initial_notification_hours_max": 72,
+        "shorter_deadline_if_widespread_or_fatal_hours": 24
+      },
+      "human_approvals": [
+        "regulatory_owner",
+        "legal_counsel"
+      ]
+    },
+    {
+      "step_id": "report_and_close",
+      "title": "Reporting and closure",
+      "actions": [
+        "Document root cause and corrective actions.",
+        "Update risk register and post-market monitoring plan.",
+        "Close incident with sign-off."
+      ],
+      "human_approvals": [
+        "risk_owner",
+        "regulatory_owner"
+      ]
+    }
+  ],
+  "evidence_attachments": [
+    "audit_log_export",
+    "evidence_pack_for_affected_runs",
+    "operational_intelligence_report"
+  ],
+  "evidence_export_hooks": [
+    "scripts/generate_regulatory_evidence_export.py",
+    "scripts/generate_operational_intelligence_report.py"
+  ],
+  "boundaries": [
+    "Deadlines are indicative defaults; the binding timelines are set by Article 73 and implementing acts.",
+    "GovAI does not transmit notifications to authorities; operators handle external communications.",
+    "Confidentiality and personal data protections still apply to attached evidence."
+  ]
+}

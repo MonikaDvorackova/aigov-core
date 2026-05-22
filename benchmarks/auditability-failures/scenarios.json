@@ -1,0 +1,86 @@
+{
+  "schema_version": 1,
+  "suite_id": "auditability-failures",
+  "scenarios": [
+    {
+      "category": "broken_digest_continuity",
+      "description": "A new event references an artefact digest that does not match the prior chained digest for this run.",
+      "id": "broken_digest_continuity",
+      "signals": [
+        "digest_mismatch",
+        "chain_break"
+      ],
+      "title": "Broken digest continuity"
+    },
+    {
+      "category": "duplicate_event_id",
+      "description": "Two distinct payloads attempt to reuse the same immutable event identifier for one run.",
+      "id": "duplicate_event_id",
+      "signals": [
+        "id_collision",
+        "replay_suspected"
+      ],
+      "title": "Duplicate event id"
+    },
+    {
+      "category": "incomplete_evidence_pack",
+      "description": "An export or pack assembly step cannot include all mandatory sections referenced by policy.",
+      "id": "incomplete_evidence_pack",
+      "signals": [
+        "export_gap",
+        "missing_section"
+      ],
+      "title": "Incomplete evidence pack"
+    },
+    {
+      "category": "invalid_evaluation",
+      "description": "Evaluation record fails schema validation or contradicts declared benchmark version.",
+      "id": "invalid_evaluation",
+      "signals": [
+        "schema_invalid",
+        "benchmark_version_conflict"
+      ],
+      "title": "Invalid evaluation"
+    },
+    {
+      "category": "missing_approval",
+      "description": "Policy mandates an approval event that is absent at promotion time.",
+      "id": "missing_approval",
+      "signals": [
+        "approval_missing",
+        "blocked_reason"
+      ],
+      "title": "Missing approval"
+    },
+    {
+      "category": "missing_audit_context",
+      "description": "Events omit required audit context such as actor identity, correlation id, or policy version binding.",
+      "id": "missing_audit_context",
+      "signals": [
+        "context_incomplete",
+        "actor_unknown"
+      ],
+      "title": "Missing audit context"
+    },
+    {
+      "category": "missing_evidence",
+      "description": "Required evidence types for the decision were never ingested for the run.",
+      "id": "missing_evidence",
+      "signals": [
+        "missing_evidence",
+        "blocked_reason"
+      ],
+      "title": "Missing evidence"
+    },
+    {
+      "category": "tenant_isolation_spoofing",
+      "description": "Evidence references another tenant's artefact id or digest namespace.",
+      "id": "tenant_isolation_spoofing",
+      "signals": [
+        "tenant_mismatch",
+        "cross_tenant_reference"
+      ],
+      "title": "Tenant isolation spoofing"
+    }
+  ]
+}

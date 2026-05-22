@@ -1,0 +1,20 @@
+---
+description: Local compliance gate commands for GovAI repository work.
+globs: []
+alwaysApply: true
+---
+
+# Compliance gate (GovAI)
+
+Before treating a change as merge-ready, the agent **must run or explicitly recommend** the following commands from the repository root (in order):
+
+1. `python -m pytest`
+2. `cargo test --manifest-path rust/Cargo.toml`
+3. `python scripts/gate_reports.py`
+4. `make gate`
+
+## Interpretation
+
+- **`make gate`** invokes `scripts/gate_reports.py` (see `Makefile`). Running both documents the Makefile contract operators rely on.
+- If any command fails, capture stdout/stderr, fix the underlying issue, and re-run the full sequence after substantive edits.
+- Do **not** remove or bypass existing CI governance workflows in `.github/workflows/` when editing automation.

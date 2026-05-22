@@ -1,0 +1,105 @@
+{
+  "alignment_scope": {
+    "deployment_contexts": [
+      "organizations_assembling_an_ai_management_system_evidence_narrative",
+      "teams_mapping_govai_audit_and_standards_artefacts_to_iso_42001_clauses"
+    ],
+    "standard_reference": "ISO/IEC 42001:2023",
+    "summary": "This manifest indexes GovAI repository artefacts that support technical readiness narratives aligned with ISO/IEC 42001 themes. It does not assert certification, legal compliance, or suitability for any jurisdiction or sector."
+  },
+  "boundaries": {
+    "billing": "no_billing_or_usage_semantics_in_iso_readiness_tooling",
+    "certification": "no_certification_mark_or_conformity_decision_emitted_by_validators",
+    "enforcement": "no_runtime_enforcement_semantics_changes",
+    "ledger": "no_ledger_writes_or_mutations",
+    "summary": "ISO/IEC 42001 readiness tooling validates manifests and clause indices, references existing governance documentation, and does not change GovAI verdict semantics, billing, ledger storage, or database schemas."
+  },
+  "clause_index": "docs/standards/iso-42001-clause-index.json",
+  "non_goals": [
+    "GovAI does not provide ISO/IEC 42001 certification, accredited audit outcomes, or legal opinions.",
+    "Clause mappings are indicative readiness support; gap analysis and management system operation remain with the organization.",
+    "Validators confirm repository artefact presence and structure only; they do not assess control effectiveness in production."
+  ],
+  "operational_probes": [
+    {
+      "command": "python3 scripts/validate_iso_42001_alignment_manifest.py --json",
+      "description": "Schema and path validation for this manifest.",
+      "name": "validate_iso_42001_alignment_manifest"
+    },
+    {
+      "command": "python3 scripts/validate_iso_42001_clause_index.py --json",
+      "description": "Schema and evidence path validation for the clause index.",
+      "name": "validate_iso_42001_clause_index"
+    }
+  ],
+  "readiness_themes": [
+    {
+      "guide": "docs/standards/iso-42001.md",
+      "id": "readiness_overview",
+      "summary": "Operator-facing overview of ISO/IEC 42001 readiness support, terminology, and explicit non-claims."
+    },
+    {
+      "guide": "docs/standards/governance_evidence_pack_standard.md",
+      "id": "evidence_interchange",
+      "summary": "Portable governance evidence packs supply structured artefacts suitable for management system documented information."
+    },
+    {
+      "guide": "docs/standards/evaluation.md",
+      "id": "deterministic_evaluation",
+      "summary": "Deterministic standards corpus evaluation supports repeatable internal measurement of interchange conformance."
+    },
+    {
+      "guide": "docs/trust/trust-center.md",
+      "id": "trust_narrative",
+      "summary": "Trust center entry point clarifies security and governance interfaces without certification claims."
+    }
+  ],
+  "referenced_documents": [
+    {
+      "path": "docs/standards/iso-42001.md",
+      "role": "iso_42001_readiness_guide"
+    },
+    {
+      "path": "docs/standards/README.md",
+      "role": "standards_index"
+    },
+    {
+      "path": "docs/standards/conformance.md",
+      "role": "conformance_tooling"
+    },
+    {
+      "path": "docs/trust/compliance-mapping.md",
+      "role": "informative_framework_mapping"
+    },
+    {
+      "path": "docs/reports/repo-debt-audit-and-cleanup.md",
+      "role": "readiness_audit_report"
+    },
+    {
+      "path": "OPEN_SOURCE_SCOPE.md",
+      "role": "scope_and_non_claims"
+    }
+  ],
+  "referenced_examples": [
+    {
+      "path": "examples/standards/evidence-pack.valid.json",
+      "role": "sample_evidence_pack"
+    },
+    {
+      "path": "examples/standards/policy-module.valid.json",
+      "role": "sample_policy_module"
+    },
+    {
+      "path": "examples/standards/decision-trace.valid.json",
+      "role": "sample_decision_trace"
+    }
+  ],
+  "required_checks": [
+    "make iso-42001-manifest",
+    "make iso-42001-clause-index",
+    "make iso-42001-readiness-check",
+    "make governance-standards-check"
+  ],
+  "summary": "GovAI ISO/IEC 42001 alignment manifest indexes clause mappings, readiness themes, portable standards examples, and stdlib validation probes. It frames readiness as evidence-backed repository scaffolding, not certification.",
+  "version": 1
+}

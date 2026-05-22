@@ -1,0 +1,29 @@
+{
+  "run_id": "9469bda4-9eaf-4c61-aa67-dd74958f14af",
+  "ts_utc": "2026-02-06T08:26:59Z",
+  "system": "ci_fallback",
+  "kind": "evidence",
+  "events": [
+    {
+      "id": "866a5bc2-b6a7-469f-a078-5e798e470687",
+      "event_id": "866a5bc2-b6a7-469f-a078-5e798e470687",
+      "run_id": "9469bda4-9eaf-4c61-aa67-dd74958f14af",
+      "ts_utc": "2026-02-06T08:26:59Z",
+      "type": "evidence_stub",
+      "system": "ci_fallback",
+      "payload": {
+        "notes": "Auto generated stub so report_init/verify can run. Replace with real evidence events."
+      },
+      "prev": null
+    }
+  ],
+  "chain": {
+    "head": "866a5bc2-b6a7-469f-a078-5e798e470687",
+    "head_event_id": "866a5bc2-b6a7-469f-a078-5e798e470687",
+    "head_id": "866a5bc2-b6a7-469f-a078-5e798e470687",
+    "hash_alg": "sha256"
+  },
+  "chain_head": "866a5bc2-b6a7-469f-a078-5e798e470687",
+  "head": "866a5bc2-b6a7-469f-a078-5e798e470687",
+  "head_event_id": "866a5bc2-b6a7-469f-a078-5e798e470687"
+}

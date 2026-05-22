@@ -1,0 +1,37 @@
+{
+  "agents": [
+    {
+      "agent_id": "lead_planner",
+      "role_ref": "supervisor"
+    },
+    {
+      "agent_id": "research_worker",
+      "role_ref": "executor_readonly"
+    },
+    {
+      "agent_id": "patch_proposer",
+      "role_ref": "executor_scoped_write"
+    }
+  ],
+  "approval_gateways": [
+    {
+      "after_agent": "patch_proposer",
+      "requires_human": true
+    }
+  ],
+  "coordination_model": "supervisor-worker",
+  "delegation_graph": [
+    {
+      "capability": "repository_analysis",
+      "from": "lead_planner",
+      "to": "research_worker"
+    },
+    {
+      "capability": "draft_patch_proposal",
+      "from": "lead_planner",
+      "to": "patch_proposer"
+    }
+  ],
+  "shared_state_policy": "pessimistic_lock",
+  "version": 1
+}

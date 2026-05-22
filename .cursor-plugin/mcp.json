@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "govai-local": {
+      "command": "python3",
+      "args": ["mcp/govai_mcp_server.py", "mcp-stdio"],
+      "env": {}
+    }
+  }
+}

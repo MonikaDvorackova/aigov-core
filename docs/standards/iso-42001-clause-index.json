@@ -1,0 +1,157 @@
+{
+  "clauses": [
+    {
+      "category": "context",
+      "clause_reference": "Clause 4",
+      "evidence_paths": [
+        "docs/governance/README.md",
+        "OPEN_SOURCE_SCOPE.md",
+        "docs/product/open-source-vs-hosted-vs-enterprise.md"
+      ],
+      "govai_mapping": "Repository scope boundaries and product layering help operators document organizational context and system boundaries; GovAI does not perform context analysis on your behalf.",
+      "id": "iso42001_clause_4_context",
+      "summary": "Understanding internal and external issues and defining the scope of the AI management system.",
+      "title": "Context of the organization"
+    },
+    {
+      "category": "leadership",
+      "clause_reference": "Clause 5",
+      "evidence_paths": [
+        "docs/governance/overrides.md",
+        "docs/control-plane/delegation-and-approvals.md",
+        "docs/manual-evidence-flow.md"
+      ],
+      "govai_mapping": "Human approval and override narratives model accountable decision points; leadership commitments and roles remain organizational artefacts outside the repository.",
+      "id": "iso42001_clause_5_leadership",
+      "summary": "Top management demonstrates leadership and commitment to the AI management system.",
+      "title": "Leadership"
+    },
+    {
+      "category": "planning",
+      "clause_reference": "Clause 6",
+      "evidence_paths": [
+        "docs/model-risk/evaluation-planning.md",
+        "docs/regulatory/risk-management-system.md",
+        "docs/standards/threat-model.md"
+      ],
+      "govai_mapping": "Planning guides and risk narratives cross-link evaluation planning with audit evidence concepts; deterministic validators support objective-setting evidence packs, not management system certification.",
+      "id": "iso42001_clause_6_planning",
+      "summary": "Actions to address risks and opportunities, AI objectives, and planning of changes.",
+      "title": "Planning"
+    },
+    {
+      "category": "support",
+      "clause_reference": "Clause 7",
+      "evidence_paths": [
+        "docs/project/local_development.md",
+        "docs/standards/implementer-checklist.md",
+        "docs/contributors/first-contribution-guide.md"
+      ],
+      "govai_mapping": "Contributor and implementer documentation supports competence and awareness for teams adopting GovAI tooling; HR competence records stay with the operator.",
+      "id": "iso42001_clause_7_support",
+      "summary": "Resources, competence, awareness, communication, and documented information for the AI management system.",
+      "title": "Support"
+    },
+    {
+      "category": "operation",
+      "clause_reference": "Clause 8",
+      "evidence_paths": [
+        "docs/governance/runtime_integration.md",
+        "docs/governance/autonomous_action_governance.md",
+        "docs/standards/governance_evidence_pack_standard.md"
+      ],
+      "govai_mapping": "Operational integration and evidence-pack interchange describe how AI lifecycle events are captured; runtime enforcement modes depend on deployment configuration.",
+      "id": "iso42001_clause_8_operation",
+      "summary": "Operational planning and control for AI systems, including lifecycle and impact considerations.",
+      "title": "Operation"
+    },
+    {
+      "category": "performance_evaluation",
+      "clause_reference": "Clause 9",
+      "evidence_paths": [
+        "docs/standards/evaluation.md",
+        "docs/model-risk/model-assurance-report.md",
+        "docs/observability/README.md"
+      ],
+      "govai_mapping": "Standards evaluation harness and model assurance reporting supply deterministic internal measurement inputs; internal audit programmes are operator-owned.",
+      "id": "iso42001_clause_9_performance_evaluation",
+      "summary": "Monitoring, measurement, analysis, evaluation, internal audit, and management review.",
+      "title": "Performance evaluation"
+    },
+    {
+      "category": "improvement",
+      "clause_reference": "Clause 10",
+      "evidence_paths": [
+        "docs/operations/incident-escalation.md",
+        "docs/operations/renewal-readiness.md"
+      ],
+      "govai_mapping": "Incident escalation guidance and phase reports document improvement-oriented engineering work; corrective action closure remains with the management system owner.",
+      "id": "iso42001_clause_10_improvement",
+      "summary": "Nonconformity, corrective action, and continual improvement of the AI management system.",
+      "title": "Improvement"
+    },
+    {
+      "category": "control_objective",
+      "clause_reference": "Annex A — AI policies",
+      "evidence_paths": [
+        "docs/standards/capability_policy_schema.md",
+        "docs/governance/agent_capability_policies.md",
+        "examples/standards/capability_policy.valid.json"
+      ],
+      "govai_mapping": "Portable capability policy interchange supports documented AI governance policies; policy content and approval are customer-controlled.",
+      "id": "iso42001_annex_a_ai_policies",
+      "summary": "Establish, implement, and maintain AI policies appropriate to the organization.",
+      "title": "AI policies"
+    },
+    {
+      "category": "control_objective",
+      "clause_reference": "Annex A — AI risk assessment",
+      "evidence_paths": [
+        "docs/model-risk/model-risk-management.md",
+        "docs/model-risk/assurance-levels.md"
+      ],
+      "govai_mapping": "Model risk documentation and assurance levels frame technical risk assessment evidence; ISO 42001 risk treatment decisions are not automated by GovAI.",
+      "id": "iso42001_annex_a_ai_risk_assessment",
+      "summary": "Assess AI risks and treat them in line with the AI management system.",
+      "title": "AI risk assessment"
+    },
+    {
+      "category": "control_objective",
+      "clause_reference": "Annex A — Data for AI systems",
+      "evidence_paths": [
+        "docs/governance/datasets.md",
+        "docs/evidence-quality/README.md"
+      ],
+      "govai_mapping": "Dataset governance and evidence-quality narratives help operators document data practices; GovAI does not certify dataset legal sufficiency.",
+      "id": "iso42001_annex_a_data_for_ai",
+      "summary": "Manage data used in development and operation of AI systems.",
+      "title": "Data for AI systems"
+    },
+    {
+      "category": "control_objective",
+      "clause_reference": "Annex A — Human oversight",
+      "evidence_paths": [
+        "docs/runtime-safety/human-oversight.md",
+        "docs/regulatory/human-oversight.md"
+      ],
+      "govai_mapping": "Human oversight documentation aligns runtime safety and regulatory narratives with ledger-backed approval events where operators configure them.",
+      "id": "iso42001_annex_a_human_oversight",
+      "summary": "Ensure appropriate human oversight of AI systems.",
+      "title": "Human oversight"
+    },
+    {
+      "category": "control_objective",
+      "clause_reference": "Annex A — Monitoring and measurement",
+      "evidence_paths": [
+        "docs/governance/audit_exports.md",
+        "docs/observability/operational-intelligence-report.md"
+      ],
+      "govai_mapping": "Audit exports and operational intelligence docs describe monitoring hooks; production telemetry configuration is deployment-specific.",
+      "id": "iso42001_annex_a_monitoring",
+      "summary": "Monitor and measure AI system performance and impacts.",
+      "title": "Monitoring and measurement"
+    }
+  ],
+  "summary": "Indicative ISO/IEC 42001:2023 clause and Annex A control mappings to GovAI repository artefacts. Readiness support only — not certification or legal compliance.",
+  "version": 1
+}

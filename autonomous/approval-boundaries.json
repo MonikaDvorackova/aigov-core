@@ -1,0 +1,13 @@
+{
+  "artifact_version": "1",
+  "bundle_id": "govai-autonomous-governance",
+  "delegated_approval_allowed": false,
+  "human_approval_required_when": [
+    "production_data_write_or_delete",
+    "credential_or_secret_touch",
+    "irreversible_infrastructure_change",
+    "cross_tenant_or_privileged_scope_expansion",
+    "policy_or_compliance_interpretation_that_changes_obligations"
+  ],
+  "notes": "These strings are stable taxonomy labels for operator mapping; they do not change GovAI verdict semantics."
+}

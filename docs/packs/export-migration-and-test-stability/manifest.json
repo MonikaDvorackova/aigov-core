@@ -1,0 +1,35 @@
+{
+  "schema_version": "aigov.pack.manifest.v1",
+  "files": [
+    {
+      "name": "bundle.json",
+      "path": "bundle.json",
+      "sha256": "e633d5f5a70795de9750a5c3336fe0b5b20ffa29a9b9baaae0db72e0c3795f08",
+      "bytes": 1859
+    },
+    {
+      "name": "report.md",
+      "path": "report.md",
+      "sha256": "3ecaffb47f38f9843418fcefc2cb14ca70d548b67b5d69c2bde005544b41cb7a",
+      "bytes": 1581
+    },
+    {
+      "name": "audit.json",
+      "path": "audit.json",
+      "sha256": "4b55bc4ab4925effcd85d649d91424d4cc5f23e0cf7aa06e8329acbf4c2c109e",
+      "bytes": 803
+    },
+    {
+      "name": "policy.txt",
+      "path": "policy.txt",
+      "sha256": "352a5f2b9bfbc76da4d94b310c24011d2e9310df70d58ebc05201e78e8eb3ede",
+      "bytes": 24
+    },
+    {
+      "name": "README.txt",
+      "path": "README.txt",
+      "sha256": "3cd8bb93190094e57e14ff33e3683487244ae34ab30ca0af9becae9b42e2e37b",
+      "bytes": 454
+    }
+  ]
+}

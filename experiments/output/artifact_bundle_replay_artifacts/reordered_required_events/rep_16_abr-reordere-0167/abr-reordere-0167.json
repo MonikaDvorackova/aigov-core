@@ -1,0 +1,43 @@
+{
+  "events": [
+    {
+      "actor": "ci",
+      "environment": "ci",
+      "event_id": "abr-reordere-0167-b",
+      "event_type": "evaluation_reported",
+      "payload": {
+        "passed": true
+      },
+      "run_id": "abr-reordere-0167",
+      "system": "replay_harness",
+      "ts_utc": "2026-01-01T00:00:02Z"
+    },
+    {
+      "actor": "ci",
+      "environment": "ci",
+      "event_id": "abr-reordere-0167-a",
+      "event_type": "ai_discovery_reported",
+      "payload": {
+        "slot": "a"
+      },
+      "run_id": "abr-reordere-0167",
+      "system": "replay_harness",
+      "ts_utc": "2026-01-01T00:00:01Z"
+    },
+    {
+      "actor": "ci",
+      "environment": "ci",
+      "event_id": "abr-reordere-0167-hum",
+      "event_type": "human_approved",
+      "payload": {
+        "decision": "approve"
+      },
+      "run_id": "abr-reordere-0167",
+      "system": "replay_harness",
+      "ts_utc": "2026-01-01T00:00:03Z"
+    }
+  ],
+  "ok": true,
+  "policy_version": "v1",
+  "run_id": "abr-reordere-0167"
+}

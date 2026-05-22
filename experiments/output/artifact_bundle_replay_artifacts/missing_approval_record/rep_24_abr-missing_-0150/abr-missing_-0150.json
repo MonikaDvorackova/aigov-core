@@ -1,0 +1,31 @@
+{
+  "events": [
+    {
+      "actor": "ci",
+      "environment": "ci",
+      "event_id": "abr-missing_-0150-disc",
+      "event_type": "ai_discovery_reported",
+      "payload": {
+        "openai": false
+      },
+      "run_id": "abr-missing_-0150",
+      "system": "replay_harness",
+      "ts_utc": "2026-01-01T00:00:01Z"
+    },
+    {
+      "actor": "ci",
+      "environment": "ci",
+      "event_id": "abr-missing_-0150-eval",
+      "event_type": "evaluation_reported",
+      "payload": {
+        "passed": true
+      },
+      "run_id": "abr-missing_-0150",
+      "system": "replay_harness",
+      "ts_utc": "2026-01-01T00:00:02Z"
+    }
+  ],
+  "ok": true,
+  "policy_version": "v1",
+  "run_id": "abr-missing_-0150"
+}

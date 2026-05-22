@@ -1,0 +1,34 @@
+{
+  "classes": [
+    {
+      "class_id": "governance_policy_gap",
+      "default_severity": "error",
+      "description": "Runtime request cannot be confidently evaluated because policy context or required governance metadata is absent.",
+      "operator_action": "Correlate run_id, tenant_id, policy_id, and audit_trace_id; confirm whether missing context is expected; escalate to policy owners if unresolved.",
+      "slo_impact": "May affect runtime governance availability or completeness."
+    },
+    {
+      "class_id": "audit_trace_gap",
+      "default_severity": "warning",
+      "description": "Runtime event cannot be joined to an audit trace or evidence export.",
+      "operator_action": "Verify event emission, audit export availability, and trace propagation before relying on dashboard summaries.",
+      "slo_impact": "May affect audit traceability targets."
+    },
+    {
+      "class_id": "runtime_latency_degradation",
+      "default_severity": "warning",
+      "description": "Runtime governance evaluation latency exceeds the dashboard threshold.",
+      "operator_action": "Review latency distribution by tenant_id and policy_id; confirm dependency health before declaring a customer incident.",
+      "slo_impact": "May affect evaluation latency objectives."
+    },
+    {
+      "class_id": "operator_override_review",
+      "default_severity": "critical",
+      "description": "Runtime governance activity requires human approval or override review.",
+      "operator_action": "Open the human approval workflow, capture rationale, and attach the approval record to the audit trace.",
+      "slo_impact": "May affect incident response and approval handling objectives."
+    }
+  ],
+  "description": "GovAI runtime observability incident taxonomy for local operator triage.",
+  "version": "1.0.0"
+}

@@ -1,0 +1,112 @@
+{
+  "schema_version": "1.0.0",
+  "mapping_id": "govai.conformity.ai_act_control_mapping.v1",
+  "summary": "Indicative mapping between EU AI Act obligations referenced in docs/regulatory/ai-act-obligations.json and GovAI repository artefacts. The mapping is operator-facing orientation only; legal sufficiency is determined outside GovAI.",
+  "source_obligations": "docs/regulatory/ai-act-obligations.json",
+  "controls": [
+    {
+      "obligation_id": "ai_act_article_9_risk_management_system",
+      "control_id": "govai.control.risk_management_lifecycle",
+      "control_summary": "Document a risk management lifecycle that is repeatable across releases, supported by GovAI evidence exports for individual runs.",
+      "supporting_artefacts": [
+        "conformity/risk-management-workflow.json",
+        "docs/regulatory/risk-management-system.md"
+      ],
+      "control_type": "process"
+    },
+    {
+      "obligation_id": "ai_act_article_10_data_governance",
+      "control_id": "govai.control.dataset_provenance_and_governance",
+      "control_summary": "Capture dataset provenance and lineage in dataset governance snapshots; cite GovAI evidence pack exports where they reinforce traceability.",
+      "supporting_artefacts": [
+        "docs/evidence-quality/README.md",
+        "scripts/validate_dataset_provenance_snapshot.py"
+      ],
+      "control_type": "evidence"
+    },
+    {
+      "obligation_id": "ai_act_article_11_technical_documentation",
+      "control_id": "govai.control.annex_iv_dossier",
+      "control_summary": "Assemble the Annex IV dossier using the technical documentation workflow; attach reproducible exports where counsel approves.",
+      "supporting_artefacts": [
+        "conformity/technical-documentation-workflow.json",
+        "docs/regulatory/technical-documentation.md"
+      ],
+      "control_type": "documentation"
+    },
+    {
+      "obligation_id": "ai_act_article_12_record_keeping",
+      "control_id": "govai.control.append_only_audit_log",
+      "control_summary": "Use the append-only audit ledger and evidence pack exports to demonstrate that lifecycle events were recorded.",
+      "supporting_artefacts": [
+        "docs/regulatory/ai-act-mapping.md",
+        "scripts/generate_regulatory_evidence_export.py"
+      ],
+      "control_type": "evidence"
+    },
+    {
+      "obligation_id": "ai_act_article_14_human_oversight",
+      "control_id": "govai.control.human_oversight_workflow",
+      "control_summary": "Document oversight workflows: who can pause, override, or escalate, and what audit events are emitted. Implementation remains operator-owned.",
+      "supporting_artefacts": [
+        "docs/regulatory/human-oversight.md",
+        "docs/runtime-safety/README.md"
+      ],
+      "control_type": "process"
+    },
+    {
+      "obligation_id": "ai_act_article_15_accuracy_robustness_cybersecurity",
+      "control_id": "govai.control.accuracy_and_robustness_records",
+      "control_summary": "Maintain accuracy, robustness, and cybersecurity records and link them in the Annex IV dossier; GovAI does not certify the underlying engineering work.",
+      "supporting_artefacts": [
+        "docs/regulatory/high-risk-system-obligations.md"
+      ],
+      "control_type": "evidence"
+    },
+    {
+      "obligation_id": "ai_act_article_43_conformity_assessment",
+      "control_id": "govai.control.conformity_assessment_workflow",
+      "control_summary": "Follow the conformity assessment workflow to organize provider activities prior to declaration; notified body interaction remains outside GovAI.",
+      "supporting_artefacts": [
+        "conformity/conformity-assessment-workflow.json",
+        "docs/regulatory/conformity-assessment.md"
+      ],
+      "control_type": "process"
+    },
+    {
+      "obligation_id": "ai_act_article_72_post_market_monitoring_by_providers",
+      "control_id": "govai.control.post_market_monitoring_workflow",
+      "control_summary": "Establish a post-market monitoring plan referencing recurring compliance summaries and incident triggers.",
+      "supporting_artefacts": [
+        "conformity/post-market-monitoring-workflow.json",
+        "docs/regulatory/post-market-monitoring.md"
+      ],
+      "control_type": "process"
+    },
+    {
+      "obligation_id": "ai_act_annex_iv_technical_documentation_elements",
+      "control_id": "govai.control.annex_iv_sections_checklist",
+      "control_summary": "Use the Annex IV section checklist in the technical documentation workflow when assembling provider dossiers.",
+      "supporting_artefacts": [
+        "conformity/technical-documentation-workflow.json",
+        "docs/regulatory/regulator-export-guide.md"
+      ],
+      "control_type": "documentation"
+    },
+    {
+      "obligation_id": "ai_act_article_26_deployer_obligations_monitoring",
+      "control_id": "govai.control.deployer_monitoring_record",
+      "control_summary": "Cross-link deployer monitoring obligations with the runtime safety and observability material; deployer compliance remains the deployer's responsibility.",
+      "supporting_artefacts": [
+        "docs/regulatory/evidence-obligations.md",
+        "docs/runtime-safety/README.md"
+      ],
+      "control_type": "process"
+    }
+  ],
+  "mapping_caveats": [
+    "Mappings are indicative; obligations under the EU AI Act and implementing acts apply directly to providers and deployers.",
+    "Control identifiers reference repository artefacts, not regulatory certification.",
+    "Some obligations require provider records that are not produced by GovAI (for example signed CE declarations)."
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "run_id": "ca7ec885-e481-49aa-9e91-c201432c4615",
+  "ts_utc": "2026-02-05T20:20:25Z",
+  "events": [],
+  "chain": {
+    "head": {
+      "id": "ca7ec885-e481-49aa-9e91-c201432c4615",
+      "prev": null,
+      "ts_utc": "2026-02-05T20:20:25Z",
+      "type": "genesis"
+    },
+    "events": []
+  },
+  "version": 1
+}

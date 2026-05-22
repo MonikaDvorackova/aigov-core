@@ -1,0 +1,46 @@
+{
+  "run_id": "02a3126c-fa83-4781-9340-583802510b5c",
+  "ts_utc": "2026-02-14T17:27:11Z",
+  "kind": "evidence",
+  "system": "ci_fallback",
+  "mode": "ci",
+  "policy_version": "v0.4_ci",
+  "events": [
+    {
+      "id": "genesis",
+      "event_id": "genesis",
+      "run_id": "02a3126c-fa83-4781-9340-583802510b5c",
+      "ts_utc": "2026-02-14T17:27:11Z",
+      "type": "evidence_genesis",
+      "system": "ci_fallback",
+      "payload": {
+        "source": "ci_fallback"
+      },
+      "prev_event_id": null,
+      "hash": "831864e5a1b7b3884997a024f6c1d1f18222d89b3daa2d6578878e0eec142fea"
+    },
+    {
+      "id": "ci_fallback_used",
+      "event_id": "ci_fallback_used",
+      "run_id": "02a3126c-fa83-4781-9340-583802510b5c",
+      "ts_utc": "2026-02-14T17:27:11Z",
+      "type": "ci_fallback_used",
+      "system": "ci_fallback",
+      "payload": {
+        "source": "ci_fallback"
+      },
+      "prev_event_id": "genesis",
+      "hash": "09dc40fa5b2d0821d0190d144e18f79dff09f4d555e91f3e84ea50f16762007e"
+    }
+  ],
+  "chain": {
+    "head": "ci_fallback_used",
+    "hash_alg": "sha256"
+  },
+  "chain_head": "ci_fallback_used",
+  "meta": {
+    "aigov_mode": "ci",
+    "source": "ci_fallback",
+    "warning": "CI fallback evidence. Forbidden in PROD."
+  }
+}

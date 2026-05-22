@@ -1,0 +1,23 @@
+{
+  "dataset_governance": null,
+  "evaluation": null,
+  "events": [],
+  "human_approval": null,
+  "identifiers": {
+    "ai_system_id": null,
+    "dataset_id": null,
+    "model_version_id": null,
+    "primary_risk_id": null,
+    "risk_ids": []
+  },
+  "log_path": "rust/audit_log__default.jsonl",
+  "model_artifact_path": null,
+  "model_version": null,
+  "ok": true,
+  "policy_version": "v0.5_dev",
+  "promotion": null,
+  "risk_register": null,
+  "run_id": "product-positioning-and-onboarding",
+  "schema_version": "aigov.bundle.v1",
+  "bundle_sha256": "95d451eb99a66519144736a9ccb1dae59991eb9f688482bcb1a31a63629b9d27"
+}

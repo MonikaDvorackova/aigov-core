@@ -1,0 +1,24 @@
+{
+  "events": [
+    {
+      "actor": "monika",
+      "event_id": "ha_RUN_ID=9196698f-f023-4c54-b6d1-b32e72fe04db",
+      "event_type": "human_approved",
+      "payload": {
+        "approver": "compliance_officer",
+        "decision": "approve",
+        "justification": "metrics meet threshold and dataset fingerprint verified",
+        "scope": "model_promoted"
+      },
+      "run_id": "RUN_ID=9196698f-f023-4c54-b6d1-b32e72fe04db",
+      "system": "aigov_poc",
+      "ts_utc": "2026-01-31T16:33:35.393687Z"
+    }
+  ],
+  "log_path": "rust/audit_log.jsonl",
+  "model_artifact_path": null,
+  "ok": true,
+  "policy_version": "v0.4_human_approval",
+  "run_id": "RUN_ID=9196698f-f023-4c54-b6d1-b32e72fe04db",
+  "bundle_sha256": "f3dd5f71abeedf7292902d69df9fcae2dac6a9ca6296362ed994d91b3a0ce196"
+}

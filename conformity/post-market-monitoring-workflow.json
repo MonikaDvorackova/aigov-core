@@ -1,0 +1,86 @@
+{
+  "schema_version": "1.0.0",
+  "workflow_id": "govai.conformity.post_market_monitoring_workflow.v1",
+  "summary": "Post-market monitoring (Article 72) workflow that defines the metrics, signal sources, review cadence, and escalation paths providers operate after a high-risk AI system is on the market.",
+  "monitoring_objectives": [
+    "Detect deviations from intended purpose and acceptable performance.",
+    "Surface incidents that may require notification to authorities.",
+    "Feed insights back into the risk management lifecycle."
+  ],
+  "monitoring_categories": [
+    {
+      "category_id": "performance_drift",
+      "description": "Track accuracy, robustness, and fairness indicators against pre-release baselines.",
+      "example_metrics": [
+        "accuracy_window_p50",
+        "false_positive_rate",
+        "calibration_error"
+      ],
+      "evidence_sources": [
+        "docs/observability/runtime-telemetry-contract.md"
+      ]
+    },
+    {
+      "category_id": "operational_stability",
+      "description": "Track availability, latency, and saturation of governance-critical components.",
+      "example_metrics": [
+        "availability_pct",
+        "p95_latency_ms",
+        "saturation_pct"
+      ],
+      "evidence_sources": [
+        "docs/observability/observability-manifest.json"
+      ]
+    },
+    {
+      "category_id": "safety_signals",
+      "description": "Track guardrail invocations, override events, and escalations.",
+      "example_metrics": [
+        "guardrail_invocation_rate",
+        "human_override_rate",
+        "kill_switch_activations"
+      ],
+      "evidence_sources": [
+        "docs/runtime-safety/README.md"
+      ]
+    },
+    {
+      "category_id": "user_feedback",
+      "description": "Capture structured feedback and complaints from affected users.",
+      "example_metrics": [
+        "complaint_volume",
+        "complaint_categorization"
+      ],
+      "evidence_sources": [
+        "docs/operations/customer-operations-manifest.json"
+      ]
+    }
+  ],
+  "review_cadence": {
+    "minimum_review_interval_days": 30,
+    "post_incident_immediate_review": true,
+    "annual_summary_required": true
+  },
+  "escalation_routes": [
+    {
+      "route_id": "internal_engineering",
+      "description": "Engineering owner is notified and opens a remediation ticket within the operator's tracker."
+    },
+    {
+      "route_id": "internal_governance",
+      "description": "Risk owner and regulatory owner review the signal and decide whether a substantial modification or incident reporting is required."
+    },
+    {
+      "route_id": "authority_notification",
+      "description": "When criteria in conformity/incident-reporting-workflow.json are met, the regulatory owner triggers external notification."
+    }
+  ],
+  "evidence_export_hooks": [
+    "scripts/generate_regulatory_evidence_export.py",
+    "scripts/generate_operational_intelligence_report.py"
+  ],
+  "boundaries": [
+    "Monitoring thresholds are operator-defined; GovAI does not enforce regulator-specific thresholds automatically.",
+    "Customer-controlled deployments may apply additional monitoring obligations beyond this workflow."
+  ]
+}

@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aigov.dev/schemas/govai.signature_report.v1.schema.json",
+  "title": "GovAI Signature Verification Report (v1)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "created_at_utc", "target", "results", "ok"],
+  "properties": {
+    "schema": { "type": "string", "const": "govai.signature_report.v1" },
+    "created_at_utc": { "type": "string", "minLength": 20, "maxLength": 40 },
+    "ok": { "type": "boolean" },
+    "target": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "tenant_id", "run_id"],
+      "properties": {
+        "kind": { "type": "string", "enum": ["evidence_pack", "export", "artifact", "policy"] },
+        "tenant_id": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "run_id": { "type": "string", "minLength": 1, "maxLength": 256 },
+        "artifact_ref": { "type": ["string", "null"], "maxLength": 2048 },
+        "policy_ref": { "type": ["string", "null"], "maxLength": 512 }
+      }
+    },
+    "results": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["check", "ok", "code", "message"],
+        "properties": {
+          "check": {
+            "type": "string",
+            "enum": [
+              "payload_digest",
+              "signature_present",
+              "signature_valid",
+              "signer_identity",
+              "trust_chain",
+              "rekor_inclusion",
+              "expiration"
+            ]
+          },
+          "ok": { "type": "boolean" },
+          "code": { "type": "string", "minLength": 1, "maxLength": 128 },
+          "message": { "type": "string", "minLength": 1, "maxLength": 2048 },
+          "details": { "type": ["object", "null"] }
+        }
+      }
+    }
+  }
+}
+

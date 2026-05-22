@@ -1,0 +1,112 @@
+{
+  "evidence_quality_program": {
+    "summary": "GovAI evidence quality and dataset governance defines machine-readable manifests, deterministic provenance snapshot validation, lineage risk heuristics, retention posture checks, and advisory scoring outputs. These artifacts support documentation gates and CI artefacts without changing audit enforcement, billing, ledgers, or database migrations.",
+    "version": "1",
+    "owner": "governance_engineering",
+    "entrypoints": [
+      "docs/evidence-quality/README.md",
+      "docs/evidence-quality/evidence-quality-manifest.json"
+    ]
+  },
+  "provenance_requirements": {
+    "summary": "Training and evaluation datasets must declare registered upstream sources, stable identifiers, optional content checksums, and governance approvals suitable for offline validation scripts.",
+    "entrypoints": [
+      "docs/evidence-quality/dataset-provenance.md",
+      "docs/evidence-quality/evidence-quality-scoring.md"
+    ]
+  },
+  "lineage_requirements": {
+    "summary": "Lineage edges and transformation steps are validated structurally so risk heuristics can flag undocumented derivation paths deterministically.",
+    "entrypoints": [
+      "docs/evidence-quality/data-lineage.md",
+      "docs/evidence-quality/dataset-risk.md"
+    ]
+  },
+  "retention_requirements": {
+    "summary": "Retention classification, explicit day counts, and legal-hold policy references are required when legal_hold is true so governance reports stay internally consistent.",
+    "entrypoints": [
+      "docs/evidence-quality/retention-policy.md",
+      "docs/evidence-quality/evidence-quality-gates.md"
+    ]
+  },
+  "scoring_model": {
+    "summary": "Scores are advisory integers from zero to one hundred derived from snapshot fields only; they do not replace compliance-summary verdicts or runtime policy enforcement.",
+    "entrypoints": [
+      "docs/evidence-quality/evidence-quality-scoring.md",
+      "docs/evidence-quality/dataset-governance-report.md"
+    ]
+  },
+  "referenced_documents": [
+    {
+      "path": "docs/evidence-quality/evidence-quality-manifest.json",
+      "role": "canonical_machine_readable_evidence_quality_index"
+    },
+    {
+      "path": "docs/evidence-quality/README.md",
+      "role": "evidence_quality_index"
+    },
+    {
+      "path": "docs/evidence-quality/evidence-quality-scoring.md",
+      "role": "scoring_model"
+    },
+    {
+      "path": "docs/evidence-quality/dataset-provenance.md",
+      "role": "provenance_contract"
+    },
+    {
+      "path": "docs/evidence-quality/data-lineage.md",
+      "role": "lineage_contract"
+    },
+    {
+      "path": "docs/evidence-quality/retention-policy.md",
+      "role": "retention_contract"
+    },
+    {
+      "path": "docs/evidence-quality/evidence-quality-gates.md",
+      "role": "documentation_gates"
+    },
+    {
+      "path": "docs/evidence-quality/dataset-risk.md",
+      "role": "risk_heuristics"
+    },
+    {
+      "path": "docs/evidence-quality/dataset-governance-report.md",
+      "role": "report_generator_notes"
+    }
+  ],
+  "referenced_examples": [
+    {
+      "path": "examples/evidence-quality/README.md",
+      "role": "example_index"
+    },
+    {
+      "path": "examples/evidence-quality/sample-dataset-provenance-snapshot.json",
+      "role": "canonical_snapshot_sample"
+    },
+    {
+      "path": "examples/evidence-quality/run-evidence-quality-check.sh",
+      "role": "driver_evidence_quality_check"
+    },
+    {
+      "path": "examples/evidence-quality/run-evidence-quality-score.sh",
+      "role": "driver_evidence_quality_score"
+    },
+    {
+      "path": "examples/evidence-quality/run-dataset-governance-report.sh",
+      "role": "driver_dataset_governance_report"
+    }
+  ],
+  "required_checks": [
+    "python3 scripts/evidence_quality_check.py --json",
+    "python3 scripts/validate_evidence_quality_manifest.py --json",
+    "python3 scripts/validate_dataset_provenance_snapshot.py --json",
+    "python3 scripts/evidence_quality_score.py --input examples/evidence-quality/sample-dataset-provenance-snapshot.json",
+    "python3 scripts/generate_dataset_governance_report.py --input examples/evidence-quality/sample-dataset-provenance-snapshot.json",
+    "make evidence-quality-check"
+  ],
+  "non_goals": [
+    "Does not alter POST /evidence semantics or compliance-summary enforcement.",
+    "Does not modify billing, Stripe, or ledger append paths.",
+    "Does not run database migrations or change Rust policy evaluation."
+  ]
+}

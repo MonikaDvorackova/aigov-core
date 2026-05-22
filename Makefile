@@ -76,14 +76,14 @@ FORCE:
 AUDIT_URL ?= http://127.0.0.1:8088
 AUDIT_PORT ?= 8088
 
-AUDIT_PIDFILE ?= .aigov_audit.pid
-AUDIT_LOG ?= .aigov_audit.log
+AUDIT_PIDFILE ?= .govai_core_runtime.pid
+AUDIT_LOG ?= .govai_core_runtime.log
 
 # Local default: convenient, but allow override in CI/operators.
 GOVAI_AUTO_MIGRATE ?= true
 
 # Explicit binary: this crate ships multiple `[[bin]]` targets; `cargo run` without `--bin` fails.
-AIGOV_AUDIT_BIN ?= aigov_audit
+AIGOV_AUDIT_BIN ?= portable_evidence_digest_once
 
 # ================================
 # Env debug
@@ -659,7 +659,7 @@ audit:
 audit_bg:
 	@set -euo pipefail; \
 	if curl -fsS --max-time 1 "$(AUDIT_URL)/health" >/dev/null 2>&1; then \
-		echo "aigov_audit already running on $(AUDIT_URL)"; \
+		echo "GovAI Core runtime already running on $(AUDIT_URL)"; \
 		exit 0; \
 	fi; \
 	PIDS="$$(lsof -tiTCP:$(AUDIT_PORT) -sTCP:LISTEN 2>/dev/null || true)"; \

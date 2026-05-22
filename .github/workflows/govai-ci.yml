@@ -1,3 +1,6 @@
+# GovAI Core CI: portable runtime / evidence infrastructure (no hosted HTTP audit server).
+# Hosted SaaS lifecycle (GET /ready, background audit service) belongs to the GovAI Platform repo.
+
 name: govai-ci
 
 on:
@@ -8,30 +11,10 @@ env:
   AIGOV_POLICY_STRICT: "true"
 
 jobs:
-  govai-verify:
+  govai-core-portable:
+    name: govai-core-portable
     runs-on: ubuntu-latest
-
-    services:
-      postgres:
-        image: postgres:16
-        env:
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_USER: postgres
-          POSTGRES_DB: postgres
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd "pg_isready -U postgres"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-
-    env:
-      DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/postgres
-      GOVAI_API_KEYS_JSON: '{"ci-test-api-key":"github-actions"}'
-      GOVAI_API_KEY: ci-test-api-key
-      GOVAI_PROJECT: github-actions
-      # CI must not rely on implicit working-directory ledger defaults.
+    timeout-minutes: 15
 
     steps:
       - name: Checkout
@@ -42,13 +25,7 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Set up GOVAI_LEDGER_DIR (runner temp)
-        run: |
-          set -euo pipefail
-          echo "GOVAI_LEDGER_DIR=$RUNNER_TEMP/govai-ledger" >> "$GITHUB_ENV"
-          mkdir -p "$RUNNER_TEMP/govai-ledger"
-
-      - name: Install GovAI from workspace (truthful parity with CI + local)
+      - name: Install GovAI from workspace
         run: |
           set -euo pipefail
           python -m pip install --upgrade pip
@@ -58,69 +35,47 @@ jobs:
       - name: Set up Rust
         uses: dtolnay/rust-toolchain@stable
 
-      - name: Build audit service
-        run: cd rust && cargo build --locked --bin portable_evidence_digest_once
-
-      - name: Prepare ledger dir (writable)
+      - name: Build portable evidence digest helper
         run: |
           set -euo pipefail
-          test -n "${GOVAI_LEDGER_DIR:-}" || { echo "::error::GOVAI_LEDGER_DIR is missing"; exit 1; }
-          mkdir -p "${GOVAI_LEDGER_DIR}"
-          ls -ld "${GOVAI_LEDGER_DIR}"
+          cd rust && cargo build --locked --bin portable_evidence_digest_once
 
-      - name: Start audit service
-        run: make audit_bg
-
-      - name: Wait for audit readiness (GET /ready)
+      - name: Governance standards (offline)
         run: |
           set -euo pipefail
-          for i in $(seq 1 60); do
-            code="$(curl -sS -o /tmp/govai_ready_body -w "%{http_code}" --max-time 2 \
-              -H "Authorization: Bearer ci-test-api-key" \
-              "http://127.0.0.1:8088/ready" || true)"
-            if [ "${code}" = "200" ]; then
-              exit 0
-            fi
-            if [ "${i}" = "1" ] || [ "${i}" = "20" ] || [ "${i}" = "40" ] || [ "${i}" = "60" ]; then
-              echo "waiting for /ready (attempt ${i}/60): last_http=${code}"
-              echo "last /ready body:"
-              sed -n '1,120p' /tmp/govai_ready_body || true
-              echo ""
-              echo "status snapshot (/status):"
-              curl -sS --max-time 2 -H "Authorization: Bearer ci-test-api-key" "http://127.0.0.1:8088/status" || true
-              echo ""
-            fi
-            sleep 0.5
-          done
-          echo "audit GET /ready did not return HTTP 200 (/health and /status are not substitutes for readiness)"
-          echo "Common causes: Postgres unreachable, migrations incomplete, or ledger dir not writable."
-          exit 1
-          
-      - name: Run blocked deployment example (must exit 3 BLOCKED)
-        env:
-          GOVAI_AUDIT_BASE_URL: http://127.0.0.1:8088
-          GOVAI_API_KEY: ci-test-api-key
-          GOVAI_PROJECT: github-actions
-        run: |
-          set -euo pipefail
-          test -f examples/blocked_deployment.sh || {
-            echo "::error::examples/blocked_deployment.sh is required for govai-ci (BLOCKED contract gate)."
-            exit 1
-          }
-          chmod +x examples/blocked_deployment.sh
-          bash examples/blocked_deployment.sh
+          make governance-standards-check
 
-      - name: Prometheus metrics endpoint smoke (GET /metrics)
+      - name: Documentation gate
         run: |
           set -euo pipefail
-          code="$(curl -sS -o /tmp/govai_metrics_body -w "%{http_code}" --max-time 2 "http://127.0.0.1:8088/metrics" || true)"
-          if [ "${code}" != "200" ]; then
-            echo "::error::GET /metrics expected HTTP 200, got ${code}"
-            sed -n '1,40p' /tmp/govai_metrics_body || true
-            exit 1
-          fi
-          if ! grep -q "govai_http_requests_total" /tmp/govai_metrics_body; then
-            echo "::error::GET /metrics body missing govai_http_requests_total"
-            sed -n '1,40p' /tmp/govai_metrics_body || true
-            exit 1
-          fi
+          make gate
+
+      - name: Portable evidence digest unit tests
+        run: |
+          set -euo pipefail
+          cd python && python -m pytest tests/test_portable_evidence_digest.py tests/test_evidence_pack_init_cli.py -q
+
+      - name: Portable artifact bundle smoke (offline)
+        run: |
+          set -euo pipefail
+          RUN_ID="govai-ci-portable-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          ART="${RUNNER_TEMP}/govai-ci-artifacts"
+          rm -rf "${ART}"
+          mkdir -p "${ART}"
+          python3 scripts/ci_portable_artifact_bundle.py \
+            --run-id "${RUN_ID}" \
+            --artifact-dir "${ART}"
+          govai verify-evidence-pack --portable-only --path "${ART}" --run-id "${RUN_ID}"
+
+      - name: Write job summary
+        if: always()
+        run: |
+          set -euo pipefail
+          {
+            echo "# GovAI Core portable CI"
+            echo
+            echo "Validates compilation, offline governance standards, documentation gate, and portable evidence/digest/replay semantics."
+            echo
+            echo "Does **not** start a localhost audit HTTP service or poll GET /ready."
+            echo "Hosted runtime orchestration is owned by the **GovAI Platform** repository."
+          } >> "${GITHUB_STEP_SUMMARY}"

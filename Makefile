@@ -6,7 +6,7 @@ AIGOV_MODE ?= ci
 
 .PHONY: \
 	FORCE \
-	audit audit_bg audit_stop audit_restart audit_logs \
+	audit audit_bg audit_stop audit_restart audit_logs require_audit_url \
 	status verify verify_log \
 	run \
 	require_run ensure_dirs ensure_reports_dir new_run report_new report_prepare report_prepare_new ensure_evidence pr_report pr_report_commit db_ingest \
@@ -73,13 +73,11 @@ discovery_scan:
 
 FORCE:
 
-AUDIT_URL ?= http://127.0.0.1:8088
-AUDIT_PORT ?= 8088
+# Optional operator-provided audit HTTP base URL (GovAI Platform or customer self-host).
+# GovAI Core does not start, background-manage, or readiness-poll a hosted audit server.
+AUDIT_URL ?= $(GOVAI_AUDIT_BASE_URL)
 
-AUDIT_PIDFILE ?= .govai_core_runtime.pid
-AUDIT_LOG ?= .govai_core_runtime.log
-
-# Local default: convenient, but allow override in CI/operators.
+# Legacy: GOVAI_AUTO_MIGRATE applied only when using an external Platform-operated runtime.
 GOVAI_AUTO_MIGRATE ?= true
 
 # Explicit binary: this crate ships multiple `[[bin]]` targets; `cargo run` without `--bin` fails.
@@ -639,7 +637,7 @@ cursor-plugin-smoke:
 cursor-plugin-check: cursor-plugin-validate cursor-plugin-smoke
 	@echo "cursor-plugin-check: OK"
 
-# Optional: read-only GET /health, /ready, /status against GOVAI_AUDIT_BASE_URL (default http://127.0.0.1:8088). No API keys; no evidence POST.
+# Optional: read-only probe against operator-configured GOVAI_AUDIT_BASE_URL (Platform/self-host). Core does not start a server.
 local-demo:
 	@python3 scripts/run_local_demo.py
 
@@ -653,37 +651,38 @@ fail-closed-demo:
 engineering_loc:
 	@python3 scripts/engineering_loc.py
 
+# Portable offline digest helper (no HTTP server).
 audit:
 	cd rust && cargo run --bin $(AIGOV_AUDIT_BIN) --locked
 
-audit_bg:
-	@echo "audit_bg is not available in GovAI Core; run hosted platform services from the proprietary platform repository."
+audit_bg audit_stop audit_restart audit_logs:
+	@echo "$@: GovAI Core does not manage a hosted audit HTTP service lifecycle."
+	@echo "Run the GovAI Platform repository for SaaS runtime orchestration, or configure GOVAI_AUDIT_BASE_URL to your operator runtime."
+	@exit 2
 
-audit_stop:
-	@echo "audit_stop is not available in GovAI Core; no hosted audit service is managed here."
+require_audit_url:
+	@if [ -z "$${GOVAI_AUDIT_BASE_URL:-}" ]; then \
+		echo "GOVAI_AUDIT_BASE_URL is required (GovAI Core does not start a local audit server)."; \
+		echo "Point it at GovAI Platform or your self-host runtime, or use offline targets: governance-standards-check, scripts/ci_portable_artifact_bundle.py"; \
+		exit 2; \
+	fi
 
-audit_restart:
-	@echo "audit_restart is not available in GovAI Core; no hosted audit service is managed here."
+status: require_audit_url
+	curl -sS "$(GOVAI_AUDIT_BASE_URL)/status" ; echo
 
-audit_logs:
-	@echo "audit_logs is not available in GovAI Core; no hosted audit service log is managed here."
+verify: require_audit_url
+	curl -sS "$(GOVAI_AUDIT_BASE_URL)/verify" ; echo
 
-status:
-	curl -sS $(AUDIT_URL)/status ; echo
-
-verify:
-	curl -sS $(AUDIT_URL)/verify ; echo
-
-verify_log:
-	curl -sS $(AUDIT_URL)/verify-log ; echo
+verify_log: require_audit_url
+	curl -sS "$(GOVAI_AUDIT_BASE_URL)/verify-log" ; echo
 
 # ================================
 # Core
 # ================================
 
-run:
+run: require_audit_url
 	cd python && . .venv/bin/activate && \
-	GOVAI_AUDIT_BASE_URL=$${GOVAI_AUDIT_BASE_URL:-http://127.0.0.1:8088} GOVAI_API_KEY=$${GOVAI_API_KEY:-ci-test-api-key} GOVAI_PROJECT=$${GOVAI_PROJECT:-github-actions} RUN_ID=$(RUN_ID) python -m aigov_py.pipeline_train
+	GOVAI_AUDIT_BASE_URL=$${GOVAI_AUDIT_BASE_URL} GOVAI_API_KEY=$${GOVAI_API_KEY:-ci-test-api-key} GOVAI_PROJECT=$${GOVAI_PROJECT:-github-actions} RUN_ID=$(RUN_ID) python -m aigov_py.pipeline_train
 
 require_run:
 	@if [ -z "$(RUN_ID)" ]; then \
@@ -692,11 +691,9 @@ require_run:
 	fi
 
 check_audit:
-	@curl -fsS --max-time 1 $(AUDIT_URL)/ready >/dev/null 2>&1 || ( \
-		echo "Audit service not reachable or not ready on $(AUDIT_URL) (expected GET /ready HTTP 200)"; \
-		echo "Start it with: make audit_bg"; \
-		exit 2; \
-	)
+	@echo "check_audit: removed in GovAI Core (no GET /ready polling or localhost orchestration)."
+	@echo "Use require_audit_url + operator runtime, or offline portable CI: python3 scripts/ci_portable_artifact_bundle.py"
+	@exit 2
 
 ensure_dirs:
 	@mkdir -p docs/reports docs/audit docs/audit_meta docs/packs docs/evidence docs/policy
@@ -794,7 +791,7 @@ db_ingest: require_run
 # demo: end to end run that generates artifacts and ingests a row to Supabase
 # demo_new: same but generates RUN_ID automatically and prints it for dashboard usage
 
-demo: require_run check_audit
+demo: require_run require_audit_url
 	@set -euo pipefail; \
 	echo "DEMO: RUN_ID=$(RUN_ID) AIGOV_MODE=$(AIGOV_MODE)"; \
 	$(MAKE) run RUN_ID="$(RUN_ID)"; \
@@ -805,7 +802,7 @@ demo: require_run check_audit
 	echo "OK: demo completed RUN_ID=$(RUN_ID)"; \
 	echo "Dashboard: /runs/$(RUN_ID)"
 
-demo_new: check_audit
+demo_new: require_audit_url
 	@set -euo pipefail; \
 	RUN_ID="$$(python3 -c 'import uuid; print(str(uuid.uuid4()))')"; \
 	echo "DEMO: generated RUN_ID=$$RUN_ID AIGOV_MODE=$(AIGOV_MODE)"; \
@@ -818,7 +815,7 @@ demo_new: check_audit
 	echo "Dashboard: /runs/$$RUN_ID"
 
 # Train → approve → promote → report_prepare (evidence + report + bundle + verify_cli) → compliance summary (HTTP)
-flow_full: require_run check_audit
+flow_full: require_run require_audit_url
 	@set -euo pipefail; \
 	echo "flow_full: RUN_ID=$(RUN_ID) AIGOV_MODE=$(AIGOV_MODE)"; \
 	$(MAKE) run RUN_ID="$(RUN_ID)"; \
@@ -827,19 +824,19 @@ flow_full: require_run check_audit
 	$(MAKE) report_prepare RUN_ID="$(RUN_ID)"; \
 	cd python && . .venv/bin/activate && \
 		RUN_ID="$(RUN_ID)" AIGOV_MODE="$(AIGOV_MODE)" python -m aigov_py.ai_discovery_completed; \
-	echo "GET $(AUDIT_URL)/compliance-summary?run_id=$(RUN_ID)"; \
-	curl -fsS "$(AUDIT_URL)/compliance-summary?run_id=$(RUN_ID)"; echo
+	echo "GET $(GOVAI_AUDIT_BASE_URL)/compliance-summary?run_id=$(RUN_ID)"; \
+	curl -fsS "$(GOVAI_AUDIT_BASE_URL)/compliance-summary?run_id=$(RUN_ID)"; echo
 
 flow: flow_full
 
 # Thin wrappers around Python scripts (core flow glue)
-approve: require_run
+approve: require_run require_audit_url
 	cd python && . .venv/bin/activate && \
-		GOVAI_AUDIT_BASE_URL=$${GOVAI_AUDIT_BASE_URL:-http://127.0.0.1:8088} GOVAI_API_KEY=$${GOVAI_API_KEY:-ci-test-api-key} GOVAI_PROJECT=$${GOVAI_PROJECT:-github-actions} RUN_ID=$(RUN_ID) AIGOV_MODE=$(AIGOV_MODE) python -m aigov_py.approve
+		GOVAI_AUDIT_BASE_URL=$${GOVAI_AUDIT_BASE_URL} GOVAI_API_KEY=$${GOVAI_API_KEY:-ci-test-api-key} GOVAI_PROJECT=$${GOVAI_PROJECT:-github-actions} RUN_ID=$(RUN_ID) AIGOV_MODE=$(AIGOV_MODE) python -m aigov_py.approve
 
-promote: require_run
+promote: require_run require_audit_url
 	cd python && . .venv/bin/activate && \
-		GOVAI_AUDIT_BASE_URL=$${GOVAI_AUDIT_BASE_URL:-http://127.0.0.1:8088} GOVAI_API_KEY=$${GOVAI_API_KEY:-ci-test-api-key} GOVAI_PROJECT=$${GOVAI_PROJECT:-github-actions} RUN_ID=$(RUN_ID) AIGOV_MODE=$(AIGOV_MODE) python -m aigov_py.promote
+		GOVAI_AUDIT_BASE_URL=$${GOVAI_AUDIT_BASE_URL} GOVAI_API_KEY=$${GOVAI_API_KEY:-ci-test-api-key} GOVAI_PROJECT=$${GOVAI_PROJECT:-github-actions} RUN_ID=$(RUN_ID) AIGOV_MODE=$(AIGOV_MODE) python -m aigov_py.promote
 
 export_bundle: require_run ensure_dirs
 	cd python && . .venv/bin/activate && \

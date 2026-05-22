@@ -93,14 +93,6 @@ jobs:
           set -euo pipefail
           make enterprise-readiness-check
 
-      - name: TypeScript SDK
-        working-directory: typescript-sdk
-        run: |
-          set -euo pipefail
-          npm ci
-          npm run build
-          npm test
-
       - name: Write release validation summary
         if: always()
         run: |

@@ -104,11 +104,7 @@ standards-conformance:
 
 # Validates shipped interchange examples against the explicit registry-backed validators.
 governance-standards-check:
-	@set -euo pipefail; \
-	for f in examples/standards/evidence-pack.valid.json examples/standards/policy-module.valid.json examples/standards/decision-trace.valid.json; do \
-		python3 scripts/validate_standard_conformance.py --json "$$f" >/dev/null; \
-	done; \
-	echo "governance-standards-check: OK"
+	@echo "governance-standards-check is not available in GovAI Core; platform standards validation belongs to the proprietary platform repository."
 
 oss-health:
 	@python3 scripts/repo_health_check.py

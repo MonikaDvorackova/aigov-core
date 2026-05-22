@@ -1,140 +1,143 @@
-# GovAI Architecture Overview
+# GovAI architecture overview
 
-GovAI is an evidence-first governance layer for AI systems.
+GovAI is **evidence-grade AI governance infrastructure** for regulated and high-assurance AI deployments. It records **audit evidence**, evaluates **policy** at ingest, and exposes one authoritative **compliance verdict** per run (`VALID`, `INVALID`, or `BLOCKED`).
 
-```docs
-preset: architecture-components
+Enterprise architecture hub (full map): **[README.md](README.md)**. Canonical terms: **[../terminology.md](../terminology.md)**.
+
+## Product architecture
+
+GovAI ships as two cooperating products:
+
+| Product | Responsibility |
+|---------|----------------|
+| **GovAI Core** | Append-only ledger, policy enforcement, compliance projection, export and replay |
+| **GovAI Platform** | Hosted SaaS, billing, onboarding, dashboard, enterprise control plane (`/api/*`) |
+
+Boundary detail: [platform-vs-core-boundary.md](platform-vs-core-boundary.md). Deployment modes: [hosted-vs-self-host-topology.md](hosted-vs-self-host-topology.md).
+
+```mermaid
+flowchart TB
+  subgraph clients [Integrators]
+    CLI[GovAI CLI / SDK]
+    CI[CI / GitHub Action]
+    RT[Runtime applications]
+  end
+  subgraph core [GovAI Core]
+    ING[POST /evidence]
+    LED[(Append-only ledger)]
+    SUM[GET /compliance-summary]
+    EXP[GET /api/export]
+    ING --> LED --> SUM
+    LED --> EXP
+  end
+  subgraph platform [GovAI Platform optional]
+    CP[JWT control plane / workflow]
+    WEB[Dashboard / billing]
+  end
+  CLI --> ING
+  CI --> ING
+  RT --> ING
+  CLI --> SUM
+  CP -.operational overlay.-> SUM
 ```
 
-The platform focuses on:
-- decision-level auditability
-- fail-closed enforcement
-- evidence continuity
-- operational governance enforcement
+## Architectural layers
 
-## High-level architecture
-
-GovAI consists of several major layers:
-
-1. Governance clients
-2. CI/CD integrations
-3. Runtime governance APIs
-4. Audit ledger and evidence storage
-5. Policy evaluation and enforcement
-6. Evidence export and replay
-
-```flow
-preset: runtime
-```
+| Layer | Function | Authoritative for verdict? |
+|-------|----------|---------------------------|
+| **Integrators** | Submit evidence; consume summary and exports | No |
+| **GovAI Core** | Ingest, ledger, policy, projection, verdict | **Yes** |
+| **GovAI Platform** | Teams, workflow queue, hosted operations | No (must reconcile with summary) |
+| **Customer GRC** | Long-term export archive, legal process | No |
 
 ## Core concepts
 
-### Decision-centric enforcement
+### Decision-centric governance execution
 
-GovAI evaluates whether a system decision is governable and auditable.
+GovAI evaluates whether a **run** is governable and auditable under a declared `policy_version`:
 
-The system does not only evaluate model quality. It evaluates whether:
-- required evidence exists
-- evaluations completed
-- approvals are present
-- traceability is intact
-- integrity guarantees hold
+- Required **audit evidence** present or **BLOCKED**
+- Decisive rules satisfied or **INVALID**
+- Integrity and digests consistent or verification failure
+
+This is not model-quality observability. Metrics and dashboards around runtime ([../observability/README.md](../observability/README.md)) are **operational aids** and do not replace the compliance verdict.
 
 ### Fail-closed semantics
 
-GovAI uses three primary verdicts:
-
-- VALID
-- INVALID
-- BLOCKED
-
-Missing governance evidence produces BLOCKED rather than implicit success.
+Formal definition: [governance-semantics.md](governance-semantics.md). Concise reference: [../trust-model.md](../trust-model.md).
 
 ### Evidence continuity
 
-Audit records must remain linked to exported artifacts through deterministic or cryptographic integrity mechanisms.
+Lifecycle: [evidence-lifecycle.md](evidence-lifecycle.md). Ledger rules: [append-only-ledger-semantics.md](append-only-ledger-semantics.md).
+
+## Lifecycles (where to read)
+
+| Lifecycle | Document |
+|-----------|----------|
+| Evidence | [evidence-lifecycle.md](evidence-lifecycle.md) |
+| Policy evaluation | [policy-evaluation-lifecycle.md](policy-evaluation-lifecycle.md) |
+| Decision trace | [decision-trace-lifecycle.md](decision-trace-lifecycle.md) |
+| Governance execution | [governance-execution-flow.md](governance-execution-flow.md) |
 
 ## Main components
 
-## Python SDK
+### Rust audit service (GovAI Core)
 
-The Python SDK provides:
-- CLI workflows
-- evidence export
-- replay tooling
-- CI integration helpers
-- compliance verification tooling
+- `POST /evidence` — ingest with policy enforcement
+- `GET /compliance-summary` — authoritative compliance verdict
+- `GET /bundle`, `GET /bundle-hash`, `GET /verify*` — integrity and CI binding
+- `GET /api/export/:run_id` — stable audit export
 
-## Rust audit service
+Implementation: [../../ARCHITECTURE.md](../../ARCHITECTURE.md). Contract note: [../strong-core-contract-note.md](../strong-core-contract-note.md).
 
-The Rust service provides:
-- governance APIs
-- audit ingestion
-- runtime evaluation
-- evidence verification
-- tenant isolation
-- readiness and operational endpoints
+### Python SDK / CLI
 
-## Policy engine
+- Governance execution helpers, evidence packs, replay, CI gates
+- Does not define a second verdict channel
 
-The policy layer evaluates:
-- governance requirements
-- enforcement rules
-- approval requirements
-- runtime governance constraints
+### Policy engine
 
-## CI/CD integration layer
+Evaluated at ingest (`policy.rs`) and on projection read. See [policy-evaluation-lifecycle.md](policy-evaluation-lifecycle.md).
 
-GovAI integrates into CI/CD pipelines using:
-- GitHub Actions
-- evidence bundle verification
-- compliance gates
-- replay validation
+### CI/CD integration
 
-## Runtime governance
+GitHub Action and `govai check` consume `GET /compliance-summary`. Diagram: [diagrams/ci_cd_compliance_flow.md](diagrams/ci_cd_compliance_flow.md).
 
-Runtime governance allows operational enforcement after deployment.
+### Runtime integration
 
-Examples:
-- runtime blocking
-- approval validation
-- policy checks
-- evidence validation
-- runtime traceability
+Preview `POST /v1/runtime/evaluate` is advisory; summary verdict remains authoritative. See [../runtime/overview.md](../runtime/overview.md).
 
 ## Tenant isolation
 
-Tenant isolation is derived from server-side API key mapping.
-
-Headers are metadata only and are not security boundaries.
+Server-side API key → `tenant_id` mapping for ledger routes. Architecture: [tenant-isolation-architecture.md](tenant-isolation-architecture.md). Security: [../security/tenant-isolation.md](../security/tenant-isolation.md).
 
 ## Deployment model
 
-Typical deployments include:
-- local development
-- self-hosted audit services
-- hosted governance endpoints
-- CI-integrated enforcement flows
+| Mode | Documentation |
+|------|----------------|
+| Hosted Professional | [../hosted-backend-deployment.md](../hosted-backend-deployment.md), [hosted-vs-self-host-topology.md](hosted-vs-self-host-topology.md) |
+| Self-host Enterprise | Same Core routes; customer-operated boundary |
+| Local development | [developer_onboarding_flow.md](developer_onboarding_flow.md) |
 
-## Developer onboarding (diagram)
+## HTTP surface
 
-For a single-page view from **clone** through **runtime evaluate**, **evidence packs**, **CI gates**, and **hosted** audit URLs, see **[developer_onboarding_flow.md](developer_onboarding_flow.md)**.
+Normative API: [`api/govai-http-v1.openapi.yaml`](../../api/govai-http-v1.openapi.yaml). Reader summary: [../api-reference.md](../api-reference.md).
 
-## HTTP surface (where to read more)
+**Auth split:** API keys for ledger routes; Supabase JWT + team header for Platform `/api/*`.
 
-The Rust binary exposes **core metadata** (`GET /health`, `GET /status`, …), **readiness** (`GET /ready`), and **gated ledger routes** (`POST /evidence`, `GET /compliance-summary`, `GET /bundle-hash`, `GET /api/export/:run_id`, billing, usage, …). A concise table lives in [ARCHITECTURE.md](../../ARCHITECTURE.md); normative schemas and stability tags are in [`api/govai-http-v1.openapi.yaml`](../../api/govai-http-v1.openapi.yaml). A reader summary is in [api-reference.md](../api-reference.md).
+## Enterprise trust and regulatory context
 
-**Dashboard and enterprise APIs** (Supabase JWT, assessments, compliance workflow queues) share the same deployment in many setups but use **different auth** from audit API keys—see ARCHITECTURE and OpenAPI `Enterprise` tags.
+| Topic | Document |
+|-------|----------|
+| Trust package | [../trust/enterprise-trust-package.md](../trust/enterprise-trust-package.md) |
+| Shared responsibility | [../trust/shared-responsibility-model.md](../trust/shared-responsibility-model.md) |
+| EU AI Act (indicative) | [../regulatory/ai-act-enterprise-positioning.md](../regulatory/ai-act-enterprise-positioning.md) |
 
-## Shipped vs planned (high level)
+## Shipped vs preview
 
-| Status | Area | Notes |
-|--------|------|--------|
-| **Shipped** | Evidence → append-only log → bundle / compliance-summary / export | Core enforcement path in `rust/`. |
-| **Shipped** | `govai` CLI + GitHub composite action | `python/aigov_py/cli.py`, root `action.yml`. |
-| **Preview** | `POST /v1/runtime/evaluate` | Documented as internal/preview; does not redefine summary verdicts. |
-| **Planned / roadmap** | Broader governance control plane, immutability options, multi-region DR | See [roadmap.md](../roadmap.md)—no commitment to dates in this architecture page. |
-
-## Future directions
-
-See [roadmap.md](../roadmap.md) for the public roadmap. Architecture themes called out there include deeper runtime governance, evidence UX, and standards/interoperability—without diluting fail-closed semantics.
+| Status | Area |
+|--------|------|
+| **Shipped** | Evidence → ledger → summary / export / replay |
+| **Shipped** | CLI, GitHub Action, standards offline validators |
+| **Preview** | `POST /v1/runtime/evaluate` |
+| **Roadmap** | Multi-region DR, extended immutability options — [../roadmap.md](../roadmap.md) |

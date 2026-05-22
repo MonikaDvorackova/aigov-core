@@ -23,6 +23,9 @@ The **GovBase dashboard** (`dashboard/` Next.js app) may be deployed alongside o
 
 | Topic | Document |
 |--------|----------|
+| Enterprise trust package (procurement entry) | [../trust/enterprise-trust-package.md](../trust/enterprise-trust-package.md) |
+| Hosted vs self-host responsibilities | [../trust/shared-responsibility-model.md](../trust/shared-responsibility-model.md) |
+| Architecture and verdict semantics | [../architecture/governance-semantics.md](../architecture/governance-semantics.md) |
 | Data categories and retention expectations | [data-handling.md](data-handling.md) |
 | Secrets and configuration | [secrets-management.md](secrets-management.md) |
 | Ledger and audit trail | [audit-ledger-security.md](audit-ledger-security.md) |

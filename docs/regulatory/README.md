@@ -13,6 +13,7 @@ preset: regulatory-matrix
 | [regulatory-evidence-manifest.json](regulatory-evidence-manifest.json) | Canonical index of documents, themes, operational probes, and required checks |
 | [ai-act-obligations.json](ai-act-obligations.json) | Structured obligation rows with evidence paths into this tree |
 | [ai-act-mapping.md](ai-act-mapping.md) | How GovAI artefacts map *indicatively* to AI Act chapters |
+| [ai-act-enterprise-positioning.md](ai-act-enterprise-positioning.md) | Provider/deployer framing, high-risk patterns, explicit non-claims |
 | [high-risk-system-obligations.md](high-risk-system-obligations.md) | High-risk system themes and non-claims |
 | [conformity-assessment.md](conformity-assessment.md) | Using exports alongside conformity workflows |
 | [evidence-obligations.md](evidence-obligations.md) | Matrix linking obligations to repository evidence |

@@ -22,4 +22,6 @@ Process health should probe **`GET /ready`** (readiness) separately from busines
 
 - [Python SDK](python-sdk.md)
 - [Error handling](error-handling.md)
+- Hosted vs self-host topology: [../architecture/hosted-vs-self-host-topology.md](../architecture/hosted-vs-self-host-topology.md)
+- Platform vs Core boundary: [../architecture/platform-vs-core-boundary.md](../architecture/platform-vs-core-boundary.md)
 - Hosted operations context: [`../operations/production-onboarding.md`](../operations/production-onboarding.md)

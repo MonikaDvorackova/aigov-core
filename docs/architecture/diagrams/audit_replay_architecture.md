@@ -1,4 +1,6 @@
-# GovAI Audit Replay Architecture
+# GovAI Audit Replay Architecture (diagram)
+
+Formal replay semantics: [../governance-semantics.md](../governance-semantics.md#reconstructibility-and-audit-replay). Evidence lifecycle: [../evidence-lifecycle.md](../evidence-lifecycle.md).
 
 This document describes how audit replay works conceptually.
 

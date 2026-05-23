@@ -53,6 +53,18 @@
       "role": "trust_center_entrypoint"
     },
     {
+      "path": "docs/trust/enterprise-trust-package.md",
+      "role": "enterprise_trust_package"
+    },
+    {
+      "path": "docs/trust/shared-responsibility-model.md",
+      "role": "shared_responsibility_model"
+    },
+    {
+      "path": "docs/architecture/governance-semantics.md",
+      "role": "governance_semantics"
+    },
+    {
       "path": "docs/trust/compliance-mapping.md",
       "role": "compliance_mapping"
     },

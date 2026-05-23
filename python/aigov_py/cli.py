@@ -723,6 +723,7 @@ def _verify_artifact_digest_continuity(
     run_id: str,
     require_export: bool = False,
     artifact_file: Path | None = None,
+    portable_only: bool = False,
 ) -> tuple[int, str]:
     reason_code = "DIGEST_MISMATCH"
     try:
@@ -805,13 +806,20 @@ def _verify_artifact_digest_continuity(
                 file=sys.stderr,
             )
             return cli_exit.EX_ERR, reason_code
+    if portable_only:
+        return cli_exit.EX_OK, "OK"
+
     try:
         got_body = eag.bundle_hash_digest(client, run_id)
     except Exception as exc:
         print(f"ERROR: /bundle-hash failed: {exc}", file=sys.stderr)
         msg = str(exc).lower()
         if "connection refused" in msg or "failed to establish a new connection" in msg:
-            print('hint: Run local audit service (e.g. make audit_bg) before verify', file=sys.stderr)
+            print(
+                "hint: Configure GOVAI_AUDIT_BASE_URL to your operator runtime (GovAI Platform or self-host), "
+                "or use verify-evidence-pack --portable-only for offline CI.",
+                file=sys.stderr,
+            )
         return cli_exit.EX_ERR, reason_code
     got = str(got_body.get("events_content_sha256") or "").strip().lower()
     if got != expected:
@@ -1585,6 +1593,11 @@ def build_parser() -> GovaiArgumentParser:
         help="Fail (exit 1) if /api/export cross-check cannot be performed or disagrees with /bundle-hash.",
     )
     s_verify_pack.add_argument(
+        "--portable-only",
+        action="store_true",
+        help="Offline GovAI Core gate: validate manifest vs bundle digest only (no /bundle-hash or compliance-summary HTTP).",
+    )
+    s_verify_pack.add_argument(
         "--artifact-file",
         dest="artifact_file",
         default=None,
@@ -2121,7 +2134,11 @@ def main(argv: Sequence[str] | None = None) -> int:
                 client = GovAIClient(audit_url.rstrip("/"), api_key=api_key, default_project=os.environ.get("GOVAI_PROJECT"))
                 _ = client.request_json("GET", "/ready", timeout=2.0, raise_on_body_ok_false=False)
             except Exception:
-                print("Local audit service is not running. Start it with: make audit_bg", file=stream)
+                print(
+                    "Operator audit runtime not reachable at GOVAI_AUDIT_BASE_URL. "
+                    "Start GovAI Platform / self-host stack, or use offline portable targets.",
+                    file=stream,
+                )
                 print("", file=stream)
 
         print(f"run_id: {res.run_id}", file=stream)
@@ -2471,6 +2488,7 @@ def main(argv: Sequence[str] | None = None) -> int:
                 return cli_exit.EX_ERR
             # Ensure manifest referent exists (CI must ship both files).
             _ = bundle_path
+            portable_only = bool(getattr(args, "portable_only", False))
             rc, reason = _verify_artifact_digest_continuity(
                 client,
                 artifact_dir=artifact_dir,
@@ -2481,12 +2499,25 @@ def main(argv: Sequence[str] | None = None) -> int:
                     if str(getattr(args, "artifact_file") or "").strip()
                     else None
                 ),
+                portable_only=portable_only,
             )
             if rc != cli_exit.EX_OK:
                 summary_verdict = "ERROR"
                 summary_codes = [reason or "DIGEST_MISMATCH"]
-                summary_next_action = "Fix evidence_digest_manifest.json / hosted bundle-hash mismatch, then rerun."
+                summary_next_action = (
+                    "Fix evidence_digest_manifest.json / bundle digest mismatch, then rerun."
+                    if portable_only
+                    else "Fix evidence_digest_manifest.json / hosted bundle-hash mismatch, then rerun."
+                )
                 return rc
+            if portable_only:
+                print("PORTABLE_OK")
+                summary_verdict = "VALID"
+                summary_codes = ["PORTABLE_DIGEST_OK"]
+                summary_next_action = (
+                    "Submit pack to operator-hosted runtime when required (GovAI Platform)."
+                )
+                return cli_exit.EX_OK
             code_sum, summary = _compliance_verdict_or_err(client, run_id, timeout=args.timeout)
             if code_sum != cli_exit.EX_OK or summary is None:
                 summary_verdict = "ERROR"

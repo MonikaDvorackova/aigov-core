@@ -1,6 +1,8 @@
-# Platform repository boundary
+# GovAI Platform vs GovAI Core (repository boundary)
 
-**Filename note:** `OPEN_SOURCE_SCOPE.md` is kept for stable links. This document describes **what belongs in this proprietary platform repository** versus the **public open-core runtime** in **[govai-core](https://github.com/govbase-dev/govai-core)**.
+**Filename note:** `OPEN_SOURCE_SCOPE.md` is kept for stable links. This document describes **what belongs in the proprietary GovAI Platform repository** versus the **GovAI Core** portable runtime maintained in **[govai-core](https://github.com/govbase-dev/govai-core)**.
+
+Canonical terminology: [docs/terminology.md](docs/terminology.md). Architecture boundary: [docs/architecture/platform-vs-core-boundary.md](docs/architecture/platform-vs-core-boundary.md).
 
 ## License
 

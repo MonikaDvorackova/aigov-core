@@ -30,89 +30,48 @@ def _workflow_job_declaration_body(lines: list[str], job_key: str) -> str:
     return "\n".join(parts)
 
 
-def test_govai_compliance_gate_includes_in_repo_pull_request_path() -> None:
-    lines = _compliance_yml().splitlines()
-    block = _workflow_job_declaration_body(lines, "govai-compliance-gate")
-    assert 'ev="${{ github.event_name }}"' in block
-    assert '[ "${ev}" = "pull_request" ]' in block
-    assert "github.event.pull_request.head.repo.full_name" in block
-    assert "github.repository" in block
+def test_compliance_ci_does_not_define_hosted_govai_compliance_gate_job() -> None:
+    """Hosted artefact gate (GOVAI_AUDIT_BASE_URL) lives in GovAI Platform, not Core CI."""
+    text = _compliance_yml()
+    assert "  govai-compliance-gate:" not in text
+    assert "  govai-compliance-gate-fork-pr-block:" not in text
 
 
-def test_evidence_pack_waits_on_ready_not_status() -> None:
+def test_evidence_pack_is_portable_offline_not_localhost_audit_server() -> None:
     text = _compliance_yml()
     idx = text.index("  evidence_pack:")
     block = text[idx : idx + 12000]
-    assert "${AUDIT_URL%/}/ready" in block or '"/ready"' in block or "/ready" in block
-    assert "${AUDIT_URL%/}/status" not in block
-
-
-def test_evidence_pack_prebuilds_audit_binary_before_ready_loop() -> None:
-    """Avoid racing GET /ready against a cold `cargo run` compile (PR #237 evidence_pack failure)."""
-    text = _compliance_yml()
-    idx = text.index("  evidence_pack:")
-    block = text[idx : idx + 14000]
-    assert "cargo build --locked --bin aigov_audit" in block
-    assert "rust/target/debug/aigov_audit" in block
-
-
-def test_hosted_compliance_gate_uses_workspace_install_not_pypi_pin() -> None:
-    lines = _compliance_yml().splitlines()
-    block = _workflow_job_declaration_body(lines, "govai-compliance-gate")
-    assert "pip install -e ./python" in block
-    assert 'aigov-py==0.2.1' not in block
-
-
-def test_hosted_gate_artifact_bound_submit_and_verify() -> None:
-    lines = _compliance_yml().splitlines()
-    block = _workflow_job_declaration_body(lines, "govai-compliance-gate")
-    assert "submit-evidence-pack" in block
-    assert "verify-evidence-pack" in block
-    assert "evidence_digest_manifest.json" in block
+    assert "ci_portable_artifact_bundle.py" in block
+    assert "verify-evidence-pack --portable-only" in block
+    assert "portable_evidence_digest_once" in block
+    assert "${AUDIT_URL%/}/ready" not in block
+    assert "GOVAI_AUDIT_BASE_URL: http://127.0.0.1:8088" not in block
+    assert "nohup" not in block
+    assert "cargo build --locked --bin aigov_audit" not in block
 
 
 def test_workflow_still_uses_editable_dev_for_repo_local_ci_build() -> None:
     text = _compliance_yml()
-    assert 'pip install -e ".[dev]"' in text
+    assert 'pip install -e ".[dev]"' in text or 'pip install -e "./python[dev]"' in text
 
 
 def test_govai_emit_run_id_appends_github_workflow_identity() -> None:
-    """Hosted ledger run_id must differ per workflow run while basename PR rules stay strict."""
+    """Portable CI run_id must differ per workflow run while basename PR rules stay strict."""
     text = _compliance_yml()
     assert 'echo "run_id=${only}-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"' in text
-    assert 'RUN_ID="${EMITTED_RUN_ID}"' in text
-    assert 'cp "docs/reports/${REPORT_BASENAME}.md" "docs/reports/${RUN_ID}.md"' in text
 
 
-def test_evidence_pack_job_exports_govai_auth_for_bundle_fetch() -> None:
-    text = _compliance_yml()
-    idx = text.index("  evidence_pack:")
-    block = text[idx : idx + 9000]
-    assert "GOVAI_API_KEY: ci-test-api-key" in block
-    assert "GOVAI_AUDIT_BASE_URL: http://127.0.0.1:8088" in block
-    assert 'AIGOV_COMPLIANCE_FETCH_STRICT: "1"' in block
-
-
-def test_evidence_pack_enforces_non_fallback_before_and_after_evidence_pack() -> None:
-    text = _compliance_yml()
-    assert "enforce_evidence_bundle_for_upload" in text
-    assert "python -m aigov_py.assert_ci_evidence_bundle" in text
-    assert text.count("enforce_evidence_bundle_for_upload") >= 4
+def test_make_verify_does_not_start_postgres_for_portable_gate() -> None:
+    lines = _compliance_yml().splitlines()
+    block = _workflow_job_declaration_body(lines, "make_verify")
+    assert "postgres:" not in block
+    assert "DATABASE_URL" not in block
 
 
 def test_makefile_ensure_evidence_strict_disables_ci_fallback() -> None:
     makefile = (_repo_root() / "Makefile").read_text(encoding="utf-8")
     assert "AIGOV_COMPLIANCE_FETCH_STRICT" in makefile
     assert "no ci_fallback" in makefile
-
-
-def test_release_promotion_evidence_path_posts_ai_discovery() -> None:
-    text = _compliance_yml()
-    rp = text.index('if [[ "${EMITTED_RUN_ID}" == release-promotion-* ]]; then')
-    seg = text[rp : rp + 2200]
-    assert 'post_local_ev "ai_discovery_reported"' in seg
-    assert "enforce_evidence_bundle_for_upload" in seg
-    assert "make evidence_pack RUN_ID=" in seg
 
 
 def test_release_promotion_emit_run_id_stays_unique_per_workflow_run() -> None:

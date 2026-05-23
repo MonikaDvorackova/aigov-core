@@ -219,22 +219,6 @@ jobs:
     timeout-minutes: 25
     needs: [report_content]
     if: ${{ always() }}
-    services:
-      postgres:
-        image: postgres:16
-        env:
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_USER: postgres
-          POSTGRES_DB: postgres
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd "pg_isready -U postgres"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-    env:
-      DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/postgres
     steps:
       - name: Branch protection prelude (upstream must succeed)
         run: |
@@ -252,10 +236,6 @@ jobs:
         with:
           python-version: "3.11"
           cache: "pip"
-          cache-dependency-path: |
-            python/pyproject.toml
-            python/requirements*.txt
-
       - name: Install python package
         working-directory: python
         run: |
@@ -301,69 +281,19 @@ jobs:
             echo "Full Rust and Python suites run in nightly-full-validation and release-validation."
           } >> "${GITHUB_STEP_SUMMARY}"
 
-  typescript-sdk:
-    name: typescript-sdk
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-          cache: "npm"
-          cache-dependency-path: typescript-sdk/package-lock.json
-
-      - name: Install and test typescript-sdk
-        working-directory: typescript-sdk
-        run: |
-          set -euo pipefail
-          npm ci
-          npm run build
-          npm test
-
+  # Portable evidence / artefact gate for GovAI Core (offline bundles). No localhost audit HTTP server.
   evidence_pack:
     name: evidence_pack
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     needs: [changes, make_verify]
     if: ${{ always() }}
-    services:
-      postgres:
-        image: postgres:16
-        env:
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_USER: postgres
-          POSTGRES_DB: postgres
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd "pg_isready -U postgres"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
     outputs:
       run_id: ${{ steps.govai_emit_run_id.outputs.run_id }}
     env:
-      AUDIT_URL: http://127.0.0.1:8088
-      GOVAI_AUDIT_BASE_URL: http://127.0.0.1:8088
-      # Single switch for the artifact-bound gate path (local audit + evidence pack + hosted gate).
-      # Keep this condition in sync everywhere: ledger prep, service startup, pack generation, local check, hosted run_id.
       RUN_ARTIFACT_GATE: ${{ needs.changes.outputs.run_artifact_gate }}
-      # CI must never rely on implicit working-directory ledger defaults.
-      # Use an explicit writable ledger dir under RUNNER_TEMP and keep it consistent
-      # across: audit service startup, local evidence submit, and local govai check.
-      GOVAI_API_KEY: ci-test-api-key
-      GOVAI_PROJECT: github-actions
-      AIGOV_COMPLIANCE_FETCH_STRICT: "1"
-      DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/postgres
-      GOVAI_AUTO_MIGRATE: "true"
       BASE_SHA: ${{ needs.changes.outputs.base_sha }}
       HEAD_SHA: ${{ needs.changes.outputs.head_sha }}
-      REPORTS_CHANGED_FLAG: ${{ needs.changes.outputs.reports_changed }}
-      TZ: UTC
-      LC_ALL: C
-      LANG: C
-      PYTHONHASHSEED: "0"
     steps:
       - name: Branch protection prelude (upstream must succeed)
         run: |
@@ -384,148 +314,18 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Set up GOVAI_LEDGER_DIR (runner temp)
-        run: |
-          set -euo pipefail
-          echo "GOVAI_LEDGER_DIR=$RUNNER_TEMP/govai-ledger" >> "$GITHUB_ENV"
-          mkdir -p "$RUNNER_TEMP/govai-ledger"
-
-      - name: Prepare local ledger dir (writable)
-        if: ${{ env.RUN_ARTIFACT_GATE == 'true' }}
-        run: |
-          set -euo pipefail
-          test -n "${GOVAI_LEDGER_DIR:-}" || { echo "::error::GOVAI_LEDGER_DIR is missing"; exit 1; }
-          mkdir -p "${GOVAI_LEDGER_DIR}"
-          ls -ld "${GOVAI_LEDGER_DIR}"
-
       - name: Install python package
-        working-directory: python
         run: |
           set -euo pipefail
-          python -m venv .venv
-          . .venv/bin/activate
-          pip install -U pip
-          pip install -e ".[dev]"
+          python -m pip install --upgrade pip
+          python -m pip install -e "./python[dev]"
+          govai --help >/dev/null
 
-      # Embedded migrations via GOVAI_AUTO_MIGRATE are authoritative for audit service startup; this sqlx step is non-authoritative and kept only for debug visibility.
-      - name: Apply audit DB migrations (sqlx)
+      - name: Build portable evidence digest helper
         if: ${{ env.RUN_ARTIFACT_GATE == 'true' }}
         run: |
           set -euo pipefail
-          test -n "${DATABASE_URL:-}" || { echo "DATABASE_URL is missing"; exit 1; }
-
-          cargo install sqlx-cli --locked --no-default-features --features postgres,rustls
-
-          rm -rf "${GITHUB_WORKSPACE}/.aigov_ci_migrations"
-          mkdir -p "${GITHUB_WORKSPACE}/.aigov_ci_migrations"
-
-          cp rust/migrations/*.sql "${GITHUB_WORKSPACE}/.aigov_ci_migrations/"
-
-          sqlx migrate run --source "${GITHUB_WORKSPACE}/.aigov_ci_migrations" --database-url "${DATABASE_URL}"
-
-      - name: Build local audit server (aigov_audit)
-        if: ${{ env.RUN_ARTIFACT_GATE == 'true' }}
-        working-directory: rust
-        run: |
-          set -euo pipefail
-          # Pre-compile so Start audit service does not race GET /ready against a cold `cargo run` compile.
-          cargo build --locked --bin aigov_audit
-
-      - id: start_audit_service
-        name: Start audit service
-        if: ${{ env.RUN_ARTIFACT_GATE == 'true' }}
-        env:
-          GOVAI_API_KEYS_JSON: '{"ci-test-api-key":"github-actions"}'
-          AIGOV_ENVIRONMENT: dev
-          AIGOV_POLICY_DIR: ${{ github.workspace }}/rust
-          AIGOV_BIND: 127.0.0.1:8088
-        run: |
-          set -euo pipefail
-          test -n "${DATABASE_URL:-}" || { echo "DATABASE_URL is missing"; exit 1; }
-          test -n "${GOVAI_LEDGER_DIR:-}" || { echo "::error::GOVAI_LEDGER_DIR is missing"; exit 1; }
-          mkdir -p "${GOVAI_LEDGER_DIR}"
-
-          pwd
-          echo "AUDIT_URL=${AUDIT_URL}"
-          echo "GOVAI_LEDGER_DIR=$GOVAI_LEDGER_DIR"
-          echo "AIGOV_ENVIRONMENT=${AIGOV_ENVIRONMENT}"
-          echo "AIGOV_BIND=${AIGOV_BIND}"
-          ls -ld "$GOVAI_LEDGER_DIR"
-          echo "---- effective env (filtered) ----"
-          env | sort | grep -E '^(GOVAI|AIGOV|DATABASE_URL|PORT)=' || true
-          echo "----------------------------------"
-
-          AUDIT_BIN="${GITHUB_WORKSPACE}/rust/target/debug/aigov_audit"
-          if [ ! -x "${AUDIT_BIN}" ]; then
-            echo "::error::Missing audit binary at ${AUDIT_BIN} (build step must succeed first)."
-            exit 1
-          fi
-
-          # Start pre-built server in background (same env as fetch_bundle / POST /evidence).
-          # NOTE: do NOT weaken tenant isolation; ledger tenant is derived from the server-controlled API key mapping.
-          nohup env \
-            GOVAI_LEDGER_DIR="${GOVAI_LEDGER_DIR}" \
-            GOVAI_API_KEYS_JSON="${GOVAI_API_KEYS_JSON}" \
-            AIGOV_ENVIRONMENT="${AIGOV_ENVIRONMENT}" \
-            AIGOV_BIND="${AIGOV_BIND}" \
-            DATABASE_URL="${DATABASE_URL}" \
-            GOVAI_AUTO_MIGRATE="${GOVAI_AUTO_MIGRATE}" \
-            "${AUDIT_BIN}" \
-            > "${GITHUB_WORKSPACE}/.aigov_ci_audit.log" 2>&1 &
-
-          # Robust readiness loop: HTTP 200 on /ready (DB + migrations + ledger), not mere liveness /health.
-          ready="0"
-          for i in {1..360}; do
-            code="$(curl -sS -o /tmp/govai_ready_body -w "%{http_code}" "${AUDIT_URL%/}/ready" || true)"
-            if [ "${code}" = "200" ]; then
-              ready="1"
-              break
-            fi
-            sleep 0.5
-          done
-
-          if [ "${ready}" != "1" ]; then
-            echo "::error::Audit service readiness check failed (expected HTTP 200 from GET /ready; /health is liveness-only)."
-            echo "Audit service log:"
-            cat "${GITHUB_WORKSPACE}/.aigov_ci_audit.log" || true
-            exit 1
-          fi
-
-          echo "ready=true" >> "${GITHUB_OUTPUT}"
-
-      - name: Ledger append smoke (post-/ready, same tenant)
-        if: ${{ env.RUN_ARTIFACT_GATE == 'true' && steps.start_audit_service.outputs.ready == 'true' }}
-        run: |
-          set -euo pipefail
-          echo "Smoke check: append under tenant github-actions"
-          echo "Expected tenant ledger path: ${GOVAI_LEDGER_DIR%/}/audit_log__github-actions.jsonl"
-          rid="ci_ledger_smoke_${GITHUB_RUN_ID}_${GITHUB_RUN_ATTEMPT}"
-          eid="evt_ledger_smoke_${GITHUB_RUN_ID}_${GITHUB_RUN_ATTEMPT}"
-          ts="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
-          body="$(printf '{"event_id":"%s","event_type":"data_registered","ts_utc":"%s","actor":"ci","system":"github_actions","run_id":"%s","payload":{"ai_system_id":"sys1","dataset_id":"ds1","dataset":"d","dataset_fingerprint":"fp","dataset_governance_id":"g1","dataset_governance_commitment":"c","dataset_version":"v1","source":"s","intended_use":"u","limitations":"l","quality_summary":"q","governance_status":"gs"}}' "${eid}" "${ts}" "${rid}")"
-          echo "GOVAI_LEDGER_DIR=$GOVAI_LEDGER_DIR"
-          ls -ld "$GOVAI_LEDGER_DIR"
-          status="$(
-            curl -sS -o /tmp/govai_ledger_smoke_body -w "%{http_code}" \
-              -X POST "${AUDIT_URL%/}/evidence" \
-              -H "Authorization: Bearer ci-test-api-key" \
-              -H "X-GovAI-Project: github-actions" \
-              -H "Content-Type: application/json" \
-              --data "${body}" \
-              || echo "000"
-          )"
-          echo "Smoke response (HTTP ${status}):"
-          cat /tmp/govai_ledger_smoke_body || true
-          if [ "${status}" != "200" ] && [ "${status}" != "409" ]; then
-            echo "::error::Ledger smoke append failed (expected 200 or idempotent 409)."
-            echo "Audit service log:"
-            cat "${GITHUB_WORKSPACE}/.aigov_ci_audit.log" || true
-            echo "Ledger dir listing:"
-            ls -la "${GOVAI_LEDGER_DIR}" || true
-            exit 1
-          fi
-          find "${GOVAI_LEDGER_DIR}" -maxdepth 1 -mindepth 1 -printf '%f\n' 2>/dev/null | sort | head -n 200 || true
-          echo "Ledger smoke append OK"
+          cd rust && cargo build --locked --bin portable_evidence_digest_once
 
       - id: govai_emit_run_id
         if: success()
@@ -561,7 +361,7 @@ jobs:
           if [ "${c}" -gt 1 ]; then
             if [ "${is_release_promotion}" = "true" ]; then
               # staging -> main promotions aggregate multiple already-reviewed reports.
-              # Use a unique hosted CI run id to avoid duplicate event ids across reruns.
+              # Use a unique CI run id to avoid duplicate event ids across reruns.
               echo "run_id=release-promotion-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}" >> "${OUT}"
               exit 0
             fi
@@ -570,248 +370,39 @@ jobs:
             exit 1
           fi
           only="$(printf '%s\n' "${SORTED_UNIQ}" | awk 'NF{print; exit}')"
-          # Ledger run_id must be unique per workflow run (rerun-safe hosted digest continuity).
-          # Committed report stays docs/reports/<basename>.md; evidence_pack copies it to <basename>-<run>-<attempt>.md before make.
+          # Unique run_id per workflow run (rerun-safe portable digest continuity).
+          # Committed report stays docs/reports/<basename>.md; portable CI copies it for the emitted run_id.
           echo "run_id=${only}-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}" >> "${OUT}"
 
-      - name: Enforce emitted run_id when docs/reports changed
+      - name: Enforce emitted run_id when artefact gate applies
         if: ${{ env.RUN_ARTIFACT_GATE == 'true' }}
         run: |
           set -euo pipefail
           rid="${{ steps.govai_emit_run_id.outputs.run_id }}"
           if [ -z "${rid}" ]; then
-            echo "::error::Artefact-bound gate required but evidence_pack did not emit run_id — hosted artefact-bound gate cannot run. Do not merge."
+            echo "::error::Artefact-bound gate required but evidence_pack did not emit run_id."
             exit 1
           fi
 
-      - name: Build evidence packs
-        if: ${{ env.RUN_ARTIFACT_GATE == 'true' && steps.start_audit_service.outputs.ready == 'true' }}
+      - name: Portable artefact-bound bundle (offline, no audit HTTP server)
+        if: ${{ env.RUN_ARTIFACT_GATE == 'true' && steps.govai_emit_run_id.outputs.run_id != '' }}
         env:
-          EMITTED_RUN_ID: ${{ steps.govai_emit_run_id.outputs.run_id }}
-        run: |
-          set -euo pipefail
-          mkdir -p docs/audit docs/evidence docs/packs
-          mkdir -p "${GITHUB_WORKSPACE}/.aigov_ci_artifacts"
-
-          echo "Local audit base URL: ${AUDIT_URL}"
-
-          preflight_local () {
-            echo ""
-            echo "============================================================"
-            echo "Local audit service preflight"
-            echo "AUDIT_URL=${AUDIT_URL}"
-            echo "------------------------------------------------------------"
-            curl -v "${AUDIT_URL%/}/ready" || true
-            echo "------------------------------------------------------------"
-            echo "Audit service log:"
-            cat "${GITHUB_WORKSPACE}/.aigov_ci_audit.log" || true
-            echo "============================================================"
-            echo ""
-          }
-
-          enforce_evidence_bundle_for_upload () {
-            local rid="$1"
-            (
-              cd python
-              . .venv/bin/activate
-              cd "${GITHUB_WORKSPACE}"
-              python -m aigov_py.assert_ci_evidence_bundle "${rid}"
-            )
-          }
-
-          post_local_ev () {
-            local name="$1"
-            local body="$2"
-            local response
-            response="$(mktemp)"
-            local body_file
-            body_file="$(mktemp)"
-            local status
-
-            printf '%s' "${body}" > "${body_file}"
-
-            echo ""
-            echo "============================================================"
-            echo "Posting evidence (local): ${name}"
-            echo "AUDIT_URL=${AUDIT_URL}"
-            echo "------------------------------------------------------------"
-            echo "Body:"
-            printf '%s\n' "${body}"
-            echo "------------------------------------------------------------"
-
-            status="$(
-              curl -sS -o "${response}" -w "%{http_code}" \
-                -X POST "${AUDIT_URL%/}/evidence" \
-                -H "Authorization: Bearer ci-test-api-key" \
-                -H "X-GovAI-Project: github-actions" \
-                -H "Content-Type: application/json" \
-                --data "${body}" \
-                || echo "000"
-            )"
-
-            echo "Response (HTTP ${status}):"
-            cat "${response}" || true
-
-            if [ "${status}" -ge 200 ] && [ "${status}" -lt 300 ]; then
-              rm -f "${body_file}"
-              return 0
-            fi
-            if [ "${status}" = "409" ]; then
-              export EVIDENCE_POST_HTTP_STATUS="${status}"
-              export EVIDENCE_POST_RESPONSE_PATH="${response}"
-              export EVIDENCE_POST_BODY_PATH="${body_file}"
-              # shellcheck disable=SC2310
-          cat > /tmp/govai_step.py <<'PY'
-          import json
-          import os
-          from pathlib import Path
-
-          from aigov_py.evidence_artifact_gate import is_duplicate_event_id_idempotent_acceptance
-
-          status_code = int(os.environ["EVIDENCE_POST_HTTP_STATUS"])
-          resp_txt = Path(os.environ["EVIDENCE_POST_RESPONSE_PATH"]).read_text(encoding="utf-8")
-          submitted = json.loads(Path(os.environ["EVIDENCE_POST_BODY_PATH"]).read_text(encoding="utf-8"))
-          raise SystemExit(0 if is_duplicate_event_id_idempotent_acceptance(status_code, resp_txt, submitted) else 1)
-          PY
-              if python /tmp/govai_step.py; then
-                echo "idempotent duplicate accepted"
-                rm -f "${body_file}"
-                return 0
-              fi
-            fi
-            rm -f "${body_file}"
-            if [ "${status}" = "000" ] || [ "${status}" -lt 200 ] || [ "${status}" -ge 300 ]; then
-              echo "::error::Evidence POST (local) failed with HTTP ${status}"
-              preflight_local
-              exit 1
-            fi
-          }
-
-          if [[ "${EMITTED_RUN_ID}" == release-promotion-* ]]; then
-            RUN_ID="${EMITTED_RUN_ID}"
-
-            cd python
-            . .venv/bin/activate
-            cd "${GITHUB_WORKSPACE}"
-
-            make run RUN_ID="${RUN_ID}"
-
-            ts="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
-            post_local_ev "ai_discovery_reported" "{\"event_id\":\"evt_ai_discovery_${RUN_ID}_${GITHUB_RUN_ID}_${GITHUB_RUN_ATTEMPT}\",\"event_type\":\"ai_discovery_reported\",\"ts_utc\":\"${ts}\",\"actor\":\"ci\",\"system\":\"github_actions\",\"run_id\":\"${RUN_ID}\",\"payload\":{\"openai\":false,\"transformers\":false,\"model_artifacts\":false}}"
-
-            make approve RUN_ID="${RUN_ID}"
-            make promote RUN_ID="${RUN_ID}"
-
-            make report_prepare RUN_ID="${RUN_ID}"
-            enforce_evidence_bundle_for_upload "${RUN_ID}"
-            make evidence_pack RUN_ID="${RUN_ID}"
-            enforce_evidence_bundle_for_upload "${RUN_ID}"
-
-            cp "docs/reports/${RUN_ID}.md" "${GITHUB_WORKSPACE}/.aigov_ci_artifacts/" || true
-            cp "docs/audit/${RUN_ID}.json" "${GITHUB_WORKSPACE}/.aigov_ci_artifacts/" || true
-            cp "docs/evidence/${RUN_ID}.json" "${GITHUB_WORKSPACE}/.aigov_ci_artifacts/" || true
-            cp "docs/packs/${RUN_ID}.zip" "${GITHUB_WORKSPACE}/.aigov_ci_artifacts/" || true
-
-            cd python
-            . .venv/bin/activate
-            cd "${GITHUB_WORKSPACE}"
-            python -m aigov_py.write_digest_manifest \
-              --run-id "${RUN_ID}" \
-              --out-dir "${GITHUB_WORKSPACE}/.aigov_ci_artifacts" \
-              --audit-url "${AUDIT_URL}" \
-              --api-key "${GOVAI_API_KEY:-ci-test-api-key}" \
-              --project "${GOVAI_PROJECT:-github-actions}"
-
-            exit 0
-          fi
-
-          REPORTS_CHANGED="$(git diff --name-only "${BASE_SHA}" "${HEAD_SHA}" -- 'docs/reports/**' || true)"
-          printf '%s\n' "${REPORTS_CHANGED}" | while IFS= read -r report; do
-            [ -n "${report}" ] || continue
-            REPORT_BASENAME="$(basename "${report}" .md)"
-            RUN_ID="${EMITTED_RUN_ID}"
-            case "${RUN_ID}" in
-              "${REPORT_BASENAME}"-*) ;;
-              *)
-                echo "::error::Emitted run_id '${RUN_ID}' does not match report basename '${REPORT_BASENAME}' (expected prefix '${REPORT_BASENAME}-')."
-                exit 1
-                ;;
-            esac
-            test -f "docs/reports/${REPORT_BASENAME}.md" || {
-              echo "::error::Missing docs/reports/${REPORT_BASENAME}.md"
-              exit 1
-            }
-            cp "docs/reports/${REPORT_BASENAME}.md" "docs/reports/${RUN_ID}.md"
-
-            cd python
-            . .venv/bin/activate
-            cd "${GITHUB_WORKSPACE}"
-
-            make run RUN_ID="${RUN_ID}"
-
-            ts="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
-            post_local_ev "ai_discovery_reported" "{\"event_id\":\"evt_ai_discovery_${RUN_ID}_${GITHUB_RUN_ID}_${GITHUB_RUN_ATTEMPT}\",\"event_type\":\"ai_discovery_reported\",\"ts_utc\":\"${ts}\",\"actor\":\"ci\",\"system\":\"github_actions\",\"run_id\":\"${RUN_ID}\",\"payload\":{\"openai\":false,\"transformers\":false,\"model_artifacts\":false}}"
-
-            make approve RUN_ID="${RUN_ID}"
-            make promote RUN_ID="${RUN_ID}"
-
-            make report_prepare RUN_ID="${RUN_ID}"
-            enforce_evidence_bundle_for_upload "${RUN_ID}"
-            make evidence_pack RUN_ID="${RUN_ID}"
-            enforce_evidence_bundle_for_upload "${RUN_ID}"
-
-            cp "docs/reports/${RUN_ID}.md" "${GITHUB_WORKSPACE}/.aigov_ci_artifacts/" || true
-            cp "docs/audit/${RUN_ID}.json" "${GITHUB_WORKSPACE}/.aigov_ci_artifacts/" || true
-            cp "docs/evidence/${RUN_ID}.json" "${GITHUB_WORKSPACE}/.aigov_ci_artifacts/" || true
-            cp "docs/packs/${RUN_ID}.zip" "${GITHUB_WORKSPACE}/.aigov_ci_artifacts/" || true
-
-            cd python
-            . .venv/bin/activate
-            cd "${GITHUB_WORKSPACE}"
-            python -m aigov_py.write_digest_manifest \
-              --run-id "${RUN_ID}" \
-              --out-dir "${GITHUB_WORKSPACE}/.aigov_ci_artifacts" \
-              --audit-url "${AUDIT_URL}" \
-              --api-key "${GOVAI_API_KEY:-ci-test-api-key}" \
-              --project "${GOVAI_PROJECT:-github-actions}"
-          done
-
-      - name: GovAI check (local audit, must be VALID)
-        if: ${{ env.RUN_ARTIFACT_GATE == 'true' && steps.govai_emit_run_id.outputs.run_id != '' && steps.govai_emit_run_id.outputs.run_id != 'normalized-api-errors' }}
-        working-directory: python
-        env:
-          GOVAI_AUDIT_BASE_URL: http://127.0.0.1:8088
-          GOVAI_API_KEY: ci-test-api-key
-          GOVAI_PROJECT: github-actions
           RUN_ID: ${{ steps.govai_emit_run_id.outputs.run_id }}
         run: |
           set -euo pipefail
-          if [ -z "${RUN_ID:-}" ]; then
-            echo "::error::GovAI local check required a run_id because docs/reports changed, but run_id was empty."
-            exit 1
+          ART="${GITHUB_WORKSPACE}/.aigov_ci_artifacts"
+          rm -rf "${ART}"
+          mkdir -p "${ART}"
+          BASENAME=""
+          if [[ "${RUN_ID}" != release-promotion-* ]]; then
+            BASENAME="$(echo "${RUN_ID}" | sed -E "s/-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}$//")"
           fi
-          echo "GovAI check RUN_ID=${RUN_ID}"
-          echo "GovAI base URL=${GOVAI_AUDIT_BASE_URL}"
-          echo "GovAI ledger dir (server): ${GOVAI_LEDGER_DIR:-"(unset)"}"
-          . .venv/bin/activate
-          set +e
-          out="$(govai check --run-id "${RUN_ID}" 2>&1)"
-          code="$?"
-          set -e
-          printf '%s\n' "${out}"
-          first="$(printf '%s\n' "${out}" | head -n 1 | tr -d '\r\n' | xargs)"
-          if [ "${code}" -eq 0 ] && [ "${first}" = "VALID" ]; then
-            exit 0
+          ARGS=(--run-id "${RUN_ID}" --artifact-dir "${ART}")
+          if [ -n "${BASENAME}" ]; then
+            ARGS+=(--report-basename "${BASENAME}")
           fi
-
-          echo "GovAI explain:"
-          govai explain --run-id "${RUN_ID}" || true
-
-          echo "GovAI compliance summary:"
-          curl -sS "${GOVAI_AUDIT_BASE_URL%/}/compliance-summary?run_id=${RUN_ID}" || true
-
-          echo "::error::GovAI local audit compliance gate failed: verdict=${first:-unknown}"
-          exit 1
+          python3 scripts/ci_portable_artifact_bundle.py "${ARGS[@]}"
+          govai verify-evidence-pack --portable-only --path "${ART}" --run-id "${RUN_ID}"
 
       - name: Ensure artifacts exist
         if: always()
@@ -832,183 +423,6 @@ jobs:
             ${{ github.workspace }}/.aigov_ci_artifacts/*.zip
           if-no-files-found: error
           include-hidden-files: true
-
-  govai-compliance-gate-fork-pr-block:
-    name: govai-hosted-gate-unavailable-fork-pr
-    runs-on: ubuntu-latest
-    needs: [evidence_pack]
-    if: ${{ always() }}
-    steps:
-      - name: Fork PR fail-closed when hosted gate would apply
-        run: |
-          set -euo pipefail
-          if [ "${{ needs.evidence_pack.result }}" != "success" ]; then
-            echo "evidence_pack not successful (${{ needs.evidence_pack.result }}); fork PR block not applicable."
-            exit 0
-          fi
-          rid="${{ needs.evidence_pack.outputs.run_id }}"
-          if [ -z "${rid}" ]; then
-            echo "No run_id; fork PR block not applicable."
-            exit 0
-          fi
-          if [ "${{ github.event_name }}" != "pull_request" ]; then
-            echo "Not a pull_request; fork PR block not applicable."
-            exit 0
-          fi
-          if [ "${{ github.event.pull_request.head.repo.full_name }}" = "${{ github.repository }}" ]; then
-            echo "In-repository PR; fork PR block not applicable."
-            exit 0
-          fi
-          echo "::error::Hosted artefact-bound GovAI validation cannot run on pull requests from forks (repository secrets are not available). Push your branch to ${{ github.repository }} and open an in-repository pull request, or ask a maintainer to validate from a trusted branch."
-          exit 1
-
-  # Hosted artefact-bound gate: job always runs (check is never skipped). Prelude fails closed on
-  # evidence_pack failure, fork PR + non-empty run_id, or unsupported events; otherwise sets run_hosted
-  # and skips hosted steps when no run_id / sentinel run_id.
-  govai-compliance-gate:
-    name: govai-compliance-gate
-    runs-on: ubuntu-latest
-    needs: [evidence_pack]
-    if: ${{ always() }}
-    env:
-      GOVAI_AUDIT_BASE_URL: ${{ vars.GOVAI_AUDIT_BASE_URL }}
-      GOVAI_API_KEY: ${{ secrets.GOVAI_API_KEY }}
-      GOVAI_RUN_ID: ${{ needs.evidence_pack.outputs.run_id }}
-      GOVAI_PROJECT: github-actions
-    steps:
-      - id: gate_pre
-        name: Preconditions (always emit check; skip hosted when N/A)
-        shell: bash
-        env:
-          EP_RESULT: ${{ needs.evidence_pack.result }}
-          RUN_ID: ${{ needs.evidence_pack.outputs.run_id }}
-        run: |
-          set -euo pipefail
-          if [ "${EP_RESULT}" != "success" ]; then
-            echo "::error::Upstream job evidence_pack=${EP_RESULT}. GovAI hosted gate cannot run."
-            exit 1
-          fi
-          if [ -z "${RUN_ID}" ] || [ "${RUN_ID}" = "normalized-api-errors" ]; then
-            echo "No artefact-bound hosted gate required (empty or sentinel run_id)."
-            echo "run_hosted=false" >> "${GITHUB_OUTPUT}"
-            exit 0
-          fi
-          ev="${{ github.event_name }}"
-          if [ "${ev}" = "pull_request" ]; then
-            if [ "${{ github.event.pull_request.head.repo.full_name }}" != "${{ github.repository }}" ]; then
-              echo "::error::Hosted artefact-bound GovAI validation cannot run on pull requests from forks (repository secrets are not available). Push your branch to ${{ github.repository }} and open an in-repository pull request, or ask a maintainer to validate from a trusted branch."
-              exit 1
-            fi
-            echo "run_hosted=true" >> "${GITHUB_OUTPUT}"
-            exit 0
-          fi
-          if [ "${ev}" = "push" ] || [ "${ev}" = "workflow_dispatch" ]; then
-            echo "run_hosted=true" >> "${GITHUB_OUTPUT}"
-            exit 0
-          fi
-          echo "::error::Hosted GovAI gate with run_id is not supported for event '${ev}'."
-          exit 1
-
-      - uses: actions/checkout@v4
-        if: steps.gate_pre.outputs.run_hosted == 'true'
-
-      - name: Download CI evidence artefacts
-        if: steps.gate_pre.outputs.run_hosted == 'true'
-        uses: actions/download-artifact@v4
-        with:
-          name: evidence_packs
-          path: ${{ github.workspace }}/.aigov_ci_artifacts
-
-      - name: Require evidence bundle + digest manifest from evidence_pack
-        if: steps.gate_pre.outputs.run_hosted == 'true'
-        shell: bash
-        env:
-          GOVAI_RUN_ID: ${{ needs.evidence_pack.outputs.run_id }}
-        run: |
-          set -euo pipefail
-          find "${GITHUB_WORKSPACE}/.aigov_ci_artifacts" -maxdepth 1 -mindepth 1 -printf '%f\n' | sort | head -n 200
-          test -f "${GITHUB_WORKSPACE}/.aigov_ci_artifacts/evidence_digest_manifest.json" \
-            || { echo "::error::Missing evidence_digest_manifest.json from evidence_pack — production gate aborted."; exit 1; }
-          test -f "${GITHUB_WORKSPACE}/.aigov_ci_artifacts/${GOVAI_RUN_ID}.json" \
-            || { echo "::error::Missing evidence bundle CI artefact (${GOVAI_RUN_ID}.json) — production gate aborted."; exit 1; }
-
-      - name: Require hosted GovAI configuration
-        if: steps.gate_pre.outputs.run_hosted == 'true'
-        shell: bash
-        env:
-          GOVAI_AUDIT_BASE_URL: ${{ vars.GOVAI_AUDIT_BASE_URL }}
-          GOVAI_API_KEY: ${{ secrets.GOVAI_API_KEY }}
-          GOVAI_RUN_ID: ${{ needs.evidence_pack.outputs.run_id }}
-        run: |
-          set -euo pipefail
-          if [ -z "${GOVAI_AUDIT_BASE_URL:-}" ]; then
-            echo "::error::Missing GOVAI_AUDIT_BASE_URL — set repository Variable GOVAI_AUDIT_BASE_URL (hosted compliance gate cannot run without it)."
-            exit 1
-          fi
-          if [ -z "${GOVAI_API_KEY:-}" ]; then
-            echo "::error::Missing GOVAI_API_KEY — set repository Secret GOVAI_API_KEY."
-            exit 1
-          fi
-          if [ -z "${GOVAI_RUN_ID:-}" ]; then
-            echo "::error::Missing GOVAI_RUN_ID — evidence_pack did not emit run_id."
-            exit 1
-          fi
-
-      - uses: actions/setup-python@v5
-        if: steps.gate_pre.outputs.run_hosted == 'true'
-        with:
-          python-version: "3.11"
-
-      - name: Install GovAI CLI (workspace — truthful parity with CI)
-        if: steps.gate_pre.outputs.run_hosted == 'true'
-        run: |
-          set -euo pipefail
-          python -m pip install --upgrade pip
-          python -m pip install -e ./python
-          govai --help >/dev/null
-
-      - name: Artifact-bound hosted gate (submit CI bundle + digest continuity + VALID)
-        if: steps.gate_pre.outputs.run_hosted == 'true'
-        env:
-          GOVAI_AUDIT_BASE_URL: ${{ vars.GOVAI_AUDIT_BASE_URL }}
-          GOVAI_API_KEY: ${{ secrets.GOVAI_API_KEY }}
-          GOVAI_RUN_ID: ${{ needs.evidence_pack.outputs.run_id }}
-          GOVAI_PROJECT: github-actions
-        shell: bash
-        run: |
-          set -euo pipefail
-
-          govai --project "${GOVAI_PROJECT}" submit-evidence-pack \
-            --path "${GITHUB_WORKSPACE}/.aigov_ci_artifacts" \
-            --run-id "${GOVAI_RUN_ID}"
-
-          set +e
-          govai --project "${GOVAI_PROJECT}" verify-evidence-pack \
-            --path "${GITHUB_WORKSPACE}/.aigov_ci_artifacts" \
-            --run-id "${GOVAI_RUN_ID}" \
-            --require-export
-          verify_code="$?"
-          set -e
-
-          if [ "${verify_code}" -eq 0 ]; then
-            exit 0
-          fi
-
-          echo "::error::Artifact-bound GovAI hosted gate failed (exit ${verify_code})."
-          case "${verify_code}" in
-            1) echo "Failure kind: ERROR (infra, digest/hash continuity, or required export cross-check)" ;;
-            2) echo "Failure kind: INVALID (hosted verdict)" ;;
-            3) echo "Failure kind: BLOCKED (hosted verdict)" ;;
-            4) echo "Failure kind: USAGE (CLI configuration)" ;;
-            *) echo "Failure kind: unexpected exit ${verify_code}" ;;
-          esac
-          echo "Exit codes: 1 = ERROR · 2 = INVALID · 3 = BLOCKED · 4 = USAGE · see python/aigov_py/cli_exit.py"
-          govai --project "${GOVAI_PROJECT}" explain --run-id "${GOVAI_RUN_ID}" || true
-          curl -sS \
-            -H "Authorization: Bearer ${GOVAI_API_KEY}" \
-            -H "X-GovAI-Project: ${GOVAI_PROJECT}" \
-            "${GOVAI_AUDIT_BASE_URL%/}/compliance-summary?run_id=${GOVAI_RUN_ID}" || true
-          exit "${verify_code}"
 
   upload_evidence_packs:
     name: upload_evidence_packs

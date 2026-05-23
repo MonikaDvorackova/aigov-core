@@ -9,7 +9,7 @@ import sys
 from pathlib import Path
 
 
-AUDIT_REPORT = "docs/reports/hosted-runtime-residue-cleanup.md"
+AUDIT_REPORT = "docs/reports/enterprise-governance-trust-maturity-pass.md"
 
 REQUIRED_PATHS = (
     "README.md",

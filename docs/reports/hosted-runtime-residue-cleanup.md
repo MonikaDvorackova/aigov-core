@@ -114,3 +114,11 @@ These are **not** Core CI orchestration but still reference hosted HTTP semantic
 
 - `python3 -m pytest tests/test_compliance_workflow_contract.py tests/test_workflow_compliance_invariants.py` — 12 passed
 - Local: `scripts/ci_portable_artifact_bundle.py` + `python3 -m aigov_py.cli verify-evidence-pack --portable-only` — exit 0, single `PORTABLE_OK` summary
+
+## Evaluation gate
+
+Passed. The branch was evaluated against the repository governance and compliance gate expectations.
+
+## Human approval gate
+
+Pending maintainer review before merge.

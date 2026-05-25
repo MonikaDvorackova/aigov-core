@@ -11,7 +11,7 @@ pub struct BlockedReason {
     pub message: String,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct VerdictOutcome {
     pub verdict: String,
     pub reason_codes: Vec<String>,

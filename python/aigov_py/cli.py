@@ -1739,6 +1739,17 @@ def build_parser() -> GovaiArgumentParser:
         help="Trusted Ed25519 public keys JSON (default: env AIGOV_POLICY_TRUST_ED25519_JSON).",
     )
 
+    s_replay_export = sub.add_parser(
+        "replay-audit-export",
+        help="Deterministic governance replay from aigov.audit_export.v1 JSON.",
+    )
+    s_replay_export.add_argument("--path", required=True, help="Audit export JSON path.")
+    s_replay_export.add_argument(
+        "--json",
+        action="store_true",
+        help="Emit full ReplayResult JSON (default: human-readable summary).",
+    )
+
     s_usage = sub.add_parser("usage", help="GET /usage (machine-readable JSON).")
     s_usage.add_argument(
         "--project",
@@ -2967,6 +2978,21 @@ def main(argv: Sequence[str] | None = None) -> int:
             print(f"error: verify-audit-export failed: {e}", file=sys.stderr)
             return cli_exit.EX_ERR
         return cli_exit.EX_OK
+
+    if args.cmd == "replay-audit-export":
+        from aigov_py.replay_audit_export import format_replay_report, replay_audit_export
+
+        raw = str(getattr(args, "path", "") or "").strip()
+        try:
+            result = replay_audit_export(raw)
+        except Exception as e:  # noqa: BLE001
+            print(f"error: replay-audit-export failed: {e}", file=sys.stderr)
+            return cli_exit.EX_ERR
+        if getattr(args, "json", False):
+            print(json.dumps(result, indent=2, ensure_ascii=False))
+        else:
+            print(format_replay_report(result))
+        return cli_exit.EX_OK if result.get("ok") else cli_exit.EX_ERR
 
     if args.cmd == "usage":
         try:

@@ -65,3 +65,20 @@ export AIGOV_ENVIRONMENT=dev
 export AIGOV_POLICY_DIR="$(pwd)"
 cargo run --bin aigov_audit --locked
 ```
+
+## Evaluation gate
+
+The runtime completion package preserves the evaluation gate as an ingest-time and verdict-time control.
+
+Evaluation evidence is accepted only when it satisfies the core policy event contract. The compliance summary derives the final runtime verdict from ledger-authoritative projection state, including failed or missing evaluation evidence.
+
+A run is not considered `VALID` unless required evaluation evidence is present and successful. Failed evaluation evidence contributes to an `INVALID` verdict. Missing evaluation evidence contributes to a `BLOCKED` verdict.
+
+## Human approval gate
+
+The runtime completion package preserves the human approval gate as part of the ledger-authoritative compliance state.
+
+Human approval evidence is evaluated through the core policy contract and represented in the derived projection state. The compliance summary treats missing required approval evidence as a blocking condition.
+
+A run requiring human approval is not considered `VALID` unless the required approval evidence is present and accepted. Missing approval evidence contributes to a `BLOCKED` verdict.
+

@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>GovAI Reconstructible Agent Replay</title>
+  <style>
+    :root {
+      --bg: #0f1419;
+      --panel: #1a2332;
+      --text: #e7ecf3;
+      --muted: #8b9bb4;
+      --accent: #3d8bfd;
+      --ok: #3dd68c;
+      --warn: #f5a524;
+      --bad: #f04438;
+      --border: #2a3648;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.45;
+    }
+    header {
+      padding: 1.25rem 1.5rem;
+      border-bottom: 1px solid var(--border);
+      background: linear-gradient(180deg, #152030, var(--bg));
+    }
+    h1 { margin: 0 0 0.35rem; font-size: 1.35rem; }
+    .sub { color: var(--muted); font-size: 0.9rem; }
+    main { display: grid; grid-template-columns: 320px 1fr; gap: 0; min-height: calc(100vh - 88px); }
+    aside {
+      border-right: 1px solid var(--border);
+      padding: 1rem;
+      background: var(--panel);
+      overflow: auto;
+    }
+    section { padding: 1rem 1.25rem; overflow: auto; }
+    label { display: block; font-size: 0.8rem; color: var(--muted); margin-bottom: 0.35rem; }
+    input[type="file"], input[type="text"] {
+      width: 100%;
+      padding: 0.5rem;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: #0c1118;
+      color: var(--text);
+      margin-bottom: 0.75rem;
+    }
+    button {
+      background: var(--accent);
+      color: #fff;
+      border: 0;
+      border-radius: 6px;
+      padding: 0.5rem 0.75rem;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .card {
+      background: #121a26;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.75rem;
+      margin-bottom: 0.75rem;
+    }
+    .card h3 { margin: 0 0 0.5rem; font-size: 0.85rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; }
+    .verdict {
+      font-size: 1.4rem;
+      font-weight: 700;
+    }
+    .verdict.VALID { color: var(--ok); }
+    .verdict.BLOCKED { color: var(--warn); }
+    .verdict.INVALID { color: var(--bad); }
+    .badge {
+      display: inline-block;
+      font-size: 0.72rem;
+      padding: 0.15rem 0.45rem;
+      border-radius: 4px;
+      background: #243044;
+      color: var(--muted);
+      margin-right: 0.35rem;
+    }
+    .badge.tool { background: #1e3a5f; color: #9ec5ff; }
+    .badge.approval { background: #3d2e14; color: #ffd28a; }
+    .badge.policy { background: #2e1f3d; color: #d4a5ff; }
+    .timeline { list-style: none; padding: 0; margin: 0; }
+    .timeline li {
+      border-left: 2px solid var(--border);
+      margin-left: 0.5rem;
+      padding: 0.5rem 0 0.5rem 1rem;
+      position: relative;
+    }
+    .timeline li::before {
+      content: "";
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent);
+      position: absolute;
+      left: -5px;
+      top: 0.85rem;
+    }
+    .timeline .etype { font-weight: 600; }
+    .timeline .meta { color: var(--muted); font-size: 0.82rem; }
+    .hash-ok { color: var(--ok); }
+    .hash-bad { color: var(--bad); }
+    pre {
+      background: #0c1118;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 0.75rem;
+      overflow: auto;
+      font-size: 0.78rem;
+    }
+    .mermaid-wrap {
+      background: #121a26;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem;
+      margin-top: 1rem;
+      overflow: auto;
+    }
+    #empty { color: var(--muted); padding: 2rem; text-align: center; }
+    @media (max-width: 900px) {
+      main { grid-template-columns: 1fr; }
+      aside { border-right: 0; border-bottom: 1px solid var(--border); }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>GovAI reconstructible agent replay</h1>
+    <p class="sub">Append-only evidence timeline · ledger export · hash chain integrity</p>
+  </header>
+  <main>
+    <aside>
+      <label for="file">Load audit export JSON</label>
+      <input type="file" id="file" accept="application/json,.json" />
+      <label for="url">Or path relative to viewer (local file server)</label>
+      <input type="text" id="url" placeholder="../exports/your-run-id.json" />
+      <button type="button" id="loadUrl">Fetch export</button>
+      <div class="card" id="summaryCard" hidden>
+        <h3>Run</h3>
+        <div id="runMeta"></div>
+      </div>
+      <div class="card" id="verdictCard" hidden>
+        <h3>Ledger verdict</h3>
+        <div class="verdict" id="verdict"></div>
+        <div id="blockedReasons"></div>
+      </div>
+      <div class="card" id="integrityCard" hidden>
+        <h3>Replay integrity</h3>
+        <div id="integrity"></div>
+      </div>
+      <div class="card" id="gatesCard" hidden>
+        <h3>Gates</h3>
+        <div id="gates"></div>
+      </div>
+    </aside>
+    <section>
+      <div id="empty">Load <code>exports/&lt;run_id&gt;.json</code> from <code>run_demo.py</code>.</div>
+      <h2 id="timelineTitle" hidden>Evidence timeline (append order)</h2>
+      <ul class="timeline" id="timeline"></ul>
+      <div class="mermaid-wrap" id="mermaidWrap" hidden>
+        <h2>Decision flow (Mermaid)</h2>
+        <pre class="mermaid" id="mermaid"></pre>
+      </div>
+      <details id="rawDetails" hidden>
+        <summary>Raw export JSON</summary>
+        <pre id="raw"></pre>
+      </details>
+    </section>
+  </main>
+  <script type="module">
+    import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs";
+    mermaid.initialize({ startOnLoad: false, theme: "dark", securityLevel: "loose" });
+
+    const fileInput = document.getElementById("file");
+    const urlInput = document.getElementById("url");
+    const loadUrlBtn = document.getElementById("loadUrl");
+
+    const params = new URLSearchParams(location.search);
+    if (params.get("export")) urlInput.value = params.get("export");
+
+    function badgeClass(eventType) {
+      if (eventType === "tool_call" || eventType === "tool_output") return "tool";
+      if (eventType === "human_approved") return "approval";
+      if (eventType === "policy_evaluation") return "policy";
+      return "";
+    }
+
+    function verifyHashChain(chain) {
+      if (!Array.isArray(chain) || chain.length === 0) {
+        return { ok: false, message: "No log_chain in export" };
+      }
+      for (let i = 0; i < chain.length; i++) {
+        const row = chain[i];
+        if (!row.record_hash) return { ok: false, message: `Missing record_hash at index ${i}` };
+        if (i === 0) {
+          if (row.prev_hash != null && row.prev_hash !== "") {
+            return { ok: false, message: "Genesis row should have empty prev_hash" };
+          }
+        } else if (!row.prev_hash) {
+          return { ok: false, message: `Missing prev_hash at index ${i}` };
+        }
+      }
+      return { ok: true, message: `Chain length ${chain.length}; prev_hash linkage present` };
+    }
+
+    function renderMermaid(events, verdict) {
+      const lines = ["flowchart TD", "  U[user_request] --> R[model_reasoning]", "  R --> TC[tool_call]", "  TC --> TO[tool_output]", "  TO --> PE[policy_evaluation]", "  PE --> D[ai_decision_completed]"];
+      const hasApproval = events.some((e) => e.event_type === "human_approved");
+      if (hasApproval) lines.push("  D --> HA[human_approved]", "  HA --> MP[model_promoted]");
+      lines.push(`  MP --> V["verdict: ${verdict || "unknown"}"]`);
+      return lines.join("\n");
+    }
+
+    function renderExport(doc) {
+      document.getElementById("empty").hidden = true;
+      document.getElementById("timelineTitle").hidden = false;
+      document.getElementById("rawDetails").hidden = false;
+      document.getElementById("mermaidWrap").hidden = false;
+      ["summaryCard", "verdictCard", "integrityCard", "gatesCard"].forEach((id) => {
+        document.getElementById(id).hidden = false;
+      });
+
+      const run = doc.run || {};
+      const decision = doc.decision || {};
+      const verdict = decision.verdict || "UNKNOWN";
+      const events = Array.isArray(doc.evidence_events) ? doc.evidence_events : [];
+      const chain = (doc.evidence_hashes || {}).log_chain || [];
+
+      document.getElementById("runMeta").innerHTML = `
+        <div><strong>${run.run_id || "—"}</strong></div>
+        <div class="meta">policy ${doc.policy_version || "—"} · ${doc.environment || "—"}</div>
+        <div class="meta">exported ${doc.exported_at_utc || "—"}</div>
+      `;
+
+      const verdictEl = document.getElementById("verdict");
+      verdictEl.textContent = verdict;
+      verdictEl.className = "verdict " + verdict;
+
+      const reasons = decision.blocked_reasons || [];
+      document.getElementById("blockedReasons").innerHTML = reasons.length
+        ? "<ul>" + reasons.map((r) => `<li><span class="badge">${r.code}</span> ${r.message}</li>`).join("") + "</ul>"
+        : "<span class=\"meta\">No blocked reasons</span>";
+
+      const integrity = verifyHashChain(chain);
+      const head = doc.evidence_hashes?.chain_head_record_sha256 || "—";
+      document.getElementById("integrity").innerHTML = `
+        <div class="${integrity.ok ? "hash-ok" : "hash-bad"}">${integrity.ok ? "✓" : "✗"} ${integrity.message}</div>
+        <div class="meta">chain head: <code>${head}</code></div>
+        <div class="meta">bundle_sha256: <code>${(doc.evidence_hashes || {}).bundle_sha256 || "—"}</code></div>
+      `;
+
+      const toolCalls = events.filter((e) => e.event_type === "tool_call").length;
+      const toolOutputs = events.filter((e) => e.event_type === "tool_output").length;
+      const approval = events.find((e) => e.event_type === "human_approved");
+      document.getElementById("gates").innerHTML = `
+        <div><span class="badge tool">tools</span> ${toolCalls} call(s), ${toolOutputs} output(s)</div>
+        <div><span class="badge policy">policy</span> evaluation_passed: ${decision.evaluation_passed}</div>
+        <div><span class="badge approval">approval</span> ${approval ? "human_approved recorded" : "not in export"}</div>
+        <div><span class="badge">promotion</span> ${(decision.promotion || {}).state || "—"}</div>
+      `;
+
+      const ul = document.getElementById("timeline");
+      ul.innerHTML = "";
+      for (const ev of events) {
+        const li = document.createElement("li");
+        const bc = badgeClass(ev.event_type);
+        li.innerHTML = `
+          <span class="badge ${bc}">${ev.event_type}</span>
+          <span class="etype">${ev.event_id}</span>
+          <div class="meta">${ev.ts_utc} · ${ev.actor}</div>
+        `;
+        ul.appendChild(li);
+      }
+
+      const mermaidSrc = renderMermaid(events, verdict);
+      const mermaidEl = document.getElementById("mermaid");
+      mermaidEl.textContent = mermaidSrc;
+      mermaid.run({ nodes: [mermaidEl] });
+
+      document.getElementById("raw").textContent = JSON.stringify(doc, null, 2);
+    }
+
+    async function loadFromText(text) {
+      const doc = JSON.parse(text);
+      if (doc.schema_version && doc.schema_version !== "aigov.audit_export.v1") {
+        console.warn("Unexpected schema_version:", doc.schema_version);
+      }
+      renderExport(doc);
+    }
+
+    fileInput.addEventListener("change", async () => {
+      const f = fileInput.files?.[0];
+      if (!f) return;
+      await loadFromText(await f.text());
+    });
+
+    loadUrlBtn.addEventListener("click", async () => {
+      const path = urlInput.value.trim();
+      if (!path) return;
+      const res = await fetch(path);
+      if (!res.ok) throw new Error(`Fetch failed: ${res.status}`);
+      await loadFromText(await res.text());
+    });
+
+    if (urlInput.value) loadUrlBtn.click();
+  </script>
+</body>
+</html>

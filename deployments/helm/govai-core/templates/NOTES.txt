@@ -1,0 +1,8 @@
+GovAI Core deployed as {{ include "govai-core.fullname" . }}.
+
+Health:  kubectl port-forward svc/{{ include "govai-core.fullname" . }} 8088:{{ .Values.service.port }}
+         curl -sS http://127.0.0.1:8088/health
+
+Ledger PVC: {{ include "govai-core.fullname" . }}-ledger (when persistence.enabled=true)
+
+Default replicaCount=1 — ledger is not multi-writer HA. See docs/runtime-operations.md.

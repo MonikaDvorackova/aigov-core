@@ -1,0 +1,51 @@
+replicaCount: 1
+
+image:
+  repository: govai-core
+  tag: latest
+  pullPolicy: IfNotPresent
+
+nameOverride: ""
+fullnameOverride: ""
+
+service:
+  type: ClusterIP
+  port: 8088
+
+persistence:
+  enabled: true
+  storageClass: ""
+  accessMode: ReadWriteOnce
+  size: 10Gi
+  mountPath: /var/lib/govai/ledger
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    cpu: "2"
+    memory: 1Gi
+
+env:
+  AIGOV_BIND: "0.0.0.0:8088"
+  AIGOV_ENVIRONMENT: prod
+  AIGOV_POLICY_DIR: /app/policies
+  GOVAI_LEDGER_DIR: /var/lib/govai/ledger
+  GOVAI_AUTO_MIGRATE: "false"
+
+# Sensitive values — override at install time (never commit production secrets).
+secrets:
+  DATABASE_URL: ""
+  GOVAI_API_KEYS: ""
+  GOVAI_API_KEYS_JSON: ""
+
+probes:
+  liveness:
+    path: /health
+    initialDelaySeconds: 15
+    periodSeconds: 20
+  readiness:
+    path: /ready
+    initialDelaySeconds: 10
+    periodSeconds: 10

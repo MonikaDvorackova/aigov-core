@@ -1,0 +1,32 @@
+# Git and editor
+.git
+.gitignore
+.cursor
+.vscode
+.idea
+
+# Python / Node artifacts
+**/__pycache__
+**/*.pyc
+**/.pytest_cache
+**/.mypy_cache
+**/node_modules
+python/.venv
+.venv
+
+# Rust build outputs (use in-image build only)
+rust/target
+target
+
+# Large or non-runtime trees
+experiments/output
+**/agent-transcripts
+docs/reports/*.pdf
+
+# Local operator data
+.govai-ledger
+*.env
+.env.*
+
+# Deploy packaging is not part of image context requirements
+deployments/**/charts/*.tgz

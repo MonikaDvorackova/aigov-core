@@ -14,6 +14,9 @@ pub mod projection;
 
 pub mod compliance_summary;
 pub mod audit_export;
+pub mod replay_validation;
+pub mod replay_projection;
+pub mod replay_engine;
 pub mod ledger_view;
 pub mod metering;
 pub mod govai_api;

@@ -34,8 +34,12 @@ from aigov_py.discovery_policy_mapping import (
     triggered_by_discovery,
 )
 from aigov_py.policy_loader import load_policy_module, policy_identity, required_evidence_from_policy
-from aigov_py.policy_bundle_signing import (
+from aigov_py.audit_export_signing import (
     load_trust_from_env_json,
+    sign_audit_export_ed25519,
+    verify_signed_audit_export,
+)
+from aigov_py.policy_bundle_signing import (
     sign_policy_bundle_ed25519,
     verify_policy_bundle_ed25519,
 )
@@ -1712,6 +1716,29 @@ def build_parser() -> GovaiArgumentParser:
         help="Optional X-GovAI-Project header (or GOVAI_PROJECT); metadata/metering only, not ledger tenant.",
     )
 
+    s_sign_export = sub.add_parser(
+        "sign-audit-export",
+        help="Sign aigov.audit_export.v1 JSON with Ed25519 (post-export; ledger unchanged).",
+    )
+    s_sign_export.add_argument("--in", dest="in_path", required=True, help="Input audit export JSON path.")
+    s_sign_export.add_argument("--out", dest="out_path", required=True, help="Output signed audit export JSON path.")
+    s_sign_export.add_argument("--issuer-id", required=True, help="Issuer id for signature trust lookup.")
+    s_sign_export.add_argument("--signer", required=True, help="Signer identity label.")
+    s_sign_export.add_argument("--private-key-base64", required=True, help="Ed25519 private key (base64, 32-byte seed).")
+    s_sign_export.add_argument("--created-at-utc", required=True, help="RFC3339 UTC timestamp.")
+    s_sign_export.add_argument("--expires-at-utc", default=None, help="Optional RFC3339 UTC timestamp.")
+
+    s_verify_export = sub.add_parser(
+        "verify-audit-export",
+        help="Verify signed aigov.audit_export.v1 (schema, hashes, run_id, Ed25519).",
+    )
+    s_verify_export.add_argument("--path", required=True, help="Signed audit export JSON path.")
+    s_verify_export.add_argument(
+        "--trust-json",
+        default=os.environ.get("AIGOV_POLICY_TRUST_ED25519_JSON"),
+        help="Trusted Ed25519 public keys JSON (default: env AIGOV_POLICY_TRUST_ED25519_JSON).",
+    )
+
     s_usage = sub.add_parser("usage", help="GET /usage (machine-readable JSON).")
     s_usage.add_argument(
         "--project",
@@ -2890,6 +2917,55 @@ def main(argv: Sequence[str] | None = None) -> int:
             print(json.dumps({"error": str(e)}, ensure_ascii=False), file=sys.stderr)
             return cli_exit.EX_ERR
         _print_json(out, compact=True)
+        return cli_exit.EX_OK
+
+    if args.cmd == "sign-audit-export":
+        try:
+            sign_audit_export_ed25519(
+                str(getattr(args, "in_path")),
+                out_path=str(getattr(args, "out_path")),
+                issuer_id=str(getattr(args, "issuer_id")),
+                signer=str(getattr(args, "signer")),
+                private_key_base64=str(getattr(args, "private_key_base64")),
+                created_at_utc=str(getattr(args, "created_at_utc")),
+                expires_at_utc=getattr(args, "expires_at_utc"),
+            )
+        except Exception as e:  # noqa: BLE001
+            print(f"error: sign-audit-export failed: {e}", file=sys.stderr)
+            return cli_exit.EX_ERR
+        return cli_exit.EX_OK
+
+    if args.cmd == "verify-audit-export":
+        raw = str(getattr(args, "path", "") or "").strip()
+        trust_raw = str(getattr(args, "trust_json", "") or "").strip()
+        if not trust_raw:
+            print(
+                "error: --trust-json or AIGOV_POLICY_TRUST_ED25519_JSON required",
+                file=sys.stderr,
+            )
+            return cli_exit.EX_USAGE
+        try:
+            doc = json.loads(Path(raw).read_text(encoding="utf-8"))
+            if not isinstance(doc, dict):
+                raise ValueError("audit export must be a JSON object")
+            trust = load_trust_from_env_json(trust_raw)
+            payload = verify_signed_audit_export(doc, trust=trust)
+            print(
+                json.dumps(
+                    {
+                        "ok": True,
+                        "run_id": payload.run_id,
+                        "schema_version": payload.schema_version,
+                        "decision_verdict": payload.decision_verdict,
+                        "events_content_sha256": payload.events_content_sha256,
+                        "bundle_sha256": payload.bundle_sha256,
+                    },
+                    indent=2,
+                )
+            )
+        except Exception as e:  # noqa: BLE001
+            print(f"error: verify-audit-export failed: {e}", file=sys.stderr)
+            return cli_exit.EX_ERR
         return cli_exit.EX_OK
 
     if args.cmd == "usage":

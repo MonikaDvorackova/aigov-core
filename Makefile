@@ -662,7 +662,6 @@ audit_bg audit_stop audit_restart audit_logs:
 	@echo "$@: GovAI Core does not manage a hosted audit HTTP service lifecycle."
 	@echo "Run the GovAI Platform repository for SaaS runtime orchestration, or configure GOVAI_AUDIT_BASE_URL to your operator runtime."
 	@exit 2
-
 require_audit_url:
 	@if [ -z "$${GOVAI_AUDIT_BASE_URL:-}" ]; then \
 		echo "GOVAI_AUDIT_BASE_URL is required (GovAI Core does not start a local audit server)."; \

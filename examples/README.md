@@ -8,7 +8,9 @@ This directory holds **illustrative** scripts, compose snippets, and sample payl
 
 | Path | Purpose |
 |------|---------|
-| [runtime-governance/](runtime-governance/) | **Phase 16** — stdlib Python runtime SDK, FastAPI/LangChain/gateway adapters, examples, `make runtime-sdk-check`. |
+| [basic-runtime-client/](basic-runtime-client/) | **Core runtime** — curl smoke (`POST /evidence`, summary, export, verify); see [docs/quickstart-runtime.md](../docs/quickstart-runtime.md). |
+| [python-runtime-client/](python-runtime-client/) | **Core runtime** — stdlib Python smoke + optional LangChain hook adapter example. |
+| [runtime-governance/](runtime-governance/) | Stdlib Python runtime SDK, FastAPI/LangChain/gateway adapters, `make runtime-sdk-check`. |
 | [ci/](ci/) | Downstream GitHub Actions pattern for the artefact-bound composite action. |
 | [runtime-evaluate/](runtime-evaluate/) | Minimal `POST /v1/runtime/evaluate` JSON sample (see OpenAPI + runtime governance docs). |
 | [evidence-pack/](evidence-pack/) | Pointers to evidence pack generation and digest flow. |

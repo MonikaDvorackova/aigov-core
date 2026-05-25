@@ -15,7 +15,7 @@ AIGOV_MODE ?= ci
 	bundle verify_cli evidence_pack \
 	emit_event \
 	flow flow_full \
-	pr_prepare gate \
+	pr_prepare gate core-runtime-examples-check \
 	runtime-sdk-check developer-integrations-platform-check \
 	audit_close \
 	demo demo_new \
@@ -97,6 +97,10 @@ env_check:
 # ensure that generated audit reports include the minimum required sections.
 gate:
 	@python3 scripts/gate_reports.py
+
+# Adoption examples must not call platform-only HTTP routes (drift vs govai_api.rs).
+core-runtime-examples-check:
+	@python3 scripts/check_core_runtime_example_routes.py
 
 # Registered interchange conformance checks.
 standards-conformance:

@@ -1,0 +1,13 @@
+{
+  "event_id": "REPLACE_EVENT_ID",
+  "event_type": "ai_discovery_reported",
+  "ts_utc": "2026-01-01T00:00:01Z",
+  "actor": "basic-runtime-client",
+  "system": "govai-core-examples",
+  "run_id": "REPLACE_RUN_ID",
+  "payload": {
+    "openai": false,
+    "transformers": false,
+    "model_artifacts": false
+  }
+}

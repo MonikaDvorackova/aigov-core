@@ -9,7 +9,7 @@ On [govbase.dev/docs](https://govbase.dev/docs), the hub renders **try consoles*
 | Role | Start here |
 |------|------------|
 | **New visitor** | [product/what-is-govai.md](product/what-is-govai.md) → [product/how-govai-works.md](product/how-govai-works.md) |
-| **AI engineer** | [quickstart-5min.md](quickstart-5min.md), [product/integration-patterns.md](product/integration-patterns.md), [github-action.md](github-action.md) |
+| **AI engineer** | [quickstart-runtime.md](quickstart-runtime.md), [quickstart-5min.md](quickstart-5min.md), [product/integration-patterns.md](product/integration-patterns.md), [github-action.md](github-action.md) |
 | **Platform / CTO** | [architecture/README.md](architecture/README.md), [architecture/overview.md](architecture/overview.md), [architecture/platform-vs-core-boundary.md](architecture/platform-vs-core-boundary.md) |
 | **Compliance / legal** | [trust-model.md](trust-model.md), [regulatory/ai-act-enterprise-positioning.md](regulatory/ai-act-enterprise-positioning.md), [trust/trust-center.md](trust/trust-center.md) |
 | **Enterprise buyer** | [trust/enterprise-trust-package.md](trust/enterprise-trust-package.md), [pricing/index.md](pricing/index.md), [buyer/README.md](buyer/README.md), [terminology.md](terminology.md) |

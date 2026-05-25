@@ -24,7 +24,8 @@ demo: evidence
 
 - Rust toolchain
 - Python ≥ 3.10
-- PostgreSQL reachable via `DATABASE_URL`
+- Writable directory for the ledger (`GOVAI_LEDGER_DIR`)
+- PostgreSQL is **optional** (only needed for issued API keys in Postgres or `GET /ready` DB checks)
 
 ## 0) Install the CLI (local editable)
 
@@ -57,14 +58,22 @@ PY
 )"
 ```
 
-## 2) Start the audit service with that key
+## 2) Start the audit runtime with that key
 
 ```bash
-export DATABASE_URL='postgresql://USER:PASSWORD@127.0.0.1:5432/DBNAME'
+export GOVAI_LEDGER_DIR="$(pwd)/.govai-ledger"
+mkdir -p "$GOVAI_LEDGER_DIR"
 export GOVAI_API_KEYS="$GOVAI_API_KEY"
+export GOVAI_API_KEYS_JSON="{\"$GOVAI_API_KEY\":\"local-dev\"}"
+export AIGOV_ENVIRONMENT=dev
+export AIGOV_POLICY_DIR="$(pwd)/rust"
 
-make audit_bg
+# In one terminal:
+make run-audit
+
+# In another:
 curl -sS http://127.0.0.1:8088/status
+curl -sS http://127.0.0.1:8088/health
 ```
 
 ## 3) Send your first evidence event (HTTP)

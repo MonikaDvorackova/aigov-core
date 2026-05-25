@@ -35,10 +35,17 @@ jobs:
       - name: Set up Rust
         uses: dtolnay/rust-toolchain@stable
 
-      - name: Build portable evidence digest helper
+      - name: Build audit runtime and portable digest helper
         run: |
           set -euo pipefail
-          cd rust && cargo build --locked --bin portable_evidence_digest_once
+          cd rust
+          cargo build --locked --bin aigov_audit
+          cargo build --locked --bin portable_evidence_digest_once
+
+      - name: Rust unit and integration tests
+        run: |
+          set -euo pipefail
+          cd rust && cargo test --locked
 
       - name: Governance standards (offline)
         run: |
@@ -74,8 +81,8 @@ jobs:
           {
             echo "# GovAI Core portable CI"
             echo
-            echo "Validates compilation, offline governance standards, documentation gate, and portable evidence/digest/replay semantics."
+            echo "Validates \`aigov_audit\` build, Rust tests (including in-process HTTP integration), offline governance standards, documentation gate, and portable evidence/digest/replay semantics."
             echo
-            echo "Does **not** start a localhost audit HTTP service or poll GET /ready."
+            echo "Does **not** start a long-lived localhost server in CI (integration tests use Axum TestClient)."
             echo "Hosted runtime orchestration is owned by the **GovAI Platform** repository."
           } >> "${GITHUB_STEP_SUMMARY}"

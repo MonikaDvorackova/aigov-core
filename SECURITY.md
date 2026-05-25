@@ -1,6 +1,6 @@
 # Security Policy
 
-GovAI is governance infrastructure for AI systems. Security reports are taken seriously because the project handles audit evidence, governance decisions, tenant isolation, and enforcement behavior.
+**GovAI Core** is open-source governance infrastructure for AI systems. Security reports are taken seriously because the project handles audit evidence, ledger integrity, tenant isolation, and enforcement behavior in the `aigov_audit` runtime.
 
 ## Reporting a vulnerability
 

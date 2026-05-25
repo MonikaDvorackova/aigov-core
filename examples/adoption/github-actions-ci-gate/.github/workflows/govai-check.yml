@@ -42,7 +42,7 @@ jobs:
           path: artefacts
 
       - name: Artefact-bound GovAI gate
-        uses: MonikaDvorackova/aigov-compliance-engine@v1
+        uses: MonikaDvorackova/govai-core@v1
         with:
           run_id: ${{ vars.GOVAI_RUN_ID }}
           artifacts_path: artefacts

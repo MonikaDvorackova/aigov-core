@@ -138,7 +138,7 @@ def test_rwci_pip_snippet_git_option(monkeypatch) -> None:
     monkeypatch.delenv("RWCI_GOVAI_PIP_SPEC", raising=False)
     monkeypatch.setenv("RWCI_AIGOV_GIT_COMMIT", "abcdef1234567890abcdef1234567890abcdef12")
     s = rwci_runner_mod.govai_pip_install_snippet()
-    assert "git+https://github.com/MonikaDvorackova/aigov-compliance-engine.git@" in s
+    assert "git+https://github.com/MonikaDvorackova/govai-core.git@" in s
     assert "#subdirectory=python" in s
 
 

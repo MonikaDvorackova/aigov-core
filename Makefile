@@ -651,6 +651,13 @@ engineering_loc:
 audit:
 	cd rust && cargo run --bin $(AIGOV_AUDIT_BIN) --locked
 
+build-audit:
+	cd rust && cargo build --locked --bin aigov_audit
+
+# Run the ledger-authoritative HTTP runtime (bind: AIGOV_BIND, default 127.0.0.1:8088).
+run-audit: build-audit
+	cd rust && cargo run --bin aigov_audit --locked
+
 audit_bg audit_stop audit_restart audit_logs:
 	@echo "$@: GovAI Core does not manage a hosted audit HTTP service lifecycle."
 	@echo "Run the GovAI Platform repository for SaaS runtime orchestration, or configure GOVAI_AUDIT_BASE_URL to your operator runtime."

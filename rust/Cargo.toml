@@ -9,6 +9,10 @@ default = []
 hosted-platform = []
 
 [[bin]]
+name = "aigov_audit"
+path = "src/main.rs"
+
+[[bin]]
 name = "portable_evidence_digest_once"
 path = "src/bin/portable_evidence_digest_once.rs"
 

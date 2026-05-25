@@ -1,6 +1,6 @@
 ---
 name: Question
-about: Ask a question about GovAI usage, architecture, or contributing
+about: Ask about GovAI Core usage, the audit runtime, or contributing
 title: "[QUESTION] "
 labels: discussion
 assignees: ""
@@ -8,7 +8,10 @@ assignees: ""
 
 ## Context
 
-What are you trying to do (for example: local setup, CI gate, hosted audit, policy module)?
+What are you trying to do? (for example: local `aigov_audit`, evidence ingest, compliance summary, reference integrations, contributor setup)
+
+**GovAI Core** = open-source ledger-authoritative audit runtime in this repository.  
+**GovAI Platform** (hosted SaaS, billing, dashboard) is a separate product — see `docs/hosted/` for reference only.
 
 ## Question
 
@@ -21,8 +24,9 @@ Commands, docs links, or steps you followed.
 ## Environment (if relevant)
 
 - OS:
-- GovAI context (local Docker / hosted / contributor fork):
+- `GOVAI_AUDIT_BASE_URL` reachable? (yes/no)
+- API key tenant mapping configured? (yes/no — do not paste secrets)
 
 ## Adoption or docs feedback
 
-If this is **pilot / integration feedback** rather than a defect, see **[`docs/community/adoption-feedback-intake.md`](../../docs/community/adoption-feedback-intake.md)** and the examples index **[`examples/README.md`](../../examples/README.md)**.
+If this is **pilot / integration feedback** rather than a defect, see **[`docs/community/adoption-feedback-intake.md`](../../docs/community/adoption-feedback-intake.md)** and **[`docs/reference-integrations.md`](../../docs/reference-integrations.md)**.

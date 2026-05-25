@@ -943,7 +943,7 @@ fn human_approved_event_ok(
 #[cfg(test)]
 mod allowlist_tests {
     use super::*;
-    use crate::policy_config::test_sync::APPROVER_ALLOWLIST_ENV_LOCK;
+    use crate::policy_config::test_sync::POLICY_ENV_LOCK;
     use crate::policy_config::PolicyConfig;
 
     fn human_payload(approver: &str) -> serde_json::Value {
@@ -976,7 +976,7 @@ mod allowlist_tests {
 
     #[test]
     fn human_approver_rejected_when_allowlist_enforced() {
-        let _g = APPROVER_ALLOWLIST_ENV_LOCK.lock().unwrap();
+        let _g = POLICY_ENV_LOCK.lock().unwrap();
         std::env::remove_var("AIGOV_APPROVER_ALLOWLIST");
         let cfg = PolicyConfig {
             enforce_approver_allowlist: true,
@@ -992,7 +992,7 @@ mod allowlist_tests {
 
     #[test]
     fn human_approver_ok_when_allowlist_disabled() {
-        let _g = APPROVER_ALLOWLIST_ENV_LOCK.lock().unwrap();
+        let _g = POLICY_ENV_LOCK.lock().unwrap();
         std::env::remove_var("AIGOV_APPROVER_ALLOWLIST");
         let cfg = PolicyConfig {
             enforce_approver_allowlist: false,
@@ -1006,7 +1006,7 @@ mod allowlist_tests {
 
     #[test]
     fn human_approver_respects_configured_allowlist() {
-        let _g = APPROVER_ALLOWLIST_ENV_LOCK.lock().unwrap();
+        let _g = POLICY_ENV_LOCK.lock().unwrap();
         std::env::remove_var("AIGOV_APPROVER_ALLOWLIST");
         let cfg = PolicyConfig {
             enforce_approver_allowlist: true,
@@ -1022,7 +1022,7 @@ mod allowlist_tests {
 
     #[test]
     fn human_approver_allowlist_env_overrides_config() {
-        let _g = APPROVER_ALLOWLIST_ENV_LOCK.lock().unwrap();
+        let _g = POLICY_ENV_LOCK.lock().unwrap();
         std::env::set_var("AIGOV_APPROVER_ALLOWLIST", "env_approver");
         let cfg = PolicyConfig {
             enforce_approver_allowlist: true,

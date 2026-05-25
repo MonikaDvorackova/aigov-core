@@ -1,6 +1,6 @@
 ---
 name: Governance RFC
-about: Propose a governance, CI gate, or contributor-policy change
+about: Propose a governance, CI gate, or contributor-policy change for GovAI Core
 title: "[RFC-GOV] "
 labels: governance
 assignees: ""
@@ -18,10 +18,13 @@ Describe the change at a level maintainers can evaluate (scope, defaults, migrat
 
 What other policies or mechanisms did you evaluate?
 
-## Impact on gates
+## Impact on core invariants
 
-- [ ] Does **not** remove or weaken existing CI governance gates.
-- [ ] Touches enforcement, evidence, tenant isolation, or verdict semantics: explain why and link security review if applicable.
+- [ ] Does **not** weaken append-only ledger semantics.
+- [ ] Does **not** weaken tenant isolation (`GOVAI_API_KEYS` + `GOVAI_API_KEYS_JSON`; `X-GovAI-Project` remains metadata only).
+- [ ] Does **not** make `GET /ready` mutating.
+- [ ] Does **not** bypass ledger-authoritative `GET /compliance-summary` verdict derivation.
+- [ ] Does **not** remove or weaken existing CI governance gates without maintainer approval.
 
 ## Auditability
 

@@ -1,6 +1,6 @@
 ---
 name: Feature request
-about: Suggest an idea or improvement for GovAI
+about: Suggest an improvement to GovAI Core (audit runtime, SDK, examples, or core docs)
 title: "[FEATURE] "
 labels: enhancement
 assignees: ""
@@ -8,7 +8,7 @@ assignees: ""
 
 ## Problem / motivation
 
-What problem would this solve, or what outcome do you want?
+What problem would this solve for integrators or operators running **`aigov_audit`**?
 
 ## Proposed direction
 
@@ -21,7 +21,8 @@ What other approaches did you consider?
 ## Scope and constraints
 
 - Does this touch enforcement, evidence, tenant isolation, or compliance verdicts?
-- Is this documentation-only, developer experience, or product behavior?
+- Is this documentation-only, developer experience, or runtime behavior?
+- **Out of scope for GovAI Core:** hosted SaaS, Stripe/billing, pricing, dashboard ACL, commercial onboarding (belongs in GovAI Platform).
 
 ## Additional context
 
@@ -29,8 +30,7 @@ Links, diagrams, or prior discussion if helpful.
 
 ## Community pointers
 
+- Runtime quickstart: [`docs/quickstart-runtime.md`](../../docs/quickstart-runtime.md)
 - Contributor funnel: [`docs/community/contributor-funnel.md`](../../docs/community/contributor-funnel.md)
 - Issue triage: [`docs/community/issue-triage.md`](../../docs/community/issue-triage.md)
-- Maintainer expectations: [`docs/community/maintainer-guide.md`](../../docs/community/maintainer-guide.md)
-- Maintainer operating model: [`docs/community/maintainer-operating-model.md`](../../docs/community/maintainer-operating-model.md)
 - RFC policy (governance changes): [`docs/community/rfc-process.md`](../../docs/community/rfc-process.md)

@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://kovali.ai/schemas/aigov.audit_export.v1.schema.json",
+  "$id": "https://github.com/MonikaDvorackova/govai-core/blob/main/docs/schemas/aigov.audit_export.v1.schema.json",
   "title": "GovAI Audit Export v1",
   "type": "object",
   "additionalProperties": true,

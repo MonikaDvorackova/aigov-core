@@ -109,6 +109,13 @@ pub fn api_key_tenant_map_is_initialized() -> bool {
     API_KEY_TENANT_MAP.get().is_some()
 }
 
+/// First `(api_key, tenant_id)` from the env map (for tests when the map was initialized earlier).
+pub fn any_env_tenant_mapping() -> Option<(String, String)> {
+    API_KEY_TENANT_MAP
+        .get()
+        .and_then(|m| m.iter().next().map(|(k, v)| (k.clone(), v.clone())))
+}
+
 /// True when the bearer token appears in `GOVAI_API_KEYS_JSON` (env map).
 pub fn env_tenant_map_contains_token(token: &str) -> bool {
     API_KEY_TENANT_MAP
@@ -134,10 +141,60 @@ pub struct AuditKeyGateState {
     pub deployment_env: GovaiEnvironment,
 }
 
+/// True when `GOVAI_API_KEYS` contains at least one bearer secret (comma-separated allowlist).
+pub fn api_keys_allowlist_configured() -> bool {
+    AuditApiKeyConfig::from_env().keys.is_some()
+}
+
+/// Dev-only single-tenant mode: no allowlist, no tenant map entries, no hosted DB key lookup.
+pub fn legacy_dev_default_tenant_allowed(deployment_env: GovaiEnvironment) -> bool {
+    deployment_env == GovaiEnvironment::Dev
+        && !runtime_key_lookup_enabled()
+        && !api_keys_allowlist_configured()
+        && API_KEY_TENANT_MAP
+            .get()
+            .map(|m| m.is_empty())
+            .unwrap_or(true)
+}
+
+/// Startup validation: allowlisted keys require a non-empty `GOVAI_API_KEYS_JSON` map.
+pub fn validate_api_key_tenant_mapping_from_env() -> Result<(), String> {
+    if !api_keys_allowlist_configured() {
+        return Ok(());
+    }
+    let raw = std::env::var("GOVAI_API_KEYS_JSON").unwrap_or_default();
+    let map = parse_api_key_tenant_map_from_env_value(&raw)?;
+    if map.is_empty() {
+        return Err(
+            "GOVAI_API_KEYS is set but GOVAI_API_KEYS_JSON is missing, empty, or has no valid \
+             api_key -> tenant_id entries"
+                .to_string(),
+        );
+    }
+    Ok(())
+}
+
+fn require_tenant_map_when_allowlist_present() -> Result<(), String> {
+    let allowlist = parse_api_keys_allowlist(&std::env::var("GOVAI_API_KEYS").unwrap_or_default());
+    if allowlist.is_empty() {
+        return Ok(());
+    }
+    let map = API_KEY_TENANT_MAP.get();
+    let mapped = map.map(|m| !m.is_empty()).unwrap_or(false);
+    if mapped {
+        return Ok(());
+    }
+    Err(
+        "GOVAI_API_KEYS is set but GOVAI_API_KEYS_JSON is missing, empty, or has no valid \
+         api_key -> tenant_id entries; each allowlisted key must map to exactly one ledger tenant"
+            .to_string(),
+    )
+}
+
 /// Initialize `GOVAI_API_KEYS_JSON` (api_key -> tenant_id) mapping once at startup.
 ///
-/// - **Dev**: missing/empty config is allowed (ledger tenant defaults to `"default"`).
-/// - **Staging/Prod**: missing/invalid/empty config fails startup.
+/// When `GOVAI_API_KEYS` is non-empty, `GOVAI_API_KEYS_JSON` must define a tenant for each key.
+/// Legacy dev single-tenant (`"default"`) applies only when neither allowlist nor map is configured.
 pub fn init_api_key_tenant_map(deployment_env: GovaiEnvironment) -> Result<(), String> {
     let raw = std::env::var("GOVAI_API_KEYS_JSON").ok();
     let raw = raw.as_deref().unwrap_or("").trim();
@@ -145,6 +202,7 @@ pub fn init_api_key_tenant_map(deployment_env: GovaiEnvironment) -> Result<(), S
     ensure_hosted_hash_map();
 
     if raw.is_empty() {
+        validate_api_key_tenant_mapping_from_env()?;
         return match deployment_env {
             GovaiEnvironment::Dev => {
                 let _ = API_KEY_TENANT_MAP.set(Arc::new(HashMap::new()));
@@ -183,20 +241,18 @@ pub fn init_api_key_tenant_map(deployment_env: GovaiEnvironment) -> Result<(), S
     }
 
     if cleaned.is_empty() {
-        return match deployment_env {
-            GovaiEnvironment::Dev => Ok(()),
-            GovaiEnvironment::Staging | GovaiEnvironment::Prod => Err(
-                "GOVAI_API_KEYS_JSON must contain at least one api_key -> tenant_id entry"
-                    .to_string(),
-            ),
-        };
+        validate_api_key_tenant_mapping_from_env()?;
+        API_KEY_TENANT_MAP
+            .set(Arc::new(HashMap::new()))
+            .map_err(|_| "GOVAI_API_KEYS_JSON was initialized more than once".to_string())?;
+        return Ok(());
     }
 
     API_KEY_TENANT_MAP
         .set(Arc::new(cleaned))
         .map_err(|_| "GOVAI_API_KEYS_JSON was initialized more than once".to_string())?;
     ensure_hosted_hash_map();
-    Ok(())
+    require_tenant_map_when_allowlist_present()
 }
 
 /// Server-controlled tenant id for the tenant-isolated ledger.
@@ -209,12 +265,10 @@ pub fn require_tenant_id_from_api_key_for_ledger(
     let token = match raw_bearer_token(headers) {
         Some(t) if !t.is_empty() => t,
         _ => {
-            return match deployment_env {
-                GovaiEnvironment::Dev if !runtime_key_lookup_enabled() => {
-                    Ok("default".to_string())
-                }
-                _ => Err("missing_api_key".to_string()),
-            };
+            if legacy_dev_default_tenant_allowed(deployment_env) {
+                return Ok("default".to_string());
+            }
+            return Err("missing_api_key".to_string());
         }
     };
 
@@ -222,27 +276,7 @@ pub fn require_tenant_id_from_api_key_for_ledger(
         return Ok(tenant_id);
     }
 
-    let env_map_empty = API_KEY_TENANT_MAP
-        .get()
-        .map(|tenant_map| tenant_map.is_empty())
-        .unwrap_or(true);
-
-    match deployment_env {
-        GovaiEnvironment::Dev if !runtime_key_lookup_enabled() && env_map_empty => {
-            Ok("default".to_string())
-        }
-        GovaiEnvironment::Dev => Err("unknown_api_key".to_string()),
-        GovaiEnvironment::Staging | GovaiEnvironment::Prod => {
-            if API_KEY_TENANT_MAP.get().is_some() || runtime_key_lookup_enabled() {
-                Err("unknown_api_key".to_string())
-            } else {
-                Err(
-                    "GOVAI_API_KEYS_JSON is required in staging/prod (JSON object mapping api_key -> tenant_id)"
-                        .to_string(),
-                )
-            }
-        }
-    }
+    Err("unknown_api_key".to_string())
 }
 
 #[derive(Clone)]
@@ -607,7 +641,7 @@ pub struct ResolvedLedgerTenant(pub String);
 mod tests {
     use super::*;
     use axum::body::Body;
-    use axum::http::{Request, StatusCode};
+    use axum::http::{header, HeaderMap, HeaderValue, Request, StatusCode};
     use axum::routing::get;
     use axum::{middleware, Router};
     use serde_json::Value;
@@ -807,5 +841,65 @@ mod tests {
         std::env::set_var("GOVAI_API_KEYS_JSON", r#"{"k1":"t1","k2":"t2"}"#);
         validate_api_key_allowlist_consistency(GovaiEnvironment::Prod)
             .expect("prod should pass when allowlist covers JSON keys (per-key caps stripped)");
+    }
+
+    #[test]
+    fn validate_api_key_tenant_mapping_fails_when_allowlist_without_json() {
+        let _g = validator_env_lock().lock().unwrap();
+        let _scoped = ScopedEnv::new(&["GOVAI_API_KEYS", "GOVAI_API_KEYS_JSON"]);
+        std::env::set_var("GOVAI_API_KEYS", "key-a,key-b");
+        std::env::remove_var("GOVAI_API_KEYS_JSON");
+        let err = validate_api_key_tenant_mapping_from_env().expect_err("must require JSON map");
+        assert!(
+            err.contains("GOVAI_API_KEYS_JSON"),
+            "unexpected: {err}"
+        );
+    }
+
+    #[test]
+    fn require_tenant_id_unknown_key_fails_even_in_dev() {
+        let _g = validator_env_lock().lock().unwrap();
+        let _scoped = ScopedEnv::new(&["GOVAI_API_KEYS", "GOVAI_API_KEYS_JSON"]);
+        std::env::set_var("GOVAI_API_KEYS", "key-a");
+        std::env::set_var("GOVAI_API_KEYS_JSON", r#"{"key-a":"tenant-a"}"#);
+        let _ = init_api_key_tenant_map(GovaiEnvironment::Dev);
+        let mut h = HeaderMap::new();
+        h.insert(
+            header::AUTHORIZATION,
+            HeaderValue::from_static("Bearer key-unknown"),
+        );
+        let err = require_tenant_id_from_api_key_for_ledger(&h, GovaiEnvironment::Dev)
+            .expect_err("unmapped key");
+        assert_eq!(err, "unknown_api_key");
+    }
+
+    #[test]
+    fn require_tenant_id_maps_distinct_keys_to_distinct_tenants() {
+        let _g = validator_env_lock().lock().unwrap();
+        let _scoped = ScopedEnv::new(&["GOVAI_API_KEYS", "GOVAI_API_KEYS_JSON"]);
+        std::env::set_var("GOVAI_API_KEYS", "key-a,key-b");
+        std::env::set_var(
+            "GOVAI_API_KEYS_JSON",
+            r#"{"key-a":"tenant-a","key-b":"tenant-b"}"#,
+        );
+        let _ = init_api_key_tenant_map(GovaiEnvironment::Dev);
+        let mut ha = HeaderMap::new();
+        ha.insert(
+            header::AUTHORIZATION,
+            HeaderValue::from_static("Bearer key-a"),
+        );
+        let mut hb = HeaderMap::new();
+        hb.insert(
+            header::AUTHORIZATION,
+            HeaderValue::from_static("Bearer key-b"),
+        );
+        assert_eq!(
+            require_tenant_id_from_api_key_for_ledger(&ha, GovaiEnvironment::Dev).unwrap(),
+            "tenant-a"
+        );
+        assert_eq!(
+            require_tenant_id_from_api_key_for_ledger(&hb, GovaiEnvironment::Dev).unwrap(),
+            "tenant-b"
+        );
     }
 }

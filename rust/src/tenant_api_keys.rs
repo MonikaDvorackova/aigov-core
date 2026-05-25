@@ -45,12 +45,7 @@ pub async fn resolve_ledger_tenant_for_bearer(
         return Ok(tid);
     }
 
-    match deployment_env {
-        GovaiEnvironment::Dev if !audit_api_key::api_key_tenant_map_is_initialized() => {
-            Ok("default".to_string())
-        }
-        _ => Err("unknown_api_key".to_string()),
-    }
+    Err("unknown_api_key".to_string())
 }
 
 async fn lookup_tenant_by_key_hash(

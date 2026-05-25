@@ -86,6 +86,28 @@ pub fn validate_ledger_dir(dir: &Path) -> Result<(), String> {
     Ok(())
 }
 
+/// Non-mutating readiness check for a tenant-scoped ledger path: parent directory exists and is
+/// writable; if the ledger file already exists, it must be readable (optional read-only open).
+pub fn check_tenant_ledger_readiness(ledger_stem: &str, tenant_id: &str) -> bool {
+    let path = crate::project::resolve_ledger_path(ledger_stem, tenant_id);
+    let file = Path::new(&path);
+    if let Some(parent) = file.parent() {
+        if !parent.as_os_str().is_empty() && parent != Path::new(".") {
+            if ensure_dir_exists(parent).is_err() || probe_writable(parent).is_err() {
+                return false;
+            }
+        }
+    } else if let Some(ref dir) = configured_ledger_dir() {
+        if validate_ledger_dir(dir).is_err() {
+            return false;
+        }
+    }
+    if file.exists() {
+        return std::fs::File::open(file).is_ok();
+    }
+    true
+}
+
 /// Startup validation:
 /// - **staging/prod**: `GOVAI_LEDGER_DIR` is required and must be a writable directory
 /// - **dev**: missing `GOVAI_LEDGER_DIR` is allowed but warns about ephemeral storage risk

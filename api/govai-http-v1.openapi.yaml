@@ -21,12 +21,15 @@ info:
     - **`internal`:** Operational / diagnostic only; **not** part of the externally supported contract. May change with less notice (still not redesigned in patch releases without cause).
     - **`deprecated`:** Still callable; scheduled for removal per **Deprecation policy** (none are deprecated today).
 
-    **Core stable surface (ledger + reads):** `GET /health`, `GET /status`, `POST /evidence`, `GET /usage`, `GET /verify`, `GET /verify-log`, `GET /bundle`, `GET /bundle-hash`, `GET /compliance-summary`, `GET /api/export/{run_id}`.
-    **Commercial metadata (stable):** `GET /pricing` (plans + usage units; no payments).
+    ## Runtime mount (`aigov_audit` binary)
 
-    **Enterprise stable surface (Supabase JWT + Postgres):** `GET /api/me`, `POST /api/assessments`, all `/api/compliance-workflow*` routes, **`/api/ai-decision-traces*`** (append-only AI flight recorder), and **`/api/functions/v2/*`** (GovAI Functions 2.0 decision intelligence read APIs) are **`stable`** as a single tier. Rationale: the published **`govai` CLI** uses `POST /api/assessments` (`create-assessment`); the same product installation documents `GET /api/me` and workflow routes for demos and dashboards. Per project rule, enterprise routes are **all stable** or **all internal** — because the CLI depends on assessments, the **entire enterprise group is stable**.
+    The open-source **`aigov_audit`** process mounts **only** the core ledger runtime below. Paths documented for GovAI Platform (hosted SaaS) are labeled **`x-govai-runtime-mount: platform-only`** — they are **not** served by the core binary in this repository.
 
-    **Internal only:** `GET /` (service banner), `GET /ready` (operational readiness + Phase 3 diagnostics), `GET /metrics` (Prometheus exposition for operators), and the preview namespace under `/v1/runtime/*`.
+    **Core runtime (mounted by `aigov_audit`):** `GET /health`, `GET /status`, `GET /ready`, `POST /evidence`, `GET /verify`, `GET /bundle`, `GET /bundle-hash`, `GET /compliance-summary`, `GET /api/export/{run_id}`.
+
+    **Platform-only (documented, not mounted on `aigov_audit`):** `GET /usage`, `GET /verify-log`, `GET /pricing`, `GET /metrics`, `GET /api/me`, `POST /api/assessments`, `/api/compliance-workflow*`, `/api/ai-decision-traces*`, `/api/functions/v2/*`, and `/v1/runtime/*`.
+
+    **Internal (core):** `GET /` (service banner). **`GET /ready`** performs non-mutating dependency checks (no ledger appends).
 
     ## Breaking vs non-breaking changes (v1)
 
@@ -60,7 +63,7 @@ info:
 
     - **Audit API keys (tenant isolation):** The ledger is isolated by **API key → tenant mapping**. Each request uses `Authorization: Bearer <secret>` to resolve the **ledger tenant**; all reads/writes are scoped to that tenant.
       - **Hosted / multi-tenant:** Configure `GOVAI_API_KEYS_JSON` to map API keys to tenant identifiers.
-      - **Dev / simple:** `GOVAI_API_KEYS` can be used as a single-tenant or local development shortcut.
+      - **Dev / simple:** When `GOVAI_API_KEYS` is unset, a single `"default"` ledger tenant may be used without a bearer token. When `GOVAI_API_KEYS` is set, **`GOVAI_API_KEYS_JSON` is required** (one tenant per key).
       - **Project label header:** `X-GovAI-Project` is **optional metadata only** (usage/billing attribution label) and **does not determine the tenant**.
     - **Supabase JWT:** `/api/me`, `/api/assessments`, `/api/compliance-workflow*` require `Authorization: Bearer <JWT>` and JWKS (`SUPABASE_URL`, optional `SUPABASE_JWT_AUD`). Optional `x-govai-team-id` for team scope.
 
@@ -73,6 +76,7 @@ tags:
   - name: CoreLedger
   - name: CoreBilling
   - name: Enterprise
+    description: GovAI Platform (hosted SaaS) — **not** mounted by the `aigov_audit` core binary (`x-govai-runtime-mount: platform-only`).
   - name: RuntimePreview
 
 paths:
@@ -97,6 +101,7 @@ paths:
       summary: Liveness
       operationId: getHealth
       x-govai-surface: stable
+      x-govai-runtime-mount: aigov_audit
       security: []
       responses:
         "200":
@@ -112,6 +117,7 @@ paths:
       summary: Prometheus metrics exposition
       operationId: getMetrics
       x-govai-surface: internal
+      x-govai-runtime-mount: platform-only
       description: |
         Prometheus text format (0.0.4). Intended for operator scrapers; does not include secrets or tenant-private payloads.
       security: []
@@ -129,10 +135,11 @@ paths:
       summary: Operational readiness (Postgres + migrations + ledger)
       operationId: getReady
       x-govai-surface: internal
+      x-govai-runtime-mount: aigov_audit
       description: |
-        Verifies database connectivity, applied SQLx migrations, writable ledger (`GOVAI_LEDGER_DIR` or dev cwd), and a tenant-scoped ledger append probe.
+        Non-mutating readiness probe for the core runtime. Verifies optional Postgres connectivity and applied SQLx migrations (when `DATABASE_URL` is set), ledger directory writability (`GOVAI_LEDGER_DIR`), and read-only tenant ledger path accessibility. **Does not append evidence** or grow hash chains.
 
-        Success responses include **`runtime_governance_enforcement`** diagnostics (Phase 3). These fields are **informational**: readiness HTTP **`200`** is **not** conditioned on **`enforceable`** — use them only for rollout / operator dashboards.
+        Success responses include **`runtime_governance_enforcement`** diagnostics. These fields are **informational** only.
       security: []
       responses:
         "200":
@@ -155,6 +162,7 @@ paths:
       summary: Policy version and deployment tier
       operationId: getStatus
       x-govai-surface: stable
+      x-govai-runtime-mount: aigov_audit
       security: []
       responses:
         "200":
@@ -169,7 +177,8 @@ paths:
       tags: [CoreMetadata]
       summary: Get pricing plans
       operationId: getPricing
-      x-govai-surface: stable
+      x-govai-surface: internal
+      x-govai-runtime-mount: platform-only
       security: []
       responses:
         "200":
@@ -185,6 +194,7 @@ paths:
       summary: Ingest one evidence event
       operationId: postEvidence
       x-govai-surface: stable
+      x-govai-runtime-mount: aigov_audit
       security:
         - bearerAuth: []
       requestBody:
@@ -242,7 +252,8 @@ paths:
       tags: [CoreLedger]
       summary: Usage and limits
       operationId: getUsage
-      x-govai-surface: stable
+      x-govai-surface: internal
+      x-govai-runtime-mount: platform-only
       security:
         - bearerAuth: []
       parameters:
@@ -477,6 +488,7 @@ paths:
       summary: Verify full append-only hash chain
       operationId: getVerify
       x-govai-surface: stable
+      x-govai-runtime-mount: aigov_audit
       security:
         - bearerAuth: []
       responses:
@@ -498,7 +510,8 @@ paths:
       tags: [CoreLedger]
       summary: Compact chain check (plaintext JSON body)
       operationId: getVerifyLog
-      x-govai-surface: stable
+      x-govai-surface: internal
+      x-govai-runtime-mount: platform-only
       security:
         - bearerAuth: []
       responses:
@@ -533,6 +546,7 @@ paths:
       summary: Bundle document for a run
       operationId: getBundle
       x-govai-surface: stable
+      x-govai-runtime-mount: aigov_audit
       security:
         - bearerAuth: []
       parameters:
@@ -557,6 +571,7 @@ paths:
       summary: Canonical bundle SHA-256
       operationId: getBundleHash
       x-govai-surface: stable
+      x-govai-runtime-mount: aigov_audit
       security:
         - bearerAuth: []
       parameters:
@@ -603,6 +618,7 @@ paths:
       summary: Compliance summary for a run
       operationId: getComplianceSummary
       x-govai-surface: stable
+      x-govai-runtime-mount: aigov_audit
       security:
         - bearerAuth: []
       parameters:
@@ -645,6 +661,7 @@ paths:
       summary: Machine-readable audit export
       operationId: getApiExportRunId
       x-govai-surface: stable
+      x-govai-runtime-mount: aigov_audit
       security:
         - bearerAuth: []
       parameters:
@@ -685,6 +702,7 @@ paths:
       summary: Current user and teams
       operationId: getApiMe
       x-govai-surface: stable
+      x-govai-runtime-mount: platform-only
       security:
         - supabaseJWT: []
       parameters:
@@ -1212,7 +1230,7 @@ components:
           type: object
           additionalProperties: false
           required:
-            [database_ping, migrations_complete, ledger_writable, tenant_ledger_probe]
+            [database_ping, migrations_complete, ledger_writable, ledger_tenant_readable]
           properties:
             database_ping:
               type: boolean
@@ -1220,8 +1238,9 @@ components:
               type: boolean
             ledger_writable:
               type: boolean
-            tenant_ledger_probe:
+            ledger_tenant_readable:
               type: boolean
+              description: Tenant ledger path is accessible read-only; no append probe is performed.
         runtime_governance_enforcement:
           $ref: "#/components/schemas/RuntimeGovernanceEnforcementDiag"
 

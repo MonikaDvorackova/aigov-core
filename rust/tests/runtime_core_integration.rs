@@ -380,4 +380,79 @@ async fn runtime_ingest_projection_verdict_export_suite() {
         assert_eq!(b["event_id"], e["event_id"]);
         assert_eq!(b["event_type"], e["event_type"]);
     }
+
+    // /ready must not append ledger records
+    let run_id = "ready-immutable-run";
+    ingest_all(&app, &[discovery_event(run_id, "ready-disc")], "tenant-a-key").await;
+    let log_path = aigov_audit::project::resolve_ledger_path("audit_log.jsonl", "tenant-a");
+    let len_before = std::fs::metadata(&log_path).map(|m| m.len()).unwrap_or(0);
+    let (_, hash_before) = send(
+        &app,
+        "GET",
+        &format!("/bundle-hash?run_id={run_id}"),
+        None,
+        "tenant-a-key",
+    )
+    .await;
+    for _ in 0..3 {
+        let (status, body) = send(&app, "GET", "/ready", None, "tenant-a-key").await;
+        assert_eq!(status, StatusCode::OK, "ready failed: {body:?}");
+        assert_eq!(body["ready"], true);
+        assert_eq!(body["checks"]["ledger_tenant_readable"], true);
+    }
+    let len_after = std::fs::metadata(&log_path).map(|m| m.len()).unwrap_or(0);
+    assert_eq!(len_before, len_after, "ready must not grow tenant ledger");
+    let probe_path = aigov_audit::project::resolve_ledger_path("audit_log.jsonl", "__ready_probe__");
+    assert!(
+        !std::path::Path::new(&probe_path).exists(),
+        "ready must not create legacy probe ledger"
+    );
+    let check_path =
+        aigov_audit::project::resolve_ledger_path("audit_log.jsonl", "__govai_ready_check__");
+    assert!(
+        !std::path::Path::new(&check_path).exists(),
+        "readiness check must not create tenant ledger file"
+    );
+    let (_, hash_after) = send(
+        &app,
+        "GET",
+        &format!("/bundle-hash?run_id={run_id}"),
+        None,
+        "tenant-a-key",
+    )
+    .await;
+    assert_eq!(
+        hash_before["events_content_sha256"], hash_after["events_content_sha256"],
+        "ready polling must not change events_content_sha256"
+    );
+    assert_eq!(
+        hash_before["bundle_sha256"], hash_after["bundle_sha256"],
+        "ready polling must not change bundle_sha256"
+    );
+
+    // unmapped API key is rejected (no default tenant collapse)
+    let (_, body) = send(
+        &app,
+        "GET",
+        &format!("/bundle?run_id={run_id}"),
+        None,
+        "tenant-b-key-not-in-map",
+    )
+    .await;
+    assert_eq!(body["error"]["code"], "INVALID_API_KEY");
+
+    // distinct keys map to distinct tenants (bundle isolation)
+    let run_a = "tenant-map-a";
+    let run_b = "tenant-map-b";
+    ingest_all(&app, &[discovery_event(run_a, "a-disc")], "tenant-a-key").await;
+    ingest_all(&app, &[discovery_event(run_b, "b-disc")], "tenant-b-key").await;
+    let (_, bundle_a_from_b) = send(
+        &app,
+        "GET",
+        &format!("/bundle?run_id={run_a}"),
+        None,
+        "tenant-b-key",
+    )
+    .await;
+    assert_eq!(bundle_a_from_b["ok"], false);
 }

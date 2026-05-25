@@ -108,6 +108,7 @@ mod tests {
         if crate::audit_api_key::api_key_tenant_map_is_initialized() {
             return;
         }
+        std::env::set_var("GOVAI_API_KEYS", "mysecret,othersecret");
         std::env::set_var(
             "GOVAI_API_KEYS_JSON",
             r#"{ "mysecret": "team_1", "othersecret": "team_2" }"#,
@@ -116,16 +117,14 @@ mod tests {
         let _ = crate::audit_api_key::init_api_key_tenant_map(GovaiEnvironment::Prod);
     }
 
-    /// Bearer token + ledger tenant expected in `GOVAI_API_KEYS_JSON` (works when another test module initialized the map first).
-    fn test_api_key_and_ledger_tenant() -> (&'static str, &'static str) {
-        if crate::audit_api_key::env_tenant_map_contains_token("mysecret") {
-            return ("mysecret", "team_1");
-        }
-        if crate::audit_api_key::env_tenant_map_contains_token("test-api-key") {
-            return ("test-api-key", "team-alpha");
+    /// Bearer token + ledger tenant from the initialized env map (another test may have set it first).
+    fn test_api_key_and_ledger_tenant() -> (String, String) {
+        if let Some(pair) = crate::audit_api_key::any_env_tenant_mapping() {
+            return pair;
         }
         ensure_test_key_map();
-        ("mysecret", "team_1")
+        crate::audit_api_key::any_env_tenant_mapping()
+            .unwrap_or_else(|| ("mysecret".to_string(), "team_1".to_string()))
     }
 
     #[test]

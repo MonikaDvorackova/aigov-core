@@ -227,6 +227,7 @@ fn export_timestamps(events: &[EvidenceEvent]) -> Value {
 mod tests {
     use super::*;
     use crate::audit_store::append_record_atomic_with_run_count;
+    use serde_json::Value;
     use crate::schema::EvidenceEvent;
     use tempfile::TempDir;
 
@@ -277,5 +278,32 @@ mod tests {
         let hashes = doc.get("evidence_hashes").expect("hashes");
         assert!(hashes.get("bundle_sha256").is_some());
         assert!(hashes.get("events_content_sha256").is_some());
+    }
+
+    #[test]
+    fn audit_export_document_validates_against_v1_json_schema() {
+        let schema_path = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+            .join("../docs/schemas/aigov.audit_export.v1.schema.json");
+        let schema_text =
+            std::fs::read_to_string(&schema_path).expect("audit export schema file");
+        let schema_val: Value = serde_json::from_str(&schema_text).expect("schema json");
+        let validator = jsonschema::validator_for(&schema_val).expect("schema compiles");
+
+        let tmp = TempDir::new().unwrap();
+        std::env::set_var("GOVAI_LEDGER_DIR", tmp.path());
+        let run_id = "schema-run-1";
+        let log_path = write_minimal_valid_run(tmp.path(), "tenant-schema", run_id);
+        let doc = build_audit_export_v1(
+            run_id,
+            "tenant-schema",
+            &log_path,
+            "test-policy",
+            GovaiEnvironment::Dev,
+            &PolicyConfig::default(),
+        )
+        .expect("export");
+        if let Err(e) = validator.validate(&doc) {
+            panic!("audit export must match aigov.audit_export.v1 schema: {e}");
+        }
     }
 }

@@ -2,7 +2,8 @@
 # MANUAL OPERATOR SMOKE — NOT GovAI Core CI
 #
 # Requires repository Variable GOVAI_AUDIT_BASE_URL + Secret GOVAI_API_KEY pointing at
-# an **operator-run** audit HTTP endpoint (GovAI Platform hosted SaaS or customer self-host).
+# an **operator-run** audit HTTP endpoint (self-hosted aigov_audit or external operator environment).
+# GovAI Platform hosted SaaS is optional and not part of GovAI Core CI.
 #
 # GovAI Core CI does NOT start localhost:8088, poll GET /ready, or run this workflow automatically.
 # Portable Core validation: `.github/workflows/govai-ci.yml` and `compliance.yml` → `evidence_pack`.

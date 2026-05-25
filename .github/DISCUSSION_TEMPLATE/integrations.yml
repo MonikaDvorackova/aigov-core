@@ -1,0 +1,31 @@
+title: Integrations
+labels:
+  - integrations
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Discuss integrating GovAI Core into applications (OpenAI-style flows, FastAPI middleware, tool-call evidence, CI gates).
+
+        Guide: [docs/reference-integrations.md](../../docs/reference-integrations.md)
+
+        **Tenant isolation:** configure `GOVAI_API_KEYS` and `GOVAI_API_KEYS_JSON` on the server. `X-GovAI-Project` is metadata only.
+  - type: dropdown
+    id: integration_area
+    attributes:
+      label: Integration area
+      options:
+        - aigov_audit HTTP runtime
+        - Python SDK (aigov_py.runtime)
+        - GitHub Actions / CI gate
+        - Reference examples
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: body
+    attributes:
+      label: Details
+      description: Describe your stack, mounted routes used, and what you observed (redact API keys).
+    validations:
+      required: true

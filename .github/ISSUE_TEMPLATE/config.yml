@@ -1,11 +1,11 @@
 blank_issues_enabled: true
 contact_links:
   - name: Security vulnerability report
-    url: https://github.com/MonikaDvorackova/aigov-compliance-engine/security/advisories/new
+    url: https://github.com/MonikaDvorackova/govai-core/security/advisories/new
     about: >
-      Report security issues privately via GitHub Security Advisories (or follow SECURITY.md).
+      Report security issues privately via GitHub Security Advisories (see SECURITY.md).
       Do not file public issues for undisclosed vulnerabilities.
   - name: Contributor funnel & community operations
-    url: https://github.com/MonikaDvorackova/aigov-compliance-engine/blob/main/docs/community/contributor-funnel.md
+    url: https://github.com/MonikaDvorackova/govai-core/blob/staging/docs/community/contributor-funnel.md
     about: >
       First-visit to first-merge path, triage expectations, and maintainer cadence (see docs/community/).

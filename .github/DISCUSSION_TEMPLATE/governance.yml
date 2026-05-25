@@ -1,0 +1,18 @@
+title: Governance & standards
+labels:
+  - governance
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Discuss portable governance standards, policy packs, evidence interchange, or contributor governance — without weakening core runtime invariants.
+
+        Evaluation and human-approval evidence are **ledger-authoritative** and feed deterministic `GET /compliance-summary` verdicts.
+
+        For formal policy changes, prefer a [Governance RFC issue](../../issues/new?template=governance_rfc.md).
+  - type: textarea
+    id: body
+    attributes:
+      label: Topic
+    validations:
+      required: true

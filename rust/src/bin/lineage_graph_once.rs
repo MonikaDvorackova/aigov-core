@@ -10,8 +10,8 @@ fn main() {
     let mermaid = args.iter().any(|a| a == "--mermaid");
     let path = args
         .iter()
+        .skip(1)
         .find(|a| !a.starts_with('-'))
-        .filter(|a| *a != &args[0])
         .cloned()
         .unwrap_or_else(|| {
             eprintln!("usage: lineage_graph_once [--mermaid] <export.json>");

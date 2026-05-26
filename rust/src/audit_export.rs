@@ -6,6 +6,7 @@ use crate::bundle::{
 use crate::compliance_summary::derive_verdict_from_state;
 use crate::govai_environment::GovaiEnvironment;
 use crate::policy_config::PolicyConfig;
+use crate::governance_graph::{build_governance_graph, lineage_block_from_graph};
 use crate::projection::derive_current_state_from_events_with_context;
 use crate::schema::EvidenceEvent;
 use serde_json::{json, Value};
@@ -56,6 +57,8 @@ pub fn build_audit_export_v1(
 
     let identifiers = serde_json::to_value(&state.identifiers).unwrap_or(json!({}));
     let requirements = export_requirements(&state);
+    let graph_doc = build_governance_graph(run_id, &events);
+    let lineage = lineage_block_from_graph(&graph_doc);
 
     Ok(json!({
         "ok": true,
@@ -93,6 +96,7 @@ pub fn build_audit_export_v1(
         "evidence_requirements": requirements,
         "evidence_events": events,
         "timestamps": timestamps,
+        "lineage": lineage,
     }))
 }
 
@@ -247,6 +251,12 @@ mod tests {
                 run_id: run_id.to_string(),
                 environment: None,
                 payload: json!({"openai": false, "transformers": false, "model_artifacts": false}),
+                parent_run_id: None,
+                root_run_id: None,
+                delegated_from_event_id: None,
+                agent_id: None,
+                agent_role: None,
+                delegation_reason: None,
             },
         ];
         for e in events {

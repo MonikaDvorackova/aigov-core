@@ -1,6 +1,7 @@
 //! Validation of audit export inputs before governance replay.
 
 use crate::bundle::{canonicalize_evidence_events, portable_evidence_digest_v1};
+use crate::lineage_validation::validate_lineage_for_run;
 use crate::schema::EvidenceEvent;
 use serde::Serialize;
 use serde_json::Value;
@@ -366,6 +367,37 @@ pub fn run_export_validations(export: &Value) -> (ReplayValidationReport, Vec<Ev
         validate_chain_continuity(export, &mut report);
         validate_events_content_sha256(&run_id, &events, export, &mut report);
         validate_lifecycle_transitions(&events, &mut report);
+        let mut known_runs: HashSet<String> = HashSet::new();
+        known_runs.insert(run_id.clone());
+        for ev in &events {
+            known_runs.insert(ev.run_id.clone());
+            let lin = ev.lineage();
+            if let Some(p) = lin.parent_run_id {
+                known_runs.insert(p);
+            }
+            if let Some(r) = lin.root_run_id {
+                known_runs.insert(r);
+            }
+            if ev.event_type == "agent_delegated" {
+                if let Some(c) = ev
+                    .payload
+                    .get("child_run_id")
+                    .and_then(|v| v.as_str())
+                {
+                    known_runs.insert(c.to_string());
+                }
+            }
+        }
+        let lineage_report = validate_lineage_for_run(&run_id, &events, &known_runs);
+        if lineage_report.delegation_cycle_detected {
+            report.push_error("lineage_delegation_cycle", "delegation cycle in run lineage");
+        }
+        for err in &lineage_report.errors {
+            report.push_error(format!("lineage_{}", err.code), err.message.clone());
+        }
+        for warn in &lineage_report.warnings {
+            report.push_warning(format!("lineage_{}", warn.code), warn.message.clone());
+        }
     }
     (report, events)
 }

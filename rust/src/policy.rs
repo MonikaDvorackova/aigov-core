@@ -971,6 +971,12 @@ mod allowlist_tests {
             run_id: "run".into(),
             environment: Some("dev".into()),
             payload: human_payload(approver),
+            parent_run_id: None,
+            root_run_id: None,
+            delegated_from_event_id: None,
+            agent_id: None,
+            agent_role: None,
+            delegation_reason: None,
         }
     }
 
@@ -1059,6 +1065,12 @@ mod gate_tests {
                 "dataset_id": "d1",
                 "model_version_id": "mv1",
             }),
+            parent_run_id: None,
+            root_run_id: None,
+            delegated_from_event_id: None,
+            agent_id: None,
+            agent_role: None,
+            delegation_reason: None,
         }
     }
 
@@ -1106,6 +1118,12 @@ mod gate_tests {
                 "dataset_id": "d1",
                 "model_version_id": "mv1",
             }),
+            parent_run_id: None,
+            root_run_id: None,
+            delegated_from_event_id: None,
+            agent_id: None,
+            agent_role: None,
+            delegation_reason: None,
         }
     }
 
@@ -1144,6 +1162,12 @@ mod gate_tests {
                 "dataset_id": "d1",
                 "model_version_id": "mv1",
             }),
+            parent_run_id: None,
+            root_run_id: None,
+            delegated_from_event_id: None,
+            agent_id: None,
+            agent_role: None,
+            delegation_reason: None,
         }
     }
 
@@ -1236,6 +1260,12 @@ mod gate_tests {
                 "threshold": 0.8,
                 "passed": true,
             }),
+            parent_run_id: None,
+            root_run_id: None,
+            delegated_from_event_id: None,
+            agent_id: None,
+            agent_role: None,
+            delegation_reason: None,
         };
         let dir = tempfile::TempDir::new().unwrap();
         let log = dir.path().join("log.jsonl");

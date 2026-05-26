@@ -15,7 +15,7 @@ AIGOV_MODE ?= ci
 	bundle verify_cli evidence_pack \
 	emit_event \
 	flow flow_full \
-	pr_prepare gate core-runtime-examples-check reference-integrations-check reconstructible-demo-check runtime-packaging-check \
+	pr_prepare gate core-runtime-examples-check reference-integrations-check reconstructible-demo-check runtime-packaging-check runtime-observability-check \
 	runtime-sdk-check developer-integrations-platform-check \
 	audit_close \
 	demo demo_new \
@@ -110,6 +110,9 @@ reconstructible-demo-check:
 
 runtime-packaging-check:
 	@python3 scripts/check_runtime_packaging.py
+
+runtime-observability-check:
+	@python3 scripts/check_runtime_observability.py
 
 # Registered interchange conformance checks.
 standards-conformance:

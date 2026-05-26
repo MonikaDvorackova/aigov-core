@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: govai-core
+  namespace: govai-core
+  labels:
+    app.kubernetes.io/name: govai-core
+data:
+  AIGOV_BIND: "0.0.0.0:8088"
+  AIGOV_ENVIRONMENT: "prod"
+  AIGOV_POLICY_DIR: "/app/policies"
+  GOVAI_LEDGER_DIR: "/var/lib/govai/ledger"
+  GOVAI_AUTO_MIGRATE: "false"
+  # DATABASE_URL and API key material belong in Secret (see secret.example.yaml).

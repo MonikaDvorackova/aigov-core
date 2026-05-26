@@ -1,0 +1,58 @@
+# GovAI Core operator stack (ledger runtime + Postgres for optional SQL migrations).
+# Self-hosted infrastructure only (not a commercial platform bundle).
+#
+# Usage (from this directory):
+#   docker compose up --build -d
+#   curl -sS http://127.0.0.1:8088/health
+#
+# Replace API key material before production use.
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: govai
+      POSTGRES_USER: govai
+      POSTGRES_PASSWORD: govai-change-me
+    volumes:
+      - govai-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U govai -d govai"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 20s
+
+  govai-core:
+    build:
+      context: ../..
+      dockerfile: Dockerfile
+    image: govai-core:local
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "8088:8088"
+    environment:
+      AIGOV_BIND: "0.0.0.0:8088"
+      AIGOV_ENVIRONMENT: "staging"
+      AIGOV_POLICY_DIR: "/app/policies"
+      GOVAI_LEDGER_DIR: "/var/lib/govai/ledger"
+      GOVAI_AUTO_MIGRATE: "true"
+      DATABASE_URL: "postgres://govai:govai-change-me@postgres:5432/govai"
+      GOVAI_API_KEYS: "operator-dev-key"
+      GOVAI_API_KEYS_JSON: '{"operator-dev-key":"operator-tenant-1"}'
+    volumes:
+      - govai-ledger-data:/var/lib/govai/ledger
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:8088/health >/dev/null"]
+      interval: 15s
+      timeout: 5s
+      retries: 6
+      start_period: 30s
+
+volumes:
+  govai-postgres-data:
+  govai-ledger-data:

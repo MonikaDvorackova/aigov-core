@@ -78,11 +78,24 @@ Operators are expected to:
 - Maintain policy bundles and environment separation (`AIGOV_ENVIRONMENT`).
 - Investigate INVALID/BLOCKED verdicts using exports and replay tooling.
 
+## Lineage and delegation threats
+
+| Threat | Impact | Mitigations (today) |
+|--------|--------|---------------------|
+| Forged delegation | False narrative of who delegated to whom | Signed exports; `agent_delegated` with `agent_id`; graph validation on replay |
+| Orphaned lineage | Child run without parent evidence | `lineage-graph` orphan detection; warnings on export |
+| Hidden sub-agents | Undisclosed workers bypassing approval | Require `parent_run_id` / `root_run_id`; cross-run export review |
+| Replay desynchronization | Export verdict differs from replayed projection | `govai replay-audit-export`; hash chain verify |
+| Lineage tampering | Edited `parent_run_id` without ledger change | Append-only ledger; chain integrity; signed export digests |
+| Cyclic governance flows | Circular delegation obscures accountability | `lineage_validation` cycle detection; invalid graph status |
+
+Core does **not** prove that `agent_id` maps to a real organizational principal without operator identity integrations.
+
 ## Explicit non-guarantees
 
 - Protection against malicious insiders with root on the ledger host.
 - Automated fraud detection on evidence payload content.
 - Legal admissibility or regulatory certification by deploying Core alone.
-- Multi-tenant cryptographic isolation beyond API key → tenant mapping.
+- Strong tenant isolation beyond API key → tenant mapping (no per-tenant crypto boundaries).
 
 See [runtime-operations.md](./runtime-operations.md) for operational guarantees and gaps.

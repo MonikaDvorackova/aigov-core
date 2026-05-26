@@ -269,6 +269,12 @@ async fn get_ready(State(st): State<AppState>) -> impl IntoResponse {
                 "model_artifacts": false,
                 "status": "probe",
             }),
+            parent_run_id: None,
+            root_run_id: None,
+            delegated_from_event_id: None,
+            agent_id: None,
+            agent_role: None,
+            delegation_reason: None,
         };
         tenant_ledger_probe = append_record_atomic_with_run_count(&probe_path, probe).is_ok();
     }

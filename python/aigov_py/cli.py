@@ -1750,6 +1750,22 @@ def build_parser() -> GovaiArgumentParser:
         help="Emit full ReplayResult JSON (default: human-readable summary).",
     )
 
+    s_lineage_graph = sub.add_parser(
+        "lineage-graph",
+        help="Build governance lineage graph from aigov.audit_export.v1 JSON.",
+    )
+    s_lineage_graph.add_argument("--path", required=True, help="Audit export JSON path.")
+    s_lineage_graph.add_argument(
+        "--json",
+        action="store_true",
+        help="Emit full graph document JSON (default: human-readable summary).",
+    )
+    s_lineage_graph.add_argument(
+        "--mermaid",
+        action="store_true",
+        help="Emit deterministic Mermaid flowchart (stdout).",
+    )
+
     s_usage = sub.add_parser("usage", help="GET /usage (machine-readable JSON).")
     s_usage.add_argument(
         "--project",
@@ -2993,6 +3009,30 @@ def main(argv: Sequence[str] | None = None) -> int:
         else:
             print(format_replay_report(result))
         return cli_exit.EX_OK if result.get("ok") else cli_exit.EX_ERR
+
+    if args.cmd == "lineage-graph":
+        from aigov_py.lineage_graph import format_lineage_summary, lineage_graph_from_export
+
+        raw = str(getattr(args, "path", "") or "").strip()
+        try:
+            if getattr(args, "mermaid", False):
+                out = lineage_graph_from_export(raw, mermaid=True)
+                print(out if isinstance(out, str) else str(out))
+                return cli_exit.EX_OK
+            doc = lineage_graph_from_export(raw)
+        except Exception as e:  # noqa: BLE001
+            print(f"error: lineage-graph failed: {e}", file=sys.stderr)
+            return cli_exit.EX_ERR
+        if getattr(args, "json", False):
+            print(json.dumps(doc, indent=2, ensure_ascii=False))
+        else:
+            print(format_lineage_summary(doc))
+        graph = doc.get("graph") if isinstance(doc, dict) else {}
+        validation = (
+            graph.get("lineage_validation") if isinstance(graph, dict) else {}
+        ) or {}
+        ok = not validation.get("errors") and not validation.get("delegation_cycle_detected")
+        return cli_exit.EX_OK if ok else cli_exit.EX_ERR
 
     if args.cmd == "usage":
         try:

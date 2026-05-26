@@ -11,3 +11,7 @@ dist/
 *.pid
 audit_log*.jsonl
 audit_log*.bak.*
+
+# Python cache
+__pycache__/
+*.pyc

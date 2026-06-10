@@ -21,10 +21,11 @@ use crate::ledger_storage;
 use crate::ledger_view::FileLedgerView;
 use crate::metering;
 use crate::ops_log;
-use crate::policy_config::{self, PolicyConfig};
+use crate::policy_config::{self, PolicyConfig, PolicySource};
 use crate::policy_store::PolicyStore;
 use crate::projection::derive_current_state_from_events_with_context;
 use crate::project;
+use crate::runtime_diagnostics::{self, ProcessStartedAt};
 use crate::runtime_metrics;
 use crate::schema::EvidenceEvent;
 use axum::extract::{Path, Query, State};
@@ -45,47 +46,17 @@ pub struct AppState {
     pub deployment_env: GovaiEnvironment,
     pub policy_store: Arc<PolicyStore>,
     pub legacy_policy: PolicyConfig,
+    pub policy_source: PolicySource,
     pub pool: DbPool,
     pub usage: ApiUsageState,
     pub api_key_cfg: AuditApiKeyConfig,
     pub base_url: Option<String>,
+    pub started_at: ProcessStartedAt,
 }
 
 #[derive(Debug, Deserialize)]
 struct RunIdQuery {
     run_id: String,
-}
-
-fn runtime_governance_enforcement_diag() -> Value {
-    let raw = std::env::var("GOVAI_RUNTIME_GOVERNANCE_ENFORCEMENT")
-        .unwrap_or_default()
-        .trim()
-        .to_ascii_lowercase();
-    let configured = match raw.as_str() {
-        "shadow" => "shadow",
-        "enforced" => "enforced",
-        _ => "off",
-    };
-    let tenants_raw = std::env::var("GOVAI_RUNTIME_GOVERNANCE_ENFORCEMENT_TENANTS").unwrap_or_default();
-    let tenant_allowlist_configured = tenants_raw
-        .split(',')
-        .map(|s| s.trim())
-        .any(|s| !s.is_empty());
-    let enforceable = configured == "enforced" && tenant_allowlist_configured;
-    let reason_if_not_enforceable = if enforceable {
-        Value::Null
-    } else if configured != "enforced" {
-        Value::String("configured_mode is not enforced".to_string())
-    } else {
-        Value::String("tenant allowlist empty".to_string())
-    };
-    json!({
-        "mode": configured,
-        "configured_mode": configured,
-        "tenant_allowlist_configured": tenant_allowlist_configured,
-        "enforceable": enforceable,
-        "reason_if_not_enforceable": reason_if_not_enforceable,
-    })
 }
 
 async fn pool_from_env() -> Result<DbPool, String> {
@@ -113,10 +84,10 @@ async fn pool_from_env() -> Result<DbPool, String> {
 
 pub async fn build_app_state() -> Result<AppState, String> {
     let deployment_env = govai_environment::resolve_from_env()?;
-    let legacy = policy_config::load_for_deployment(deployment_env)?;
+    let resolved = policy_config::load_for_deployment(deployment_env)?;
     let policy_store = Arc::new(PolicyStore::load_for_deployment(
         deployment_env,
-        legacy.clone(),
+        resolved.clone(),
     )?);
     let _ = ledger_storage::validate_startup(deployment_env)?;
     crate::audit_api_key::init_api_key_tenant_map(deployment_env)?;
@@ -131,11 +102,13 @@ pub async fn build_app_state() -> Result<AppState, String> {
     Ok(AppState {
         deployment_env,
         policy_store,
-        legacy_policy: legacy.config,
+        legacy_policy: resolved.config,
+        policy_source: resolved.source,
         pool,
         usage,
         api_key_cfg,
         base_url,
+        started_at: ProcessStartedAt::now(),
     })
 }
 
@@ -220,38 +193,28 @@ async fn get_health() -> Json<Value> {
 }
 
 async fn get_status(State(st): State<AppState>) -> Json<Value> {
-    let mut body = json!({
-        "ok": true,
-        "policy_version": govai_environment::policy_version_for(st.deployment_env),
-        "environment": st.deployment_env.as_str(),
-        "runtime_governance_enforcement": runtime_governance_enforcement_diag(),
-    });
-    if let Some(ref u) = st.base_url {
-        body["base_url"] = json!(u);
-    }
+    let body = runtime_diagnostics::build_status_body(&st, st.started_at, &st.policy_source).await;
     Json(body)
 }
 
 async fn get_ready(State(st): State<AppState>) -> impl IntoResponse {
-    let db_configured = db::postgres_url_configured_nonempty().is_ok();
-    let mut database_ping = !db_configured;
-    let mut migrations_complete = !db_configured;
-    if db_configured {
-        database_ping = sqlx::query_scalar::<_, i32>("select 1")
-            .fetch_one(&st.pool)
-            .await
-            .is_ok();
-        if database_ping {
-            migrations_complete = db::verify_sqlx_migrations_complete(&st.pool)
-                .await
-                .is_ok();
-        }
-    }
-
-    let ledger_writable = ledger_storage::validate_startup(st.deployment_env)
-        .map(|_| true)
+    let checks = runtime_diagnostics::readiness_components(&st, true).await;
+    let database_ping = checks
+        .get("database_ping")
+        .and_then(|v| v.as_bool())
         .unwrap_or(false);
-
+    let migrations_complete = checks
+        .get("migrations_complete")
+        .and_then(|v| v.as_bool())
+        .unwrap_or(false);
+    let ledger_writable = checks
+        .get("ledger_writable")
+        .and_then(|v| v.as_bool())
+        .unwrap_or(false);
+    let tenant_ledger_probe = checks
+        .get("tenant_ledger_probe")
+        .and_then(|v| v.as_bool())
+        .unwrap_or(false);
     let mut tenant_ledger_probe = false;
     if ledger_writable {
         let probe_path = project::resolve_ledger_path(LEDGER_STEM, "__ready_probe__");
@@ -294,7 +257,7 @@ async fn get_ready(State(st): State<AppState>) -> impl IntoResponse {
                 "ok": true,
                 "ready": true,
                 "checks": checks,
-                "runtime_governance_enforcement": runtime_governance_enforcement_diag(),
+                "runtime_governance_enforcement": runtime_diagnostics::runtime_governance_enforcement_diag(),
             })),
         )
             .into_response();

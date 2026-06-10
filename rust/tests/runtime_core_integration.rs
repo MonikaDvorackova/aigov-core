@@ -236,6 +236,18 @@ async fn runtime_ingest_projection_verdict_export_suite() {
     let resp = app.clone().oneshot(req).await.unwrap();
     assert_eq!(resp.status(), StatusCode::OK);
 
+    let req = Request::builder()
+        .uri("/status")
+        .body(Body::empty())
+        .unwrap();
+    let resp = app.clone().oneshot(req).await.unwrap();
+    assert_eq!(resp.status(), StatusCode::OK);
+    let body = body_json(resp).await;
+    assert_eq!(body["ok"], true);
+    assert!(body.get("runtime_version").is_some());
+    assert!(body.get("configuration").is_some());
+    assert!(body.get("readiness_components").is_some());
+
     // duplicate event rejection
     let run_id = "dup-run";
     let ev = discovery_event(run_id, "dup-event-1");

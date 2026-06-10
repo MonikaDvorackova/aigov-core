@@ -1534,6 +1534,18 @@ def build_parser() -> GovaiArgumentParser:
         help="Also submit a fresh evidence pack to the audit service and verify /bundle-hash digest (requires GOVAI_API_KEY).",
     )
 
+    s_runtime_diag = sub.add_parser(
+        "runtime-diagnostics",
+        help="Probe /health, /ready, and /status for operator diagnostics (read-only).",
+    )
+    s_runtime_diag.add_argument(
+        "--base-url",
+        default=None,
+        help="Audit service origin (default: GOVAI_AUDIT_BASE_URL or http://127.0.0.1:8088).",
+    )
+    s_runtime_diag.add_argument("--timeout", type=float, default=10.0, help="HTTP timeout seconds.")
+    s_runtime_diag.add_argument("--json", action="store_true", help="Machine-readable report on stdout.")
+
     s_verify = sub.add_parser("verify", help="Verify local docs/* artifacts and governance hash chain.")
     s_verify.add_argument("--run-id", default=None, help="Run UUID (fallback: env GOVAI_RUN_ID or RUN_ID).")
     s_verify.add_argument("--json", action="store_true", help="Machine-readable output on stdout.")
@@ -2273,6 +2285,23 @@ def main(argv: Sequence[str] | None = None) -> int:
     api_key = _api_key(args)
     project = _resolve_project(args)
     repro = _format_repro_command(args_list)
+
+    if args.cmd == "runtime-diagnostics":
+        from aigov_py.runtime_diagnostics import run_runtime_diagnostics
+
+        base = (
+            getattr(args, "base_url", None)
+            or os.environ.get("GOVAI_AUDIT_BASE_URL")
+            or "http://127.0.0.1:8088"
+        ).strip()
+        if not base:
+            print("error: --base-url or GOVAI_AUDIT_BASE_URL required", file=sys.stderr)
+            return cli_exit.EX_USAGE
+        return run_runtime_diagnostics(
+            base,
+            timeout_sec=float(getattr(args, "timeout", 10.0)),
+            json_out=bool(getattr(args, "json", False)),
+        )
 
     if args.cmd == "preflight":
         local_only = bool(getattr(args, "local_only", False))

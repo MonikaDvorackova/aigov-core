@@ -38,6 +38,8 @@ pub mod project;
 pub mod rate_limit;
 pub mod rbac;
 pub mod runtime_metrics;
+pub mod runtime_diagnostics;
+pub mod trace_context;
 
 pub mod api_usage;
 pub mod tenant_api_keys;

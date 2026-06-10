@@ -77,6 +77,11 @@ jobs:
           set -euo pipefail
           make runtime-packaging-check
 
+      - name: Runtime observability contract
+        run: |
+          set -euo pipefail
+          make runtime-observability-check
+
       - name: Lineage governance graph contract
         run: |
           set -euo pipefail

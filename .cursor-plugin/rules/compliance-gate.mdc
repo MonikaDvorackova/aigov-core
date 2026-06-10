@@ -1,10 +1,10 @@
 ---
-description: Local compliance gate commands for GovAI repository work.
+description: Local compliance gate commands for AIGov repository work.
 globs: []
 alwaysApply: true
 ---
 
-# Compliance gate (GovAI)
+# Compliance gate (AIGov)
 
 Before treating a change as merge-ready, the agent **must run or explicitly recommend** the following commands from the repository root (in order):
 

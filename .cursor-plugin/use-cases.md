@@ -1,6 +1,6 @@
-# GovAI Cursor plugin — use cases
+# AIGov Cursor plugin — use cases
 
-How different roles use the GovAI Cursor plugin together with the open source engine and optional hosted services. Capabilities depend on your deployment; this document describes **typical** patterns.
+How different roles use the AIGov Cursor plugin together with the open source engine and optional hosted services. Capabilities depend on your deployment; this document describes **typical** patterns.
 
 ## AI startup CTO
 
@@ -44,7 +44,7 @@ How different roles use the GovAI Cursor plugin together with the open source en
 
 **Plugin usage:**
 
-- OSS plugin for **developer IDE consistency** on top of a **private** or **hosted** GovAI backend (per contract).
+- OSS plugin for **developer IDE consistency** on top of a **private** or **hosted** AIGov backend (per contract).
 - Enterprise features (SSO, RBAC, retention) apply to the **service** and organisation controls; see [../docs/commercial/enterprise-features.md](../docs/commercial/enterprise-features.md).
 
 **Outcomes:** Developers get the same Cursor-native experience while central IT maintains authoritative enforcement and identity.

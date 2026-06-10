@@ -222,19 +222,12 @@ pub async fn readiness_components(st: &AppState, include_ledger_probe: bool) -> 
                 "model_artifacts": false,
                 "status": "probe",
             }),
-            payload: json!({
-                "openai": false,
-                "transformers": false,
-                "model_artifacts": false,
-                "status": "probe",
-            }),
             parent_run_id: None,
             root_run_id: None,
             delegated_from_event_id: None,
             agent_id: None,
             agent_role: None,
             delegation_reason: None,
-        };
         };
         let ok =
             crate::audit_store::append_record_atomic_with_run_count(&probe_path, probe).is_ok();

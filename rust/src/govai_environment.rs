@@ -215,6 +215,12 @@ mod tests {
             run_id: "r1".into(),
             environment: None,
             payload: serde_json::json!({}),
+            parent_run_id: None,
+            root_run_id: None,
+            delegated_from_event_id: None,
+            agent_id: None,
+            agent_role: None,
+            delegation_reason: None,
         };
         stamp_event_environment_for_ingest(&mut ev, GovaiEnvironment::Dev, &[]).unwrap();
         assert_eq!(ev.environment.as_deref(), Some("dev"));
@@ -231,6 +237,12 @@ mod tests {
             run_id: "r1".into(),
             environment: Some("prod".into()),
             payload: serde_json::json!({}),
+            parent_run_id: None,
+            root_run_id: None,
+            delegated_from_event_id: None,
+            agent_id: None,
+            agent_role: None,
+            delegation_reason: None,
         };
         let err =
             stamp_event_environment_for_ingest(&mut ev, GovaiEnvironment::Dev, &[]).unwrap_err();
@@ -248,6 +260,12 @@ mod tests {
             run_id: "r1".into(),
             environment: Some("staging".into()),
             payload: serde_json::json!({}),
+            parent_run_id: None,
+            root_run_id: None,
+            delegated_from_event_id: None,
+            agent_id: None,
+            agent_role: None,
+            delegation_reason: None,
         }];
         let mut ev = EvidenceEvent {
             event_id: "e1".into(),
@@ -258,6 +276,12 @@ mod tests {
             run_id: "r1".into(),
             environment: None,
             payload: serde_json::json!({}),
+            parent_run_id: None,
+            root_run_id: None,
+            delegated_from_event_id: None,
+            agent_id: None,
+            agent_role: None,
+            delegation_reason: None,
         };
         let err = stamp_event_environment_for_ingest(&mut ev, GovaiEnvironment::Dev, &existing)
             .unwrap_err();
@@ -275,6 +299,12 @@ mod tests {
             run_id: "r1".into(),
             environment: None,
             payload: serde_json::json!({}),
+            parent_run_id: None,
+            root_run_id: None,
+            delegated_from_event_id: None,
+            agent_id: None,
+            agent_role: None,
+            delegation_reason: None,
         };
         assert_eq!(ledger_environment_consensus(&[ev]).unwrap(), None);
     }
@@ -290,6 +320,12 @@ mod tests {
             run_id: "r1".into(),
             environment: Some("dev".into()),
             payload: serde_json::json!({}),
+            parent_run_id: None,
+            root_run_id: None,
+            delegated_from_event_id: None,
+            agent_id: None,
+            agent_role: None,
+            delegation_reason: None,
         };
         let b = EvidenceEvent {
             event_id: "e2".into(),
@@ -300,6 +336,12 @@ mod tests {
             run_id: "r1".into(),
             environment: Some("prod".into()),
             payload: serde_json::json!({}),
+            parent_run_id: None,
+            root_run_id: None,
+            delegated_from_event_id: None,
+            agent_id: None,
+            agent_role: None,
+            delegation_reason: None,
         };
         assert!(ledger_environment_consensus(&[a, b]).is_err());
     }

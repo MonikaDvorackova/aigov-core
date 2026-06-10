@@ -215,6 +215,39 @@ async fn get_ready(State(st): State<AppState>) -> impl IntoResponse {
         .get("tenant_ledger_probe")
         .and_then(|v| v.as_bool())
         .unwrap_or(false);
+    let mut tenant_ledger_probe = false;
+    if ledger_writable {
+        let probe_path = project::resolve_ledger_path(LEDGER_STEM, "__ready_probe__");
+        let probe = EvidenceEvent {
+            event_id: format!("ready-probe-{}", uuid::Uuid::new_v4()),
+            event_type: "ai_discovery_reported".to_string(),
+            ts_utc: chrono::Utc::now().to_rfc3339_opts(chrono::SecondsFormat::Secs, true),
+            actor: "ready_probe".to_string(),
+            system: "govai".to_string(),
+            run_id: format!("ready-probe-{}", uuid::Uuid::new_v4()),
+            environment: Some(st.deployment_env.as_str().to_string()),
+            payload: json!({
+                "openai": false,
+                "transformers": false,
+                "model_artifacts": false,
+                "status": "probe",
+            }),
+            parent_run_id: None,
+            root_run_id: None,
+            delegated_from_event_id: None,
+            agent_id: None,
+            agent_role: None,
+            delegation_reason: None,
+        };
+        tenant_ledger_probe = append_record_atomic_with_run_count(&probe_path, probe).is_ok();
+    }
+
+    let checks = json!({
+        "database_ping": database_ping,
+        "migrations_complete": migrations_complete,
+        "ledger_writable": ledger_writable,
+        "tenant_ledger_probe": tenant_ledger_probe,
+    });
 
     let ready = database_ping && migrations_complete && ledger_writable && tenant_ledger_probe;
     if ready {

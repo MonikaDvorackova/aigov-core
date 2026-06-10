@@ -1,0 +1,94 @@
+{
+  "package": "govai-cursor-plugin",
+  "publication_state": "pre_submit_not_live",
+  "not_live_disclaimer": "Tracks real committed assets and explicitly missing listing media. Does not imply listing approval or a live store entry.",
+  "installation_model": "full_repository_required_for_mcp",
+  "approved_brand_source": "dashboard/brand/aigov-mark.ico",
+  "assets": [
+    {
+      "id": "logo",
+      "role": "manifest_logo",
+      "path": "assets/logo.png",
+      "status": "committed",
+      "dimensions": "512x512",
+      "format": "image/png",
+      "source": "dashboard/brand/aigov-mark.ico",
+      "derivation": "scripts/sync_cursor_marketplace_brand_from_ico.sh",
+      "description": "48x48 ICO frame centered on 512x512 canvas without scaling."
+    },
+    {
+      "id": "hero",
+      "role": "marketplace_hero",
+      "path": "assets/listing/govai-marketplace-hero-2400x800.png",
+      "status": "committed",
+      "dimensions": "2400x800",
+      "format": "image/png",
+      "source": "dashboard/brand/aigov-mark.ico",
+      "derivation": "scripts/sync_cursor_marketplace_brand_from_ico.sh",
+      "description": "Unchanged ICO mark on dark background; no redraw."
+    },
+    {
+      "id": "demo_flow_evidence",
+      "role": "demo_flow_evidence",
+      "path": "assets/capture-evidence/demo-flow-evidence.json",
+      "status": "committed",
+      "format": "application/json",
+      "source": "scripts/record_cursor_marketplace_demo_evidence.py"
+    },
+    {
+      "id": "screenshot_mcp_connected",
+      "role": "listing_screenshot",
+      "path": "assets/listing/govai-cursor-mcp-01-installation-check.png",
+      "status": "committed",
+      "dimensions": "1920x1080",
+      "format": "image/png",
+      "capture_guide": "publication/manual-capture-procedure.md",
+      "description": "Terminal run of installation-check showing full repository MCP readiness."
+    },
+    {
+      "id": "screenshot_gate_success",
+      "role": "listing_screenshot",
+      "path": "assets/listing/govai-cursor-mcp-02-gate-pass.png",
+      "status": "committed",
+      "dimensions": "1920x1080",
+      "format": "image/png",
+      "capture_guide": "publication/manual-capture-procedure.md"
+    },
+    {
+      "id": "screenshot_evidence_validation",
+      "role": "listing_screenshot",
+      "path": "assets/listing/govai-cursor-mcp-03-evidence.png",
+      "status": "committed",
+      "dimensions": "1920x1080",
+      "format": "image/png",
+      "capture_guide": "publication/manual-capture-procedure.md"
+    },
+    {
+      "id": "screenshot_audit_dry_run",
+      "role": "listing_screenshot",
+      "path": "assets/listing/govai-cursor-mcp-04-dry-run.png",
+      "status": "committed",
+      "dimensions": "1920x1080",
+      "format": "image/png",
+      "capture_guide": "publication/manual-capture-procedure.md"
+    },
+    {
+      "id": "screenshot_rules_panel",
+      "role": "listing_screenshot",
+      "path": "assets/listing/govai-cursor-mcp-05-rules.png",
+      "status": "committed",
+      "dimensions": "1920x1080",
+      "format": "image/png",
+      "capture_guide": "publication/manual-capture-procedure.md"
+    },
+    {
+      "id": "demo_video",
+      "role": "optional_demo_video",
+      "path": "assets/listing/govai-cursor-plugin-quickstart-1080p-en.mp4",
+      "status": "not_required",
+      "dimensions": "1920x1080",
+      "format": "video/mp4",
+      "capture_guide": "assets/README.md"
+    }
+  ]
+}

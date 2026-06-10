@@ -1,0 +1,36 @@
+{
+  "package": "govai-cursor-plugin",
+  "cursor_marketplace_submission_model": "full_repository_required_for_mcp",
+  "not_live_disclaimer": "Describes installation behaviour only; does not imply a live Marketplace listing.",
+  "scopes": {
+    "plugin_only": {
+      "label": "Plugin subtree only",
+      "workspace_root_contains": [".cursor-plugin/plugin.json"],
+      "delivers": ["rules", "skills", "listing_copy"],
+      "mcp_tools_available": false,
+      "marketplace_viable_alone": false,
+      "notes": "If Cursor installs only .cursor-plugin/ without the monorepo, govai-local MCP cannot resolve mcp/govai_mcp_server.py, python/, or scripts/."
+    },
+    "full_repository": {
+      "label": "Full AIGov repository checkout",
+      "workspace_root_contains": [
+        ".cursor-plugin/plugin.json",
+        "mcp/govai_mcp_server.py",
+        "python",
+        "scripts/gate_reports.py",
+        "examples/standards/governance_evidence_pack.valid.json"
+      ],
+      "delivers": ["rules", "skills", "mcp_tools", "offline_evidence_validation", "gate_scripts"],
+      "mcp_tools_available": true,
+      "marketplace_viable_alone": true,
+      "recommended_for_listing": true,
+      "listing_requirement": "Marketplace long description must state that MCP tools require opening the full repository as the Cursor workspace root."
+    }
+  },
+  "mcp_entrypoint": {
+    "command": "python3",
+    "args": ["mcp/govai_mcp_server.py", "mcp-stdio"],
+    "path_basis": "repository_root"
+  },
+  "installation_check_cli": "python3 mcp/govai_mcp_server.py installation-check"
+}

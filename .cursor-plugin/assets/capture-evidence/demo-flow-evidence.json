@@ -1,0 +1,153 @@
+{
+  "recorded_at": "2026-06-05T15:22:45+00:00",
+  "purpose": "Demo-flow evidence from repository CLI; not a substitute for Cursor UI screenshots.",
+  "ok": true,
+  "cases": [
+    {
+      "name": "installation-check",
+      "ok": true,
+      "exit_code": 0
+    },
+    {
+      "name": "govai-gate-reports",
+      "ok": true,
+      "exit_code": 0
+    },
+    {
+      "name": "govai-verify-evidence-pack",
+      "ok": true,
+      "exit_code": 0
+    },
+    {
+      "name": "govai-generate-audit-report-template",
+      "ok": true,
+      "exit_code": 0
+    }
+  ],
+  "details": [
+    {
+      "argv": [
+        "/usr/local/bin/python3",
+        "/Users/monikadvorackova/projekty/aigov-compliance-engine/aigov-compliance-engine/mcp/govai_mcp_server.py",
+        "installation-check"
+      ],
+      "exit_code": 0,
+      "stdout": "{\n  \"ok\": true,\n  \"tool\": \"installation_check\",\n  \"installation_mode\": \"full_repository\",\n  \"rules_skills_available\": true,\n  \"mcp_tools_available\": true,\n  \"marketplace_plugin_only_insufficient_for_mcp\": false,\n  \"checks\": {\n    \"plugin_json\": true,\n    \"mcp_server\": true,\n    \"python_tree\": true,\n    \"gate_script\": true,\n    \"evidence_example\": true\n  },\n  \"repo_root\": \"/Users/monikadvorackova/projekty/aigov-compliance-engine/aigov-compliance-engine\",\n  \"note\": \"MCP tools require the full AIGov repository checkout as the Cursor workspace root. Rules and skills may still load from .cursor-plugin/ alone.\",\n  \"command\": [],\n  \"exit_code\": null,\n  \"stdout\": \"\",\n  \"stderr\": \"\",\n  \"stdout_truncated\": false,\n  \"stderr_truncated\": false,\n  \"duration_ms\": 0\n}\n",
+      "stderr": "",
+      "parsed": {
+        "ok": true,
+        "tool": "installation_check",
+        "installation_mode": "full_repository",
+        "rules_skills_available": true,
+        "mcp_tools_available": true,
+        "marketplace_plugin_only_insufficient_for_mcp": false,
+        "checks": {
+          "plugin_json": true,
+          "mcp_server": true,
+          "python_tree": true,
+          "gate_script": true,
+          "evidence_example": true
+        },
+        "repo_root": "/Users/monikadvorackova/projekty/aigov-compliance-engine/aigov-compliance-engine",
+        "note": "MCP tools require the full AIGov repository checkout as the Cursor workspace root. Rules and skills may still load from .cursor-plugin/ alone.",
+        "command": [],
+        "exit_code": null,
+        "stdout": "",
+        "stderr": "",
+        "stdout_truncated": false,
+        "stderr_truncated": false,
+        "duration_ms": 0
+      },
+      "ok": true
+    },
+    {
+      "argv": [
+        "/usr/local/bin/python3",
+        "/Users/monikadvorackova/projekty/aigov-compliance-engine/aigov-compliance-engine/mcp/govai_mcp_server.py",
+        "govai-gate-reports"
+      ],
+      "exit_code": 0,
+      "stdout": "{\n  \"ok\": true,\n  \"command\": [\n    \"/usr/local/bin/python3\",\n    \"/Users/monikadvorackova/projekty/aigov-compliance-engine/aigov-compliance-engine/scripts/gate_reports.py\"\n  ],\n  \"exit_code\": 0,\n  \"stdout\": \"gate OK; checked 222 reports\\n\",\n  \"stderr\": \"\",\n  \"stdout_truncated\": false,\n  \"stderr_truncated\": false,\n  \"duration_ms\": 94,\n  \"tool\": \"govai_gate_reports\",\n  \"govai_access\": \"read_only\"\n}\n",
+      "stderr": "",
+      "parsed": {
+        "ok": true,
+        "command": [
+          "/usr/local/bin/python3",
+          "/Users/monikadvorackova/projekty/aigov-compliance-engine/aigov-compliance-engine/scripts/gate_reports.py"
+        ],
+        "exit_code": 0,
+        "stdout": "gate OK; checked 222 reports\n",
+        "stderr": "",
+        "stdout_truncated": false,
+        "stderr_truncated": false,
+        "duration_ms": 94,
+        "tool": "govai_gate_reports",
+        "govai_access": "read_only"
+      },
+      "ok": true
+    },
+    {
+      "argv": [
+        "/usr/local/bin/python3",
+        "/Users/monikadvorackova/projekty/aigov-compliance-engine/aigov-compliance-engine/mcp/govai_mcp_server.py",
+        "govai-verify-evidence-pack",
+        "--path",
+        "examples/standards/governance_evidence_pack.valid.json"
+      ],
+      "exit_code": 0,
+      "stdout": "{\n  \"ok\": true,\n  \"command\": [\n    \"/Users/monikadvorackova/projekty/aigov-compliance-engine/aigov-compliance-engine/python/.venv/bin/python\",\n    \"-m\",\n    \"aigov_py.standards.cli\",\n    \"validate-evidence-pack\",\n    \"/Users/monikadvorackova/projekty/aigov-compliance-engine/aigov-compliance-engine/examples/standards/governance_evidence_pack.valid.json\"\n  ],\n  \"exit_code\": 0,\n  \"stdout\": \"{\\\"digest\\\":\\\"sha256:22daf2bd765040980deb23b55f2f80cb9b566547ca440b321f892d552338679d\\\",\\\"issues\\\":[],\\\"ok\\\":true}\\n\",\n  \"stderr\": \"\",\n  \"stdout_truncated\": false,\n  \"stderr_truncated\": false,\n  \"duration_ms\": 350,\n  \"tool\": \"govai_verify_evidence_pack\",\n  \"govai_access\": \"read_only\",\n  \"path\": \"/Users/monikadvorackova/projekty/aigov-compliance-engine/aigov-compliance-engine/examples/standards/governance_evidence_pack.valid.json\"\n}\n",
+      "stderr": "",
+      "parsed": {
+        "ok": true,
+        "command": [
+          "/Users/monikadvorackova/projekty/aigov-compliance-engine/aigov-compliance-engine/python/.venv/bin/python",
+          "-m",
+          "aigov_py.standards.cli",
+          "validate-evidence-pack",
+          "/Users/monikadvorackova/projekty/aigov-compliance-engine/aigov-compliance-engine/examples/standards/governance_evidence_pack.valid.json"
+        ],
+        "exit_code": 0,
+        "stdout": "{\"digest\":\"sha256:22daf2bd765040980deb23b55f2f80cb9b566547ca440b321f892d552338679d\",\"issues\":[],\"ok\":true}\n",
+        "stderr": "",
+        "stdout_truncated": false,
+        "stderr_truncated": false,
+        "duration_ms": 350,
+        "tool": "govai_verify_evidence_pack",
+        "govai_access": "read_only",
+        "path": "/Users/monikadvorackova/projekty/aigov-compliance-engine/aigov-compliance-engine/examples/standards/governance_evidence_pack.valid.json"
+      },
+      "ok": true
+    },
+    {
+      "argv": [
+        "/usr/local/bin/python3",
+        "/Users/monikadvorackova/projekty/aigov-compliance-engine/aigov-compliance-engine/mcp/govai_mcp_server.py",
+        "govai-generate-audit-report-template",
+        "--stem",
+        "cursor-marketplace-demo-evidence",
+        "--dry-run"
+      ],
+      "exit_code": 0,
+      "stdout": "{\n  \"ok\": true,\n  \"tool\": \"govai_generate_audit_report_template\",\n  \"govai_access\": \"read_only\",\n  \"dry_run\": true,\n  \"wrote_file\": false,\n  \"path\": \"/Users/monikadvorackova/projekty/aigov-compliance-engine/aigov-compliance-engine/docs/reports/cursor-marketplace-demo-evidence.md\",\n  \"would_write_bytes\": 497,\n  \"preview\": \"# Audit report: cursor-marketplace-demo-evidence\\n\\n## Evaluation gate\\n\\nDescribe automated checks, test scope, and pass/fail criteria for this change set.\\n\\n## Human approval gate\\n\\nList required human reviewers, policy sign-off, and any staged rollout approvals.\\n\\n## Risk assessment\\n\\nIdentify user, safety, security, and operational risks; note mitigations and residual risk.\\n\\n## Rollback plan\\n\\nDocument how to revert or disable the change, data migration rollback (if any), and communication steps.\\n\",\n  \"command\": [],\n  \"exit_code\": null,\n  \"stdout\": \"\",\n  \"stderr\": \"\",\n  \"stdout_truncated\": false,\n  \"stderr_truncated\": false,\n  \"duration_ms\": 0\n}\n",
+      "stderr": "",
+      "parsed": {
+        "ok": true,
+        "tool": "govai_generate_audit_report_template",
+        "govai_access": "read_only",
+        "dry_run": true,
+        "wrote_file": false,
+        "path": "/Users/monikadvorackova/projekty/aigov-compliance-engine/aigov-compliance-engine/docs/reports/cursor-marketplace-demo-evidence.md",
+        "would_write_bytes": 497,
+        "preview": "# Audit report: cursor-marketplace-demo-evidence\n\n## Evaluation gate\n\nDescribe automated checks, test scope, and pass/fail criteria for this change set.\n\n## Human approval gate\n\nList required human reviewers, policy sign-off, and any staged rollout approvals.\n\n## Risk assessment\n\nIdentify user, safety, security, and operational risks; note mitigations and residual risk.\n\n## Rollback plan\n\nDocument how to revert or disable the change, data migration rollback (if any), and communication steps.\n",
+        "command": [],
+        "exit_code": null,
+        "stdout": "",
+        "stderr": "",
+        "stdout_truncated": false,
+        "stderr_truncated": false,
+        "duration_ms": 0
+      },
+      "ok": true
+    }
+  ]
+}

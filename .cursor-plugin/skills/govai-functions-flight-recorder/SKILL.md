@@ -1,9 +1,9 @@
 ---
 name: govai-functions-flight-recorder
-description: Record and read GovAI Functions 2.0 AI decision flight telemetry (append-only traces, flight-pack APIs, validators).
+description: Record and read AIGov Functions 2.0 AI decision flight telemetry (append-only traces, flight-pack APIs, validators).
 ---
 
-# GovAI Functions 2.0 — flight recorder skill
+# AIGov Functions 2.0 — flight recorder skill
 
 Use this skill when implementing or reviewing **AI decision flight recorder** integrations (model hashes, tool calls, policy evaluation, human gates, appeals, incidents, monitoring, sealing, legal evidence references, certification marks).
 

@@ -2,6 +2,7 @@
 
 use crate::policy_config::PolicyConfig;
 use crate::replay_projection::{project_governance_state, ReplayProjection};
+use crate::governance_graph::build_governance_graph;
 use crate::replay_validation::{
     events_for_projection, export_run_id, run_export_validations, ReplayValidationReport,
 };
@@ -29,6 +30,8 @@ pub struct ReplayResult {
     pub validation: ReplayValidationReport,
     pub projection: Option<ReplayProjection>,
     pub determinism_digest: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub lineage: Option<Value>,
 }
 
 pub fn replay_audit_export_v1(export: &Value, policy_cfg: &PolicyConfig) -> ReplayResult {
@@ -61,8 +64,12 @@ pub fn replay_audit_export_v1(export: &Value, policy_cfg: &PolicyConfig) -> Repl
             validation,
             projection: None,
             determinism_digest: String::new(),
+            lineage: None,
         };
     }
+
+    let lineage_doc = build_governance_graph(&run_id, &events);
+    let lineage = serde_json::to_value(&lineage_doc.summary).ok();
 
     let projection_events = events_for_projection(&events);
     let bundle_sha = export
@@ -129,6 +136,7 @@ pub fn replay_audit_export_v1(export: &Value, policy_cfg: &PolicyConfig) -> Repl
         validation,
         projection: Some(projection),
         determinism_digest,
+        lineage,
     }
 }
 

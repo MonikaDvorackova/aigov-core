@@ -3,7 +3,7 @@ name: create-evidence-pack
 description: Create and offline-validate Governance Evidence Pack JSON; distinguish hosted CI artefact flows from local validators.
 ---
 
-# Skill: Create and verify evidence packs (GovAI)
+# Skill: Create and verify evidence packs (AIGov)
 
 Use this skill when generating **CI evidence artefacts**, **governance evidence pack JSON**, or validating packs **offline** before submission.
 

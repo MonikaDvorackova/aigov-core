@@ -1,0 +1,21 @@
+{
+  "approved_source": "dashboard/brand/aigov-mark.ico",
+  "approved_source_sha256": "e8b0d521e4b3d9188d1d564fec3f95afaf0784fc6e46ac6eaabb7720d7d831be",
+  "derivation": "lossless_composite_no_scale",
+  "mark_frame": "48x48",
+  "tool": "imagemagick_magick",
+  "outputs": {
+    "assets/logo.png": {
+      "sha256": "4cfeafe4ada8edee45a0ab12d7e0f39b40233e9b294d711f80f13febf8b0dddf",
+      "canvas": "512x512",
+      "mark_scale": "none"
+    },
+    "assets/listing/govai-marketplace-hero-2400x800.png": {
+      "sha256": "4af11c8db40b1f36ff5351a5b1473158cbf9ff6ae52e1b604879b4b81ae843e5",
+      "canvas": "2400x800",
+      "background": "#0B1220",
+      "mark_offset": "+120+376",
+      "mark_scale": "none"
+    }
+  }
+}

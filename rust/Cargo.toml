@@ -20,6 +20,10 @@ path = "src/bin/portable_evidence_digest_once.rs"
 name = "replay_audit_export_once"
 path = "src/bin/replay_audit_export_once.rs"
 
+[[bin]]
+name = "lineage_graph_once"
+path = "src/bin/lineage_graph_once.rs"
+
 [dependencies]
 axum = "0.7"
 tokio = { version = "1", features = ["full"] }

@@ -615,6 +615,12 @@ mod tests {
             run_id: "r".to_string(),
             environment: Some("dev".to_string()),
             payload,
+            parent_run_id: None,
+            root_run_id: None,
+            delegated_from_event_id: None,
+            agent_id: None,
+            agent_role: None,
+            delegation_reason: None,
         }
     }
 

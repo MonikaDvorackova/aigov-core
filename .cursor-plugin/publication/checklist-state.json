@@ -1,0 +1,47 @@
+{
+  "completed": [
+    "status-not-live",
+    "cursor-plugin-check",
+    "plugin-json-metadata",
+    "submission-copy-synced",
+    "cursor-version-policy",
+    "installation-model-documented",
+    "logo-committed",
+    "marketplace-hero",
+    "real-screenshots",
+    "demo-flow-evidence",
+    "rules-skills-no-scaffold-tokens",
+    "reviewer-notes",
+    "support-contact",
+    "pre-submit-checklist",
+    "manual-capture-procedure",
+    "marketplace-assets-manifest"
+  ],
+  "pending": [
+    "legal-marketing-review",
+    "portal-submit",
+    "cursor-approval"
+  ],
+  "pre_submit_go": [
+    "status-not-live",
+    "cursor-plugin-check",
+    "plugin-json-metadata",
+    "submission-copy-synced",
+    "cursor-version-policy",
+    "installation-model-documented",
+    "logo-committed",
+    "marketplace-hero",
+    "real-screenshots",
+    "demo-flow-evidence",
+    "reviewer-notes",
+    "support-contact",
+    "pre-submit-checklist",
+    "manual-capture-procedure",
+    "marketplace-assets-manifest"
+  ],
+  "pre_submit_nogo": [
+    "legal-marketing-review",
+    "portal-submit",
+    "cursor-approval"
+  ]
+}

@@ -65,8 +65,7 @@ def _write_minimal_sdk_repo(sdk_mod, root: Path, *, pkg_text: str) -> None:
     (root / "typescript-sdk/package.json").write_text(pkg_text, encoding="utf-8")
     (root / "Makefile").write_text(
         "public-sdk-packages-check:\n"
-        "sdk-ecosystem-check:\n"
-        "typescript-client-check:\n",
+        "oss-ecosystem-check:\n",
         encoding="utf-8",
     )
     audit = root / sdk_mod.AUDIT_REPORT
@@ -91,8 +90,7 @@ def test_forbidden_rust_sdk_label_fails(sdk_mod, tmp_path: Path):
     (root / "typescript-sdk/package.json").write_text("{}", encoding="utf-8")
     (root / "Makefile").write_text(
         "public-sdk-packages-check:\n"
-        "sdk-ecosystem-check:\n"
-        "typescript-client-check:\n",
+        "oss-ecosystem-check:\n",
         encoding="utf-8",
     )
     (root / "dashboard/lib/landing/landingPageContent.ts").write_text(

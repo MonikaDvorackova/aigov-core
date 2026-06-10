@@ -1,5 +1,7 @@
 # Marketplace demo flow (reviewer script)
 
+**Publication status:** submission-ready in-repo; **not live** in Cursor Marketplace — see [`status.md`](status.md).
+
 ## Preconditions
 
 - Cursor current stable channel.

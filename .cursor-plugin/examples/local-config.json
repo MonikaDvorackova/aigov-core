@@ -1,5 +1,5 @@
 {
-  "comment": "Example Cursor MCP configuration fragment for local GovAI tooling (merge into your .cursor/mcp.json or equivalent). Same server definition as .cursor-plugin/mcp.json and plugin.json mcpServers. Paths are relative to the repository root.",
+  "comment": "Example Cursor MCP configuration fragment for local AIGov tooling (merge into your .cursor/mcp.json or equivalent). Same server definition as .cursor-plugin/mcp.json and plugin.json mcpServers. Paths are relative to the repository root.",
   "mcpServers": {
     "govai-local": {
       "command": "python3",

@@ -3,7 +3,7 @@ name: fix-compliance-gate
 description: Diagnose and fix failing governance gates (pytest, Rust, gate_reports, make gate) with minimal scoped changes.
 ---
 
-# Skill: Fix GovAI compliance gate failures
+# Skill: Fix AIGov compliance gate failures
 
 Use this skill when **`python scripts/gate_reports.py`**, **`make gate`**, **pytest**, **Rust tests**, or **artifact-bound CI** fails after local edits.
 

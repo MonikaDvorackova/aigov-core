@@ -1,8 +1,8 @@
 {
   "name": "govai",
   "version": "0.1.0",
-  "description": "Deterministic AI governance, evidence packs, compliance gates, policy checks, and audit traces for AI systems — Cursor rules, Agent skills, and a local stdio MCP bridge to repository tooling.",
-  "author": "GovAI maintainers",
+  "description": "AIGov platform repository tooling for Cursor: rules, agent skills, and a local stdio MCP bridge to audit-runtime and platform CI gates. Proprietary platform; public runtime is govai-core.",
+  "author": "AIGov maintainers",
   "homepage": "https://github.com/MonikaDvorackova/aigov-compliance-engine",
   "repository": "https://github.com/MonikaDvorackova/aigov-compliance-engine",
   "license": "UNLICENSED",
@@ -13,12 +13,18 @@
     "evidence-pack",
     "audit",
     "mcp",
-    "cursor"
+    "cursor",
+    "govai-platform"
   ],
   "logo": "assets/logo.png",
   "rules": "rules",
   "skills": "skills",
   "mcpServers": {
+    "aigov-local": {
+      "command": "python3",
+      "args": ["mcp/aigov_mcp_server.py", "mcp-stdio"],
+      "env": {}
+    },
     "govai-local": {
       "command": "python3",
       "args": ["mcp/govai_mcp_server.py", "mcp-stdio"],

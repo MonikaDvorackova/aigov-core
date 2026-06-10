@@ -1,0 +1,74 @@
+{
+  "items": {
+    "status-not-live": {
+      "type": "file_contains",
+      "path": ".cursor-plugin/publication/status.md",
+      "needles": ["Not live", "not approved", "aigov-mark.ico"]
+    },
+    "cursor-plugin-check": {
+      "type": "json_field",
+      "path": ".cursor-plugin/assets/capture-evidence/demo-flow-evidence.json",
+      "field": "ok",
+      "equals": true
+    },
+    "plugin-json-metadata": {
+      "type": "file_exists",
+      "path": ".cursor-plugin/plugin.json"
+    },
+    "submission-copy-synced": {
+      "type": "file_contains",
+      "path": ".cursor-plugin/publication/submission-copy.md",
+      "needles": ["not live", "not approved"]
+    },
+    "cursor-version-policy": {
+      "type": "file_exists",
+      "path": ".cursor-plugin/publication/cursor-version-policy.md"
+    },
+    "installation-model-documented": {
+      "type": "installation_model",
+      "expected_model": "full_repository_required_for_mcp"
+    },
+    "logo-committed": {
+      "type": "file_exists",
+      "path": ".cursor-plugin/assets/logo.png"
+    },
+    "marketplace-hero": {
+      "type": "file_exists",
+      "path": ".cursor-plugin/assets/listing/govai-marketplace-hero-2400x800.png"
+    },
+    "real-screenshots": {
+      "type": "file_exists",
+      "path": ".cursor-plugin/assets/listing/govai-cursor-mcp-01-installation-check.png"
+    },
+    "demo-flow-evidence": {
+      "type": "json_nonempty_list",
+      "path": ".cursor-plugin/assets/capture-evidence/demo-flow-evidence.json",
+      "field": "cases"
+    },
+    "rules-skills-no-scaffold-tokens": {
+      "type": "file_exists",
+      "path": ".cursor-plugin/rules/compliance-gate.mdc"
+    },
+    "reviewer-notes": {
+      "type": "file_exists",
+      "path": ".cursor-plugin/publication/reviewer-notes.md"
+    },
+    "support-contact": {
+      "type": "file_exists",
+      "path": ".cursor-plugin/publication/support-and-contact.md"
+    },
+    "pre-submit-checklist": {
+      "type": "file_exists",
+      "path": ".cursor-plugin/publication/pre-submit-checklist.md"
+    },
+    "manual-capture-procedure": {
+      "type": "file_exists",
+      "path": ".cursor-plugin/publication/manual-capture-procedure.md"
+    },
+    "marketplace-assets-manifest": {
+      "type": "file_contains",
+      "path": ".cursor-plugin/assets/marketplace-assets.json",
+      "needles": ["aigov-mark.ico", "\"status\": \"committed\"", "demo_flow_evidence"]
+    }
+  }
+}

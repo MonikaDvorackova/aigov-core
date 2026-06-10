@@ -1,18 +1,35 @@
 # Cursor Marketplace — publication package
 
-This folder is the **single place** for marketplace-facing copy, demo choreography, screenshot planning, and release checklists for the GovAI Cursor plugin.
+Single maintainer entry point for the AIGov Cursor plugin **first submission**. This package is **documentation-ready** in the repository; listing media is **incomplete**; it is **not** a claim of Cursor Marketplace approval or a live listing.
+
+**Authoritative status:** [`status.md`](status.md)
+
+## Files
 
 | File | Purpose |
 | --- | --- |
-| [submission-copy.md](submission-copy.md) | Final listing text (short + long descriptions, categories, limitations) |
-| [demo-flow.md](demo-flow.md) | Step-by-step demo suitable for reviewers |
-| [screenshot-plan.md](screenshot-plan.md) | Ordered list of still images to capture |
-| [release-checklist.md](release-checklist.md) | Maintainer steps before publishing a version |
+| [status.md](status.md) | Internally usable / listing media incomplete / not live |
+| [submission-copy.md](submission-copy.md) | Short and long listing copy, categories, limitations |
+| [demo-flow.md](demo-flow.md) | Reviewer and maintainer demo script |
+| [screenshot-plan.md](screenshot-plan.md) | Ordered still captures and alt-text guidance |
+| [reviewer-notes.md](reviewer-notes.md) | Security model, tool surface, review order |
+| [support-and-contact.md](support-and-contact.md) | Issues, email, SLA framing |
+| [cursor-version-policy.md](cursor-version-policy.md) | Tested Cursor versions and upgrade policy |
+| [release-checklist.md](release-checklist.md) | Pre-submit maintainer steps (evidence-backed checkboxes) |
+| [pre-submit-checklist.md](pre-submit-checklist.md) | Go / no-go criteria for portal open vs upload vs live listing |
+| [installation-model.md](installation-model.md) | Full-repository MCP requirement audit |
+| [manual-capture-procedure.md](manual-capture-procedure.md) | Deterministic real screenshot capture steps |
+| [checklist-state.json](checklist-state.json) | Completed vs pending item IDs |
+| [checklist-evidence.json](checklist-evidence.json) | Evidence registry for completed items |
 
-## Support and licensing
+## Assets
 
-- Support expectations and licence framing are summarised in **`release-checklist.md`** and **`submission-copy.md`**.
-- The plugin remains **repository-local** by default; hosted GovAI verdicts stay authoritative for production.
+| Resource | Location |
+| --- | --- |
+| Asset manifest (machine-readable) | [`../assets/marketplace-assets.json`](../assets/marketplace-assets.json) |
+| Manifest logo (from `aigov-mark.ico`) | [`../assets/logo.png`](../assets/logo.png) |
+| Demo-flow CLI evidence | [`../assets/capture-evidence/demo-flow-evidence.json`](../assets/capture-evidence/demo-flow-evidence.json) |
+| Missing hero/screenshots | [`../assets/listing/README.md`](../assets/listing/README.md) |
 
 ## Validation
 
@@ -22,6 +39,19 @@ From the repository root:
 make cursor-plugin-check
 ```
 
-The same target runs in **`.github/workflows/oss-developer-experience.yml`** before **`make enterprise-readiness-check`**, so broken manifests or MCP smoke failures block merges to **`main`** and **`staging`**.
+Runs `scripts/validate_cursor_plugin.py` (manifest, publication structure, brand derivation) and `scripts/smoke_cursor_plugin.py`.
 
-Internal vs listing scope: the plugin pack under **`.cursor-plugin/`** is **production-ready for internal clone-and-use** when this check passes; **this `publication/` folder** is the staging area for **marketplace listing** copy, screenshots, and maintainer release steps that are still **maintainer-owned** and not implied complete until those artefacts exist.
+Strict listing-media gate (all committed assets on disk; ICO derivation hashes must match):
+
+```bash
+make cursor-marketplace-listing-check
+```
+
+## Internal vs Marketplace scope
+
+| Layer | Ready when |
+| --- | --- |
+| Clone-and-use | `make cursor-plugin-check` passes; full repo workspace |
+| Documentation package | This folder + `marketplace-assets.json` + missing-media docs |
+| Portal upload | `make cursor-marketplace-listing-check` passes + legal review |
+| Live listing | Maintainer submit + Cursor approval — **not done yet** |

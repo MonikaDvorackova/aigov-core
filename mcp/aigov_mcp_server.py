@@ -27,7 +27,6 @@ _TOOLS_READ_ONLY: Final[frozenset[str]] = frozenset(
         "govai_verify_evidence_pack",
         "govai_gate_reports",
         "govai_make_gate",
-        "govai_validate_functions_v2_pack",
     }
 )
 _TOOLS_WRITE: Final[frozenset[str]] = frozenset({"govai_generate_audit_report_template"})
@@ -257,17 +256,6 @@ def tool_govai_gate_reports() -> dict[str, Any]:
     return body
 
 
-def tool_govai_validate_functions_v2_pack(rel_path: str) -> dict[str, Any]:
-    py = sys.executable or "python3"
-    script = REPO_ROOT / "scripts" / "validate_govai_functions_v2_pack.py"
-    argv = [py, str(script), "--strict", rel_path]
-    body = _run_subprocess(argv, cwd=REPO_ROOT, timeout_s=120.0)
-    body["tool"] = "govai_validate_functions_v2_pack"
-    body["govai_access"] = _tool_access("govai_validate_functions_v2_pack")
-    body["path"] = rel_path
-    return body
-
-
 def tool_govai_make_gate() -> dict[str, Any]:
     body = _run_subprocess(["make", "gate"], cwd=REPO_ROOT, timeout_s=_TIMEOUT_MAKE_GATE_S)
     body["tool"] = "govai_make_gate"
@@ -393,20 +381,6 @@ _MCP_TOOL_SPECS: list[dict[str, Any]] = [
             },
         },
     },
-    {
-        "name": "govai_validate_functions_v2_pack",
-        "description": "[read-only] Validate a AIGov Functions 2.0 flight-pack JSON fixture (scripts/validate_govai_functions_v2_pack.py --strict).",
-        "inputSchema": {
-            "type": "object",
-            "properties": {
-                "path": {
-                    "type": "string",
-                    "description": "Repo-relative path to JSON (e.g. examples/govai-functions-2/sample-flight-pack.v1.json).",
-                }
-            },
-            "required": ["path"],
-        },
-    },
 ]
 
 
@@ -439,23 +413,6 @@ def _dispatch_tool(name: str, arguments: dict[str, Any] | None) -> dict[str, Any
         return tool_govai_gate_reports()
     if name == "govai_make_gate":
         return tool_govai_make_gate()
-    if name == "govai_validate_functions_v2_pack":
-        path = str(arguments.get("path") or "").strip()
-        if not path:
-            return {
-                "ok": False,
-                "error": "missing_path",
-                "tool": name,
-                "govai_access": _tool_access(name),
-                "command": [],
-                "exit_code": None,
-                "stdout": "",
-                "stderr": "",
-                "stdout_truncated": False,
-                "stderr_truncated": False,
-                "duration_ms": 0,
-            }
-        return tool_govai_validate_functions_v2_pack(path)
     if name == "govai_generate_audit_report_template":
         stem = arguments.get("stem")
         stem_s = str(stem).strip() if stem else None
@@ -596,13 +553,6 @@ def main(argv: list[str] | None = None) -> int:
 
     p_mg = sub.add_parser("govai-make-gate", help="Run make gate.")
     p_mg.set_defaults(func=lambda _: _emit(tool_govai_make_gate()))
-
-    p_f2 = sub.add_parser(
-        "govai-validate-functions-v2-pack",
-        help="Validate AIGov Functions 2.0 flight-pack JSON (--strict).",
-    )
-    p_f2.add_argument("--path", required=True, help="Repo-relative JSON path")
-    p_f2.set_defaults(func=lambda ns: _emit(tool_govai_validate_functions_v2_pack(ns.path)))
 
     p_tpl = sub.add_parser("govai-generate-audit-report-template", help="Write docs/reports/<stem>.md template.")
     p_tpl.add_argument("--stem", default=None, help="Filename stem (no extension).")

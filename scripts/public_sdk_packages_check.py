@@ -69,8 +69,7 @@ def compute_public_sdk_packages(root: Path) -> tuple[dict, int]:
     makefile = _read(root, "Makefile")
     for target in (
         "public-sdk-packages-check",
-        "sdk-ecosystem-check",
-        "typescript-client-check",
+        "oss-ecosystem-check",
     ):
         if target not in makefile:
             failures.append(f"missing_make_target:{target}")

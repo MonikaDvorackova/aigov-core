@@ -103,7 +103,6 @@ def _smoke_mcp_stdio_handshake(py: str) -> tuple[bool, str]:
             "govai_gate_reports",
             "govai_verify_evidence_pack",
             "govai_generate_audit_report_template",
-            "govai_validate_functions_v2_pack",
         }
         if names != expected:
             return False, f"tools/list names={sorted(names)}"
@@ -179,18 +178,6 @@ def main() -> int:
         ok_dr = False
         detail_dr = f"exit={code} parse_error={e!s}"
     cases.append(_case("govai-generate-audit-report-template (dry-run)", ok_dr, detail_dr))
-
-    rel_f2 = str((REPO_ROOT / "examples" / "govai-functions-2" / "sample-flight-pack.v1.json").relative_to(REPO_ROOT))
-    argv_f2 = [py, str(MCP_CLI), "govai-validate-functions-v2-pack", "--path", rel_f2]
-    code, out, _err = _run(argv_f2)
-    try:
-        body_f2 = _parse_json_stdout(out)
-        ok_f2 = code == 0 and bool(body_f2.get("ok")) is True
-        detail_f2 = f"exit={code} ok={body_f2.get('ok')}"
-    except (json.JSONDecodeError, ValueError) as e:
-        ok_f2 = False
-        detail_f2 = f"exit={code} parse_error={e!s}"
-    cases.append(_case("govai-validate-functions-v2-pack", ok_f2, detail_f2))
 
     overall = all(c["status"] == "pass" for c in cases)
     summary = {

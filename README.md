@@ -1,14 +1,22 @@
-# GovAI
+# GovAI Core
 
-GovAI is an **audit-backed governance backend** for AI deployments: append-only evidence, policy enforcement at ingest, a single authoritative compliance verdict (`GET /compliance-summary`), optional **hosted Stripe billing**, exportable audit artefacts, and **GovAI Functions 2.0** (append-only AI decision flight recorder extensions plus read APIs under `GET /api/functions/v2/{run_id}/*` for executive, legal, and scorecard views — see `docs/govai-functions-2.md`). CI gates (for example the published GitHub Action) are one integration surface, not the whole product.
+GovAI Core is the **open-source**, ledger-authoritative audit runtime for reconstructible AI governance. The `aigov_audit` service appends evidence to tenant-scoped ledgers, enforces policy at ingest, derives **VALID / INVALID / BLOCKED** from ledger projection (`GET /compliance-summary`), exports `aigov.audit_export.v1`, and verifies hash chains.
 
-## Repository boundary (license)
+**Quickstart:** [`docs/quickstart-runtime.md`](docs/quickstart-runtime.md) · **Mounted API contract:** [`docs/runtime-api-contract.md`](docs/runtime-api-contract.md) · **Repository scope:** [`OPEN_SOURCE_SCOPE.md`](OPEN_SOURCE_SCOPE.md)
 
-**This repository is the private GovAI platform repository.** This repository is not open source. Root [`LICENSE`](LICENSE) is proprietary; use, copy, modification, distribution, hosting, resale, and white-label operation require a **separate written agreement** with the copyright holder.
+## What this repository is
 
-The **public open-core runtime** (audit engine, portable contracts, and permissive licensing for that surface) is maintained separately in **[govai-core](https://github.com/govbase-dev/govai-core)**.
+| In scope (GovAI Core) | Out of scope (GovAI Platform — separate product) |
+|----------------------|--------------------------------------------------|
+| Append-only evidence ingest (`POST /evidence`) | Hosted SaaS operations |
+| Ledger integrity and `GET /verify` | Stripe / billing / pricing |
+| Deterministic compliance summary | Dashboard access control |
+| Audit export and portable standards validators | Commercial onboarding flows |
+| Python CLI, runtime SDK, examples, GitHub Action patterns | Enterprise JWT `/api/*` control plane (not mounted on `aigov_audit`) |
 
-**Proprietary in this repository** includes hosted SaaS infrastructure, billing, onboarding, tenant management, enterprise control plane, dashboards, operational tooling, and production infrastructure. See [`OPEN_SOURCE_SCOPE.md`](OPEN_SOURCE_SCOPE.md) for the platform vs open-core boundary (filename retained for stable links).
+License terms: [`LICENSE`](LICENSE). Contributor expectations: [`CONTRIBUTING.md`](CONTRIBUTING.md), [`GOVERNANCE.md`](GOVERNANCE.md), [`SECURITY.md`](SECURITY.md).
+
+Historical documentation under `docs/hosted/`, `docs/billing/`, `docs/pricing/`, and `dashboard/` describes the **GovAI Platform** and is retained for reference only — it is **not** part of the core runtime surface mounted by `aigov_audit`.
 
 ## Strategy: audit engine, portable standards, interchange, and offline validation
 
@@ -258,8 +266,8 @@ Choose one:
 1. Clone the repo
 
 ```bash
-git clone https://github.com/MonikaDvorackova/aigov-compliance-engine.git
-cd aigov-compliance-engine
+git clone https://github.com/MonikaDvorackova/govai-core.git
+cd govai-core
 ```
 
 2. Run GovAI (Docker)
@@ -353,30 +361,9 @@ See:
 - enforcing approval workflows before release
 - requiring audit evidence for decisions
 
-## Commercial pricing
+## GovAI Platform (not in GovAI Core)
 
-GovAI is offered as **govai-core** (public open-core runtime) plus **proprietary hosted platform and enterprise** capabilities in this repository. **Canonical pricing:** [docs/pricing/index.md](docs/pricing/index.md) · **Public page:** [govbase.dev/pricing](https://govbase.dev/pricing)
-
-| Tier | Indicative price | Highlights |
-|------|------------------|------------|
-| **GovAI Core (govai-core)** | Free (open core) | Rust audit engine, CLI, Python & TypeScript SDKs, GitHub Actions, policy framework — **[govai-core](https://github.com/govbase-dev/govai-core)** |
-| **Hosted Professional** | $499–$1,999 / month | Managed SaaS on [govbase.dev](https://govbase.dev), dashboard, evidence export, standard SLA (**proprietary platform**) |
-| **Enterprise** | From $25,000 / year | SSO, private cloud or on-premise, advanced RBAC, custom SLA, procurement support |
-| **Advisory Services** | $250–$500 / hour | EU AI Act implementation, policy design, training, audit preparation |
-
-**Contact:** [hello@govbase.dev](mailto:hello@govbase.dev) — demo, enterprise sales, and advisory sessions. Hosted Stripe billing is optional and operator-configured; see [docs/billing.md](docs/billing.md).
-
-## Pricing
-
-- **Free — €0:** local testing and evaluation, limited runs, PyPI CLI (`aigov-py==0.2.1`), audit evidence export.
-- **Pro — €499/month:** production CI, higher run and event limits, GitHub Action, hosted audit endpoint, standard support (self-serve Stripe checkout when configured — see [docs/billing.md](docs/billing.md)).
-- **Enterprise — Custom:** regulated or larger teams, custom limits, self-hosted or dedicated deployment, SSO and access control where supported, audit and procurement support.
-
-## Private pilot
-
-Email [hello@govbase.dev](mailto:hello@govbase.dev?subject=GovAI%20private%20pilot%20request) with subject `GovAI private pilot request` to scope a pilot covering one AI system or CI pipeline, with a hosted or self-hosted audit endpoint and structured feedback during the pilot. This is not a productized signup flow.
-
-See [docs/pilot-onboarding.md](docs/pilot-onboarding.md) for private pilot setup.
+Commercial hosting, billing, pricing, dashboard ACL, onboarding, and managed tenant provisioning belong to the **GovAI Platform** product (separate from this repository). Reference material may appear under `docs/pricing/`, `docs/billing/`, `docs/hosted/`, and `dashboard/` for historical context only.
 
 ## Decision states
 
@@ -538,7 +525,7 @@ If you are onboarding a new pilot customer, follow `docs/hosted-pilot-runbook.md
 
 ```yaml
       - name: GovAI artefact-bound gate (submit + verify digest + VALID)
-        uses: MonikaDvorackova/aigov-compliance-engine@v1
+        uses: MonikaDvorackova/govai-core@v1
         with:
           run_id: ${{ vars.GOVAI_RUN_ID }}
           artifacts_path: ${{ github.workspace }}/downloaded-artifacts
@@ -686,7 +673,7 @@ Publication-ready **channel playbooks**, **FAQ**, and **positioning** live under
 
 # Contributors and community
 
-Contributions to **this private platform repository** are subject to the proprietary [`LICENSE`](LICENSE) and maintainer agreements. Open-core contributions belong in **[govai-core](https://github.com/govbase-dev/govai-core)**.
+Contributions to **GovAI Core** belong in this repository. See [`CONTRIBUTING.md`](CONTRIBUTING.md), [`GOVERNANCE.md`](GOVERNANCE.md), and [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md). Do not weaken ledger-authoritative invariants documented there.
 
 ## Contributor onboarding
 

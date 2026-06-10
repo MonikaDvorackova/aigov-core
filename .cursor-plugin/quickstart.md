@@ -1,6 +1,6 @@
-# GovAI Cursor plugin — quickstart
+# AIGov Cursor plugin — quickstart
 
-This guide gets you from zero to a **first successful compliance documentation gate** using the GovAI Cursor plugin (rules, skills, and local MCP). Authoritative enforcement remains in the **Rust audit service**, **database policy**, and **CI**; the plugin accelerates consistent local workflows.
+This guide gets you from zero to a **first successful compliance documentation gate** using the AIGov Cursor plugin (rules, skills, and local MCP). Authoritative enforcement remains in the **Rust audit service**, **database policy**, and **CI**; the plugin accelerates consistent local workflows.
 
 ## Prerequisites
 
@@ -23,7 +23,9 @@ See also the canonical overview in [README.md](README.md).
 - **Plugin-level MCP:** [`.cursor-plugin/mcp.json`](mcp.json) — defines the `govai-local` stdio server (same shape as the `mcpServers` block in `plugin.json`). Cursor may discover this file when loading the plugin from the repository.
 - **Workspace MCP:** For a local `.cursor/mcp.json`, merge **`examples/local-config.json`** or copy **`.cursor/mcp.json.example`** from the repository root.
 
-**Path contract:** `args` use **`mcp/govai_mcp_server.py`** relative to the **repository root**. Open the repo as the workspace root (or adjust paths / use a wrapper — not shipped here).
+**Path contract:** `args` use **`mcp/govai_mcp_server.py`** relative to the **repository root**. Open the repo as the workspace root.
+
+**Optional wrapper:** `mcp/run_govai_mcp_stdio.sh` (`command: bash`, `args: ["mcp/run_govai_mcp_stdio.sh"]`). See [`mcp/README.md`](../mcp/README.md). Never tee or log MCP stdout (including to `/tmp`) — stdout must carry JSON-RPC only.
 
 **Clone-friendly copy (no absolute paths, no secrets):** from the repository root:
 

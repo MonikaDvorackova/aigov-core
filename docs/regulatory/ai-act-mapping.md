@@ -20,3 +20,17 @@ GovAI is an **audit-backed decision system**: it records structured lifecycle ev
 - Conformity assessment outcomes and EU declaration of conformity.
 
 For the obligation index consumed by tooling, see [ai-act-obligations.json](ai-act-obligations.json) and [evidence-obligations.md](evidence-obligations.md).
+
+## Provider and deployer roles
+
+GovAI is **infrastructure** used by providers and deployers; it does not assign your legal role under the AI Act. Enterprise readers should use [ai-act-enterprise-positioning.md](ai-act-enterprise-positioning.md) for auditability framing, high-risk deployment patterns, and explicit non-claims.
+
+## Governance vs conformity
+
+| GovAI supplies | GovAI does not supply |
+|----------------|----------------------|
+| Append-only audit evidence and deterministic compliance verdict per `run_id` | EU declaration of conformity |
+| Exports and indicative mapping to documentation themes | Notified body outcomes |
+| Human oversight **evidence hooks** (approvals, BLOCKED prerequisites) | Operational kill switches in your production AI system |
+
+Verdict semantics: [../architecture/governance-semantics.md](../architecture/governance-semantics.md).

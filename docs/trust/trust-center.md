@@ -21,6 +21,8 @@ preset: trust-controls
 
 | Audience | Start here |
 |----------|------------|
+| Enterprise procurement / RFP | [enterprise-trust-package.md](enterprise-trust-package.md), [shared-responsibility-model.md](shared-responsibility-model.md) |
+| Enterprise architecture | [../architecture/README.md](../architecture/README.md), [../terminology.md](../terminology.md) |
 | Security architecture | [../security/security-overview.md](../security/security-overview.md) |
 | Procurement / RFP | [compliance-mapping.md](compliance-mapping.md) |
 | ISO/IEC 42001 readiness (mapped, not certified) | [../standards/iso-42001.md](../standards/iso-42001.md) |

@@ -1,20 +1,5 @@
-# OSS developer experience, commercial readiness, enterprise security/trust,
-# pilot execution, customer operations, partner ecosystem, regulatory evidence,
-# marketplace, policy pack marketplace, customer analytics, revenue intelligence,
-# evidence quality and
-# dataset governance, policy intelligence, developer integrations,
-# revenue enablement, release engineering, runtime observability,
-# runtime safety, hosted platform readiness, model risk and assurance,
-# agent governance, delegation artefacts, and public launch and
-# ecosystem standardization.
-#
-# Checks include required files, strict documentation links, report heading gate,
-# commercial path checks, enterprise security/trust checks, pilot package checks,
-# customer operations checks, partner ecosystem checks, regulatory evidence checks,
-# marketplace checks, policy pack marketplace checks, customer analytics checks,
-# evidence quality and dataset governance checks, policy intelligence checks,
-# developer integrations checks, revenue enablement checks, release engineering checks,
-# model risk / evaluation snapshot checks, and public launch and ecosystem standardization checks.
+# GovAI Core OSS developer experience: scripts that exist in this repository only.
+# Platform-wide validators (commercial, hosted, regulatory, and similar) live in the proprietary platform repository.
 
 name: oss-developer-experience
 
@@ -33,189 +18,36 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install Python package
+        working-directory: python
+        run: |
+          set -euo pipefail
+          python -m venv .venv
+          . .venv/bin/activate
+          pip install -U pip
+          pip install -e ".[dev]"
+
       - name: Cursor plugin bundle (validate + smoke)
         run: |
           set -euo pipefail
           make cursor-plugin-check
 
-      - name: Public SDK, TypeScript npm, and ISO readiness checks
+      - name: Public SDK packages check
         run: |
           set -euo pipefail
           mkdir -p .oss-ci-out
           make public-sdk-packages-check
-          make npm-typescript-publishing-check
-          make iso-42001-readiness-check
-          make typescript-client-check
           python3 scripts/public_sdk_packages_check.py --json > .oss-ci-out/public-sdk-packages.json
-          python3 scripts/npm_typescript_publishing_check.py --json > .oss-ci-out/npm-typescript-publishing.json
-          python3 scripts/iso_42001_readiness_check.py --json > .oss-ci-out/iso-42001-readiness.json
 
-      - name: Enterprise readiness OSS checks
-        env:
-          GOVAI_OSS_DIAGNOSTICS_BASE_REF: origin/${{ github.base_ref }}
-          GOVAI_RELEASE_PROMOTION: ${{ github.head_ref == 'staging' && github.base_ref == 'main' }}
+      - name: Core readiness (gate + runtime contracts + benchmark)
         run: |
           set -euo pipefail
           make enterprise-readiness-check
-
-      - name: Research manuscript evidence
-        env:
-          GOVAI_EMPIRICAL_QUICK: "1"
-        run: |
-          set -euo pipefail
-          mkdir -p .oss-ci-out
-          export MANUSCRIPT_EVIDENCE_DIR="${GITHUB_WORKSPACE}/.oss-ci-out"
-          make manuscript-evidence-check
-
-      - name: Commercial platform readiness
-        run: |
-          set -euo pipefail
-          make commercial-readiness
-
-      - name: Machine-readable OSS artefacts
-        env:
-          GOVAI_OSS_DIAGNOSTICS_BASE_REF: origin/${{ github.base_ref }}
-          GOVAI_RELEASE_PROMOTION: ${{ github.head_ref == 'staging' && github.base_ref == 'main' }}
-        run: |
-          set -euo pipefail
-          mkdir -p .oss-ci-out
-          python3 scripts/repo_health_check.py --json > .oss-ci-out/repo-health.json
-          python3 scripts/roi_calculator.py --input examples/revenue/sample-roi-input.json --json > .oss-ci-out/revenue-roi.json
-          if [ -f docs/operations/production-readiness-checklist.md ]; then
-            cp docs/operations/production-readiness-checklist.md .oss-ci-out/production-readiness-checklist.md
-          else
-            python3 scripts/customer_operations_check.py --json > .oss-ci-out/customer-operations.json
-            {
-              echo "# Production readiness checklist"
-              echo
-              echo "Generated from customer operations diagnostics."
-            } > .oss-ci-out/production-readiness-checklist.md
-          fi
-          python3 scripts/generate_partner_certification_package.py > .oss-ci-out/partner-certification-package.md
-          python3 scripts/generate_regulatory_evidence_export.py > .oss-ci-out/regulatory-evidence-export.md
-          python3 scripts/validate_marketplace_manifest.py --manifest marketplace/manifest.json --json > .oss-ci-out/policy-pack-marketplace-manifest-validation.json
-          if [ -f scripts/validate_registry.py ]; then
-            if [ -f scripts/validate_registry.py ]; then
-  python3 scripts/validate_registry.py --json > .oss-ci-out/registry-validation.json
-else
-  printf '{"ok":true,"skipped":true,"reason":"registry validator not present"}\n' > .oss-ci-out/registry-validation.json
-fi
-          else
-            printf '{"ok":true,"skipped":true,"reason":"registry validator not present"}\n' > .oss-ci-out/registry-validation.json
-          fi
-          python3 scripts/validate_policy_pack.py examples/marketplace/eu-ai-act-basic --json > .oss-ci-out/policy-pack-eu-ai-act-basic-validation.json
-          python3 scripts/validate_policy_pack.py examples/marketplace/financial-services-ai --json > .oss-ci-out/policy-pack-financial-services-ai-validation.json
-          python3 scripts/validate_policy_pack.py examples/marketplace/healthcare-ai --json > .oss-ci-out/policy-pack-healthcare-ai-validation.json
-          python3 scripts/validate_policy_pack.py examples/marketplace/internal-model-risk --json > .oss-ci-out/policy-pack-internal-model-risk-validation.json
-          python3 scripts/validate_policy_pack.py examples/marketplace/vendor-evaluation --json > .oss-ci-out/policy-pack-vendor-evaluation-validation.json
-          python3 scripts/validate_policy_pack.py examples/marketplace/vendor-risk --json > .oss-ci-out/policy-pack-vendor-risk-validation.json
-          python3 scripts/validate_extension_package.py --json > .oss-ci-out/extension-package-validation.json
-          python3 scripts/generate_marketplace_listing.py --package examples/marketplace/sample-extension-package.json > .oss-ci-out/marketplace-listing.md
-          python3 scripts/customer_health_score.py --input examples/customer-analytics/sample-customer-health.json --json > .oss-ci-out/customer-health-score.json
-          python3 scripts/generate_executive_business_review.py --input examples/customer-analytics/sample-customer-health.json > .oss-ci-out/executive-business-review.md
-          python3 scripts/validate_dataset_provenance_snapshot.py --snapshot examples/evidence-quality/sample-dataset-provenance-snapshot.json --json > .oss-ci-out/dataset-provenance-snapshot-validation.json
-          python3 scripts/evidence_quality_score.py --input examples/evidence-quality/sample-dataset-provenance-snapshot.json > .oss-ci-out/evidence-quality-score.json
-          python3 scripts/generate_dataset_governance_report.py --input examples/evidence-quality/sample-dataset-provenance-snapshot.json > .oss-ci-out/dataset-governance-report.md
-          python3 scripts/validate_governance_control_snapshot.py --json > .oss-ci-out/governance-control-snapshot-validation.json
-          python3 scripts/generate_governance_control_report.py --input examples/policy-intelligence/sample-governance-control-snapshot.json > .oss-ci-out/governance-control-report.md
-          python3 scripts/validate_automation_pack.py --pack examples/integrations/sample-automation-pack.json --json > .oss-ci-out/automation-pack-validation.json
-          python3 scripts/generate_automation_pack_summary.py --pack examples/integrations/sample-automation-pack.json --out .oss-ci-out/automation-pack-summary.md > .oss-ci-out/automation-pack-summary.md
-          python3 scripts/hosted_platform_check.py --json > .oss-ci-out/hosted-platform.json
-          python3 scripts/hosted_saas_readiness_check.py --json > .oss-ci-out/hosted-saas-readiness.json
-          python3 scripts/validate_hosted_platform_manifest.py --json > .oss-ci-out/hosted-platform-manifest-validation.json
-          python3 scripts/validate_hosted_readiness_snapshot.py --input examples/hosted-platform/sample-hosted-readiness-snapshot.json --json > .oss-ci-out/hosted-readiness-snapshot-validation.json
-          python3 scripts/hosted_readiness_score.py --input examples/hosted-platform/sample-hosted-readiness-snapshot.json --json > .oss-ci-out/hosted-readiness-score.json
-          python3 scripts/generate_hosted_readiness_export.py --input examples/hosted-platform/sample-hosted-readiness-snapshot.json > .oss-ci-out/hosted-readiness-export.md
-          python3 scripts/multi_tenant_check.py --json > .oss-ci-out/multi-tenant.json
-          python3 scripts/multi_tenant_check.py --tenant-isolation-only --json > .oss-ci-out/tenant-isolation-check.json
-          python3 scripts/generate_agent_governance_report.py --input examples/agent-governance/sample-agent-delegation-snapshot.json > .oss-ci-out/agent-governance-report.md
-          python3 scripts/generate_public_launch_report.py --input examples/launch/sample-standardization-readiness-snapshot.json > .oss-ci-out/public-launch-report.md
-          python3 scripts/security_trust_check.py --json > .oss-ci-out/security-trust.json
-          cp docs/trust/trust-manifest.json .oss-ci-out/trust-manifest.json
-          python3 scripts/validate_trust_manifest.py --json > .oss-ci-out/trust-manifest-validation.json
-          python3 scripts/trust_chain_check.py --json > .oss-ci-out/trust-chain.json
-          python3 scripts/validate_docs_links.py --strict --json > .oss-ci-out/docs-links.json
-          python3 scripts/oss_diagnostics.py --json > .oss-ci-out/oss-diagnostics.json
-          if [ -d benchmark-runs/latest ]; then
-            for f in event-ingestion-benchmarks.json hash-chain-benchmarks.json export-benchmarks.json storage-benchmarks.json multi-tenant-benchmarks.json failure-benchmarks.json empirical-evaluation-summary.json; do
-              if [ -f "benchmark-runs/latest/$f" ]; then
-                cp "benchmark-runs/latest/$f" ".oss-ci-out/$f"
-              fi
-            done
-          fi
-          python3 scripts/commercial_readiness_check.py --json > .oss-ci-out/commercial-readiness.json
-          python3 scripts/pilot_execution_check.py --json > .oss-ci-out/pilot-execution.json
-          python3 scripts/validate_pilot_manifest.py --json > .oss-ci-out/pilot-manifest-validation.json
-          python3 scripts/validate_revenue_manifest.py --json > .oss-ci-out/revenue-manifest-validation.json
-          python3 scripts/revenue_enablement_check.py --json > .oss-ci-out/revenue-enablement.json
-          python3 scripts/customer_operations_check.py --json > .oss-ci-out/customer-operations.json
-          python3 scripts/validate_customer_operations_manifest.py --json > .oss-ci-out/customer-operations-manifest-validation.json
-          python3 scripts/generate_production_readiness_checklist.py --manifest docs/operations/customer-operations-manifest.json --out .oss-ci-out/production-readiness-checklist.md
-          python3 scripts/partner_ecosystem_check.py --json > .oss-ci-out/partner-ecosystem.json
-          python3 scripts/partner_ecosystem_check.py --integration-marketplace-only --json > .oss-ci-out/integration-marketplace-check.json
-          python3 scripts/validate_product_analytics_manifest.py --json > .oss-ci-out/product-analytics-manifest-validation.json
-          python3 scripts/product_analytics_check.py --json > .oss-ci-out/product-analytics-diagnostics.json
-          python3 scripts/validate_partner_ecosystem_manifest.py --json > .oss-ci-out/partner-ecosystem-manifest-validation.json
-          python3 scripts/generate_partner_certification_package.py --manifest docs/partners/partner-ecosystem-manifest.json --out .oss-ci-out/partner-certification-package.md
-          python3 scripts/regulatory_evidence_check.py --json > .oss-ci-out/regulatory-evidence.json
-          python3 scripts/validate_regulatory_evidence_manifest.py --json > .oss-ci-out/regulatory-manifest-validation.json
-          python3 scripts/validate_ai_act_obligations.py --json > .oss-ci-out/ai-act-obligations-validation.json
-          python3 scripts/generate_regulatory_evidence_export.py --manifest docs/regulatory/regulatory-evidence-manifest.json --out .oss-ci-out/regulatory-evidence-export.md
-          python3 scripts/observability_check.py --json > .oss-ci-out/observability.json
-          python3 scripts/validate_observability_manifest.py --json > .oss-ci-out/observability-manifest-validation.json
-          python3 scripts/validate_operational_snapshot.py --input examples/observability/sample-operational-snapshot.json --json > .oss-ci-out/operational-snapshot-validation.json
-          python3 scripts/operational_health_score.py --input examples/observability/sample-operational-snapshot.json --json > .oss-ci-out/operational-health-score.json
-          python3 scripts/generate_operational_intelligence_report.py --input examples/observability/sample-operational-snapshot.json --out .oss-ci-out/operational-intelligence-report.md
-          python3 scripts/runtime_safety_check.py --json > .oss-ci-out/runtime-safety.json
-          python3 scripts/validate_runtime_safety_manifest.py --json > .oss-ci-out/runtime-safety-manifest-validation.json
-          python3 scripts/validate_runtime_safety_snapshot.py --input examples/runtime-safety/sample-runtime-safety-snapshot.json --json > .oss-ci-out/runtime-safety-snapshot-validation.json
-          python3 scripts/runtime_safety_score.py --input examples/runtime-safety/sample-runtime-safety-snapshot.json > .oss-ci-out/runtime-safety-score.json
-          python3 scripts/generate_runtime_safety_report.py --input examples/runtime-safety/sample-runtime-safety-snapshot.json --out .oss-ci-out/runtime-safety-report.md
-          python3 scripts/model_risk_check.py --json > .oss-ci-out/model-risk.json
-          python3 scripts/validate_model_risk_manifest.py --json > .oss-ci-out/model-risk-manifest-validation.json
-          python3 scripts/validate_model_evaluation_snapshot.py --input examples/model-risk/sample-model-evaluation-snapshot.json --json > .oss-ci-out/model-evaluation-snapshot-validation.json
-          python3 scripts/model_risk_score.py --input examples/model-risk/sample-model-evaluation-snapshot.json > .oss-ci-out/model-risk-score.json
-          python3 scripts/generate_model_assurance_report.py --input examples/model-risk/sample-model-evaluation-snapshot.json --out .oss-ci-out/model-assurance-report.md
-          python3 scripts/agent_governance_check.py --json > .oss-ci-out/agent-governance.json
-          python3 scripts/validate_agent_governance_manifest.py --json > .oss-ci-out/agent-governance-manifest-validation.json
-          python3 scripts/validate_agent_delegation_snapshot.py --input examples/agent-governance/sample-agent-delegation-snapshot.json --json > .oss-ci-out/agent-delegation-snapshot-validation.json
-          python3 scripts/agent_governance_score.py --input examples/agent-governance/sample-agent-delegation-snapshot.json --json > .oss-ci-out/agent-governance-score.json
-          python3 scripts/generate_agent_governance_report.py --input examples/agent-governance/sample-agent-delegation-snapshot.json --out .oss-ci-out/agent-governance-report.md
-          python3 scripts/autonomous_governance_check.py --json > .oss-ci-out/autonomous-governance.json
-          python3 scripts/autonomous_governance_check.py --multi-agent --json > .oss-ci-out/autonomous-multi-agent-governance.json
-          python3 scripts/marketplace_check.py --json > .oss-ci-out/marketplace.json
-          python3 scripts/validate_marketplace_manifest.py --json > .oss-ci-out/marketplace-manifest-validation.json
-          python3 scripts/registry_check.py --json > .oss-ci-out/registry-validation.json
-          python3 scripts/customer_analytics_check.py --json > .oss-ci-out/customer-analytics.json
-          python3 scripts/validate_customer_analytics_manifest.py --json > .oss-ci-out/customer-analytics-manifest-validation.json
-          python3 scripts/evidence_quality_check.py --json > .oss-ci-out/evidence-quality.json
-          python3 scripts/validate_evidence_quality_manifest.py --json > .oss-ci-out/evidence-quality-manifest-validation.json
-          python3 scripts/policy_intelligence_check.py --json > .oss-ci-out/policy-intelligence.json
-          python3 scripts/validate_policy_intelligence_manifest.py --json > .oss-ci-out/policy-intelligence-manifest-validation.json
-          python3 scripts/validate_revenue_intelligence_manifest.py --json > .oss-ci-out/revenue-intelligence-manifest-validation.json
-          python3 scripts/revenue_intelligence_check.py --json > .oss-ci-out/revenue-intelligence.json
-          python3 scripts/policy_coverage_score.py --input examples/policy-intelligence/sample-governance-control-snapshot.json --json > .oss-ci-out/policy-coverage-score.json
-          python3 scripts/governance_posture_aggregate_check.py --json > .oss-ci-out/control-plane.json
-          python3 scripts/validate_control_plane_manifest.py --json > .oss-ci-out/control-plane-manifest-validation.json
-          python3 scripts/validate_governance_posture_snapshot.py --json --input examples/control-plane/sample-governance-posture-snapshot.json > .oss-ci-out/governance-posture-snapshot-validation.json
-          python3 scripts/governance_posture_score.py --input examples/control-plane/sample-governance-posture-snapshot.json > .oss-ci-out/governance-posture-score.json
-          python3 scripts/generate_control_plane_report.py --input examples/control-plane/sample-governance-posture-snapshot.json --out .oss-ci-out/control-plane-report.md
-          python3 scripts/developer_integrations_check.py --json > .oss-ci-out/developer-integrations.json
-          python3 scripts/validate_developer_integrations_manifest.py --json > .oss-ci-out/developer-integrations-manifest-validation.json
-          python3 scripts/validate_release_manifest.py --json > .oss-ci-out/release-manifest-validation.json
-          python3 scripts/validate_changelog.py --json > .oss-ci-out/changelog-validation.json
-          python3 scripts/release_readiness_report.py --json > .oss-ci-out/release-readiness-report.json
-          cp docs/releases/release-notes-template.md .oss-ci-out/release-notes-template.md
-          python3 scripts/public_launch_check.py --json > .oss-ci-out/public-launch.json
-          python3 scripts/validate_public_launch_manifest.py --json > .oss-ci-out/public-launch-manifest-validation.json
-          python3 scripts/validate_standardization_readiness_snapshot.py --input examples/launch/sample-standardization-readiness-snapshot.json --json > .oss-ci-out/standardization-readiness-snapshot-validation.json
-          python3 scripts/public_launch_readiness_score.py --input examples/launch/sample-standardization-readiness-snapshot.json --json > .oss-ci-out/public-launch-readiness-score.json
-          python3 scripts/generate_public_launch_report.py --input examples/launch/sample-standardization-readiness-snapshot.json --out .oss-ci-out/public-launch-report.md
-          python3 scripts/research_package_check.py --json > .oss-ci-out/research-package.json
-          python3 scripts/validate_research_manifest.py --json > .oss-ci-out/research-manifest-validation.json
-          python3 scripts/validate_iso_42001_alignment_manifest.py --json > .oss-ci-out/iso-42001-alignment-manifest-validation.json
-          python3 scripts/validate_iso_42001_clause_index.py --json > .oss-ci-out/iso-42001-clause-index-validation.json
-          python3 scripts/npm_typescript_publishing_check.py --json > .oss-ci-out/npm-typescript-publishing.json
 
       - name: Upload OSS check JSON artifacts
         if: success()

@@ -1,4 +1,6 @@
-# GovAI Evidence Lifecycle
+# GovAI Evidence Lifecycle (diagram)
+
+Narrative and state model: [../evidence-lifecycle.md](../evidence-lifecycle.md). Enterprise hub: [../README.md](../README.md).
 
 This diagram describes how evidence moves through GovAI from collection to replay.
 

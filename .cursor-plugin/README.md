@@ -1,14 +1,16 @@
-# GovAI — Cursor plugin (rules, skills, local MCP)
+# AIGov — Cursor plugin (rules, skills, local MCP)
 
 ## Overview
 
-This package turns the GovAI compliance engine repository into an **IDE-native governance assistant** for Cursor: deterministic **rules** (branch flow, audit expectations, compliance gates), **Agent skills** (gate triage, evidence-pack validation, audit authoring, EU AI Act–oriented mapping guidance), and a **local MCP bridge** (`mcp/govai_mcp_server.py`) that wraps existing repo scripts and tests.
+This package turns the AIGov compliance engine repository into an **IDE-native governance assistant** for Cursor: deterministic **rules** (branch flow, audit expectations, compliance gates), **Agent skills** (gate triage, evidence-pack validation, audit authoring, EU AI Act–oriented mapping guidance), and a **local MCP bridge** (`mcp/govai_mcp_server.py`) that wraps existing repo scripts and tests.
 
 The hosted audit service, Rust runtime enforcement, database migrations, and CI workflows remain **authoritative** for production compliance. The plugin accelerates **local** checks and consistent agent behaviour; it does not replace organisational controls.
 
-**Marketplace publication package:** curated submission copy, demo flow, screenshot plan, and release checklist live under **`publication/`** (start at [`publication/README.md`](publication/README.md)).
+**Publication status:** internally usable from a full repo clone; **submission-ready** documentation and asset manifest; **not live** and **not approved** in Cursor Marketplace — see [`publication/status.md`](publication/status.md).
 
-**Manifest schema:** `plugin.json` follows the **Cursor Marketplace–oriented** layout (`name`, `version`, `description`, `author`, `homepage`, `repository`, `license`, `keywords`, `logo`, `rules`, `skills`, `mcpServers`). The Marketplace **slug** is the manifest `name` (`govai`); **GovAI** remains the product name in prose and listing copy.
+**Marketplace publication package:** listing copy, demo flow, reviewer notes, support contacts, version policy, and release checklist live under **`publication/`** (start at [`publication/README.md`](publication/README.md)).
+
+**Manifest schema:** `plugin.json` follows the **Cursor Marketplace–oriented** layout (`name`, `version`, `description`, `author`, `homepage`, `repository`, `license`, `keywords`, `logo`, `rules`, `skills`, `mcpServers`). The Marketplace **slug** is the manifest `name` (`govai`); **AIGov** remains the product name in prose and listing copy.
 
 **Internal / historical manifest fields** (for example `schema_version`, `tagline`, `bundles`, `mcp.entry`) are no longer carried in `plugin.json`; submission taglines and categories live in [`marketplace.md`](marketplace.md) and [`publication/submission-copy.md`](publication/submission-copy.md).
 
@@ -38,7 +40,7 @@ The **`govai-local`** server uses **stdio** and the same argv shape everywhere:
 
 **Path resolution:** `args` paths are **relative to the repository root** (the workspace that contains `mcp/`). The server discovers the repo root via `.cursor-plugin/plugin.json` when possible.
 
-**Marketplace vs clone-and-use:** When the plugin is consumed from a **full GovAI repository checkout** opened as the Cursor workspace root, repo-relative `args` work as above. If a Marketplace install exposes only the plugin subtree **without** the rest of the monorepo, `mcp/govai_mcp_server.py` will not exist next to the workspace — use a **full clone** for MCP-backed tools or copy the `govai-local` block into a workspace that points at your checkout (see **Remaining marketplace risks** below).
+**Marketplace vs clone-and-use:** When the plugin is consumed from a **full AIGov repository checkout** opened as the Cursor workspace root, repo-relative `args` work as above. If a Marketplace install exposes only the plugin subtree **without** the rest of the monorepo, `mcp/govai_mcp_server.py` will not exist next to the workspace — use a **full clone** for MCP-backed tools or copy the `govai-local` block into a workspace that points at your checkout (see **Remaining marketplace risks** below).
 
 ## Available tools
 
@@ -83,7 +85,7 @@ Each skill lives under `skills/<kebab-name>/SKILL.md` with YAML frontmatter (`na
 
 ## Non-goals
 
-- Not a substitute for **hosted** GovAI audit artefacts, **Rust** enforcement, or **database** policy.
+- Not a substitute for **hosted** AIGov audit artefacts, **Rust** enforcement, or **database** policy.
 - Not legal advice; EU AI Act mapping skill is **operational** guidance only.
 - Not a full MCP SDK implementation — stdio JSON-RPC is intentionally minimal; extend if Cursor requirements evolve.
 
@@ -101,26 +103,28 @@ Each skill lives under `skills/<kebab-name>/SKILL.md` with YAML frontmatter (`na
 
 ## Readiness checklist
 
-### Internal use (this repository — intended state today)
-
-These items support **teams cloning the repo** and using the plugin pack locally; they are **not** a claim of Cursor Marketplace listing approval.
+### Internally usable (clone-and-use — ready)
 
 - [x] `plugin.json` with Marketplace-oriented metadata (`govai`, version, author, links, license, keywords, `logo`, `rules`, `skills`, `mcpServers`).
 - [x] Plugin-level **`mcp.json`** plus workspace examples (`.cursor/mcp.json.example`, `examples/local-config.json`).
 - [x] Non-empty rules, skill directories with `SKILL.md`, README, and `examples/local-config.json`.
-- [x] `assets/logo.png` for manifest `logo` (derived from `dashboard/public/icon-512.png`).
+- [x] `assets/logo.png` derived from `dashboard/brand/aigov-mark.ico` (lossless composite, no mark scaling).
 - [x] Local MCP server with read/write separation and dry-run for audit templates.
 - [x] Validation and smoke scripts plus `Makefile` targets `cursor-plugin-validate`, `cursor-plugin-smoke`, `cursor-plugin-check`.
 - [x] CI runs **`make cursor-plugin-check`** on PRs and pushes to **`main`** / **`staging`** (see `.github/workflows/oss-developer-experience.yml`).
 
-### Public Cursor Marketplace (remaining before a listing)
+### Documentation-ready (repository — ready)
 
-Do **not** treat the internal checklist above as marketplace approval. A public release still needs vendor-specific artefacts and evidence that are **out of scope** for this repo-only package until you add them.
+- [x] [`publication/status.md`](publication/status.md) states **not live** and **listing media incomplete**.
+- [x] Full-repository MCP model documented ([`installation-model.md`](publication/installation-model.md), `installation-check` CLI).
+- [x] Demo-flow CLI evidence committed; logo, hero, and screenshots committed in `marketplace-assets.json`.
+- [x] Go/no-go checklists with evidence validation ([`pre-submit-checklist.md`](publication/pre-submit-checklist.md)).
+- [x] Hero banner and five Cursor UI screenshots committed; `make cursor-marketplace-listing-check` passes.
+- [ ] Legal/marketing sign-off and Cursor portal submit — **external**.
 
-- [ ] Vendor-specific packaging, signing, and submission steps per **current** Cursor Marketplace documentation.
-- [ ] Screenshots (or other listing-required visuals): rules in use, MCP tool success output, evidence validation, dry-run template preview — **none are committed here**; follow **`publication/screenshot-plan.md`** when assets exist.
-- [ ] Explicit **supported Cursor version range** in listing copy and maintenance policy (see **`publication/release-checklist.md`**).
-- [ ] Curated publication copy and demo flow kept in sync with shipped tools (**`publication/`** — see [`publication/README.md`](publication/README.md)).
+### Not live in Cursor Marketplace
+
+The plugin is **not published**, **not approved**, and **not listed** in Cursor Marketplace. Do not imply a live listing in docs or screenshots until [`publication/status.md`](publication/status.md) is updated after actual approval.
 
 ### Remaining marketplace risks
 
@@ -135,4 +139,4 @@ Do **not** treat the internal checklist above as marketplace approval. A public 
 
 Commercial collateral for sales and customer success lives under `docs/commercial/` (pricing, OSS vs hosted matrix, enterprise features, support and SLA, onboarding playbook, sales one-pager, marketplace submission checklist).
 
-See also `marketplace.md` (submission draft) and `docs/reports/repo-debt-audit-and-cleanup.md` (commercial readiness audit).
+See also `marketplace.md` (submission index) and `docs/reports/cursor-marketplace-readiness.md` (readiness audit).

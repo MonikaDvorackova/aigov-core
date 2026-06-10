@@ -42,9 +42,63 @@ fn allow_runtime_policy_fallback(deployment_env: GovaiEnvironment) -> bool {
 
 #[cfg(test)]
 pub(crate) mod test_sync {
-    use std::sync::Mutex;
-    /// Serializes tests that set/read `AIGOV_APPROVER_ALLOWLIST` (process-global).
-    pub static APPROVER_ALLOWLIST_ENV_LOCK: Mutex<()> = Mutex::new(());
+    use std::collections::HashMap;
+    use std::path::PathBuf;
+    use std::sync::{Mutex, MutexGuard};
+
+    /// Serializes policy-related tests that read/write process-global environment variables.
+    pub static POLICY_ENV_LOCK: Mutex<()> = Mutex::new(());
+
+    const TRACKED_ENV_KEYS: &[&str] = &[
+        "AIGOV_POLICY_DIR",
+        "AIGOV_POLICY_FILE",
+        "AIGOV_POLICY_STRICT",
+        "AIGOV_APPROVER_ALLOWLIST",
+        "AIGOV_ENVIRONMENT",
+    ];
+
+    /// Holds [`POLICY_ENV_LOCK`] and restores tracked env vars (and optional cwd) on drop.
+    pub struct PolicyEnvGuard {
+        _lock: MutexGuard<'static, ()>,
+        saved: HashMap<String, Option<String>>,
+        saved_cwd: Option<PathBuf>,
+    }
+
+    impl PolicyEnvGuard {
+        pub fn lock() -> Self {
+            let lock = POLICY_ENV_LOCK.lock().expect("policy env test lock");
+            let mut saved = HashMap::new();
+            for key in TRACKED_ENV_KEYS {
+                saved.insert(key.to_string(), std::env::var(key).ok());
+            }
+            Self {
+                _lock: lock,
+                saved,
+                saved_cwd: None,
+            }
+        }
+
+        pub fn lock_with_cwd() -> Self {
+            let mut guard = Self::lock();
+            guard.saved_cwd = std::env::current_dir().ok();
+            guard
+        }
+    }
+
+    impl Drop for PolicyEnvGuard {
+        fn drop(&mut self) {
+            if let Some(cwd) = self.saved_cwd.take() {
+                let _ = std::env::set_current_dir(cwd);
+            }
+            for key in TRACKED_ENV_KEYS {
+                match self.saved.get(*key) {
+                    Some(Some(value)) => std::env::set_var(key, value),
+                    Some(None) => std::env::remove_var(key),
+                    None => {}
+                }
+            }
+        }
+    }
 }
 
 fn default_approver_allowlist() -> Vec<String> {
@@ -573,10 +627,7 @@ mod tests {
 
     #[test]
     fn load_for_deployment_honors_aigov_policy_dir() {
-        use std::sync::Mutex;
-        static DIR_LOCK: Mutex<()> = Mutex::new(());
-        let _g = DIR_LOCK.lock().unwrap();
-        let orig_cwd = std::env::current_dir().unwrap();
+        let _guard = test_sync::PolicyEnvGuard::lock_with_cwd();
         let policies = TempDir::new().unwrap();
         fs::write(
             policies.path().join("policy.staging.json"),
@@ -595,19 +646,16 @@ mod tests {
         assert!(!r.config.enforce_approver_allowlist);
         assert_eq!(r.source.kind, PolicySourceKind::EnvFile);
         assert_eq!(r.source.path.as_deref(), Some("policy.staging.json"));
-        std::env::remove_var("AIGOV_POLICY_DIR");
-        std::env::set_current_dir(orig_cwd).unwrap();
     }
 
     #[test]
     fn effective_allowlist_env_override() {
-        let _g = test_sync::APPROVER_ALLOWLIST_ENV_LOCK.lock().unwrap();
+        let _guard = test_sync::PolicyEnvGuard::lock();
         let mut cfg = PolicyConfig::default();
         cfg.approver_allowlist = vec!["from_file".to_string()];
         std::env::set_var("AIGOV_APPROVER_ALLOWLIST", "from_env,From_Env");
         let eff = effective_approver_allowlist(&cfg);
         assert_eq!(eff, vec!["from_env"]);
-        std::env::remove_var("AIGOV_APPROVER_ALLOWLIST");
     }
 
     #[test]
@@ -674,16 +722,12 @@ mod tests {
 
     #[test]
     fn load_for_deployment_strict_env_rejects_missing_file_even_on_dev() {
-        use std::sync::Mutex;
-        static ENV_LOCK: Mutex<()> = Mutex::new(());
-        let _g = ENV_LOCK.lock().unwrap();
+        let _guard = test_sync::PolicyEnvGuard::lock();
         let dir = TempDir::new().unwrap();
         std::env::remove_var("AIGOV_POLICY_FILE");
         std::env::set_var("AIGOV_POLICY_DIR", dir.path().to_string_lossy().as_ref());
         std::env::set_var("AIGOV_POLICY_STRICT", "true");
         let e = super::load_for_deployment(GovaiEnvironment::Dev).unwrap_err();
         assert!(e.contains(POLICY_REFUSE_MESSAGE));
-        std::env::remove_var("AIGOV_POLICY_STRICT");
-        std::env::remove_var("AIGOV_POLICY_DIR");
     }
 }

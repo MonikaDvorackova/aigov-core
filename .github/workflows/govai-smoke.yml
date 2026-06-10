@@ -1,12 +1,12 @@
 # -----------------------------------------------------------------------------
-# THIS IS A SYNTHETIC SMOKE TEST ONLY — NOT A PRODUCTION COMPLIANCE GATE
+# MANUAL OPERATOR SMOKE — NOT GovAI Core CI
 #
-# Manual workflow_dispatch harness: scripted evidence (NOT CI-generated artefacts).
-# Validates hosted connectivity / policy DEMO sequence; does NOT prove artefact-bound
-# continuity (events_content_sha256 vs CI manifest).
+# Requires repository Variable GOVAI_AUDIT_BASE_URL + Secret GOVAI_API_KEY pointing at
+# an **operator-run** audit HTTP endpoint (self-hosted aigov_audit or external operator environment).
+# GovAI Platform hosted SaaS is optional and not part of GovAI Core CI.
 #
-# Production artefact-bound validation: `.github/workflows/compliance.yml` → job
-# `govai-compliance-gate` (`submit-evidence-pack` + `verify-evidence-pack`).
+# GovAI Core CI does NOT start localhost:8088, poll GET /ready, or run this workflow automatically.
+# Portable Core validation: `.github/workflows/govai-ci.yml` and `compliance.yml` → `evidence_pack`.
 # -----------------------------------------------------------------------------
 #
 # Required configuration (manual runs only — Settings → Secrets and variables → Actions):

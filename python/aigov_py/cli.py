@@ -34,8 +34,12 @@ from aigov_py.discovery_policy_mapping import (
     triggered_by_discovery,
 )
 from aigov_py.policy_loader import load_policy_module, policy_identity, required_evidence_from_policy
-from aigov_py.policy_bundle_signing import (
+from aigov_py.audit_export_signing import (
     load_trust_from_env_json,
+    sign_audit_export_ed25519,
+    verify_signed_audit_export,
+)
+from aigov_py.policy_bundle_signing import (
     sign_policy_bundle_ed25519,
     verify_policy_bundle_ed25519,
 )
@@ -723,6 +727,7 @@ def _verify_artifact_digest_continuity(
     run_id: str,
     require_export: bool = False,
     artifact_file: Path | None = None,
+    portable_only: bool = False,
 ) -> tuple[int, str]:
     reason_code = "DIGEST_MISMATCH"
     try:
@@ -805,13 +810,20 @@ def _verify_artifact_digest_continuity(
                 file=sys.stderr,
             )
             return cli_exit.EX_ERR, reason_code
+    if portable_only:
+        return cli_exit.EX_OK, "OK"
+
     try:
         got_body = eag.bundle_hash_digest(client, run_id)
     except Exception as exc:
         print(f"ERROR: /bundle-hash failed: {exc}", file=sys.stderr)
         msg = str(exc).lower()
         if "connection refused" in msg or "failed to establish a new connection" in msg:
-            print('hint: Run local audit service (e.g. make audit_bg) before verify', file=sys.stderr)
+            print(
+                "hint: Configure GOVAI_AUDIT_BASE_URL to your operator runtime (GovAI Platform or self-host), "
+                "or use verify-evidence-pack --portable-only for offline CI.",
+                file=sys.stderr,
+            )
         return cli_exit.EX_ERR, reason_code
     got = str(got_body.get("events_content_sha256") or "").strip().lower()
     if got != expected:
@@ -1522,6 +1534,18 @@ def build_parser() -> GovaiArgumentParser:
         help="Also submit a fresh evidence pack to the audit service and verify /bundle-hash digest (requires GOVAI_API_KEY).",
     )
 
+    s_runtime_diag = sub.add_parser(
+        "runtime-diagnostics",
+        help="Probe /health, /ready, and /status for operator diagnostics (read-only).",
+    )
+    s_runtime_diag.add_argument(
+        "--base-url",
+        default=None,
+        help="Audit service origin (default: GOVAI_AUDIT_BASE_URL or http://127.0.0.1:8088).",
+    )
+    s_runtime_diag.add_argument("--timeout", type=float, default=10.0, help="HTTP timeout seconds.")
+    s_runtime_diag.add_argument("--json", action="store_true", help="Machine-readable report on stdout.")
+
     s_verify = sub.add_parser("verify", help="Verify local docs/* artifacts and governance hash chain.")
     s_verify.add_argument("--run-id", default=None, help="Run UUID (fallback: env GOVAI_RUN_ID or RUN_ID).")
     s_verify.add_argument("--json", action="store_true", help="Machine-readable output on stdout.")
@@ -1583,6 +1607,11 @@ def build_parser() -> GovaiArgumentParser:
         "--require-export",
         action="store_true",
         help="Fail (exit 1) if /api/export cross-check cannot be performed or disagrees with /bundle-hash.",
+    )
+    s_verify_pack.add_argument(
+        "--portable-only",
+        action="store_true",
+        help="Offline GovAI Core gate: validate manifest vs bundle digest only (no /bundle-hash or compliance-summary HTTP).",
     )
     s_verify_pack.add_argument(
         "--artifact-file",
@@ -1697,6 +1726,56 @@ def build_parser() -> GovaiArgumentParser:
         "--project",
         default=os.environ.get("GOVAI_PROJECT"),
         help="Optional X-GovAI-Project header (or GOVAI_PROJECT); metadata/metering only, not ledger tenant.",
+    )
+
+    s_sign_export = sub.add_parser(
+        "sign-audit-export",
+        help="Sign aigov.audit_export.v1 JSON with Ed25519 (post-export; ledger unchanged).",
+    )
+    s_sign_export.add_argument("--in", dest="in_path", required=True, help="Input audit export JSON path.")
+    s_sign_export.add_argument("--out", dest="out_path", required=True, help="Output signed audit export JSON path.")
+    s_sign_export.add_argument("--issuer-id", required=True, help="Issuer id for signature trust lookup.")
+    s_sign_export.add_argument("--signer", required=True, help="Signer identity label.")
+    s_sign_export.add_argument("--private-key-base64", required=True, help="Ed25519 private key (base64, 32-byte seed).")
+    s_sign_export.add_argument("--created-at-utc", required=True, help="RFC3339 UTC timestamp.")
+    s_sign_export.add_argument("--expires-at-utc", default=None, help="Optional RFC3339 UTC timestamp.")
+
+    s_verify_export = sub.add_parser(
+        "verify-audit-export",
+        help="Verify signed aigov.audit_export.v1 (schema, hashes, run_id, Ed25519).",
+    )
+    s_verify_export.add_argument("--path", required=True, help="Signed audit export JSON path.")
+    s_verify_export.add_argument(
+        "--trust-json",
+        default=os.environ.get("AIGOV_POLICY_TRUST_ED25519_JSON"),
+        help="Trusted Ed25519 public keys JSON (default: env AIGOV_POLICY_TRUST_ED25519_JSON).",
+    )
+
+    s_replay_export = sub.add_parser(
+        "replay-audit-export",
+        help="Deterministic governance replay from aigov.audit_export.v1 JSON.",
+    )
+    s_replay_export.add_argument("--path", required=True, help="Audit export JSON path.")
+    s_replay_export.add_argument(
+        "--json",
+        action="store_true",
+        help="Emit full ReplayResult JSON (default: human-readable summary).",
+    )
+
+    s_lineage_graph = sub.add_parser(
+        "lineage-graph",
+        help="Build governance lineage graph from aigov.audit_export.v1 JSON.",
+    )
+    s_lineage_graph.add_argument("--path", required=True, help="Audit export JSON path.")
+    s_lineage_graph.add_argument(
+        "--json",
+        action="store_true",
+        help="Emit full graph document JSON (default: human-readable summary).",
+    )
+    s_lineage_graph.add_argument(
+        "--mermaid",
+        action="store_true",
+        help="Emit deterministic Mermaid flowchart (stdout).",
     )
 
     s_usage = sub.add_parser("usage", help="GET /usage (machine-readable JSON).")
@@ -2121,7 +2200,11 @@ def main(argv: Sequence[str] | None = None) -> int:
                 client = GovAIClient(audit_url.rstrip("/"), api_key=api_key, default_project=os.environ.get("GOVAI_PROJECT"))
                 _ = client.request_json("GET", "/ready", timeout=2.0, raise_on_body_ok_false=False)
             except Exception:
-                print("Local audit service is not running. Start it with: make audit_bg", file=stream)
+                print(
+                    "Operator audit runtime not reachable at GOVAI_AUDIT_BASE_URL. "
+                    "Start GovAI Platform / self-host stack, or use offline portable targets.",
+                    file=stream,
+                )
                 print("", file=stream)
 
         print(f"run_id: {res.run_id}", file=stream)
@@ -2202,6 +2285,23 @@ def main(argv: Sequence[str] | None = None) -> int:
     api_key = _api_key(args)
     project = _resolve_project(args)
     repro = _format_repro_command(args_list)
+
+    if args.cmd == "runtime-diagnostics":
+        from aigov_py.runtime_diagnostics import run_runtime_diagnostics
+
+        base = (
+            getattr(args, "base_url", None)
+            or os.environ.get("GOVAI_AUDIT_BASE_URL")
+            or "http://127.0.0.1:8088"
+        ).strip()
+        if not base:
+            print("error: --base-url or GOVAI_AUDIT_BASE_URL required", file=sys.stderr)
+            return cli_exit.EX_USAGE
+        return run_runtime_diagnostics(
+            base,
+            timeout_sec=float(getattr(args, "timeout", 10.0)),
+            json_out=bool(getattr(args, "json", False)),
+        )
 
     if args.cmd == "preflight":
         local_only = bool(getattr(args, "local_only", False))
@@ -2471,6 +2571,7 @@ def main(argv: Sequence[str] | None = None) -> int:
                 return cli_exit.EX_ERR
             # Ensure manifest referent exists (CI must ship both files).
             _ = bundle_path
+            portable_only = bool(getattr(args, "portable_only", False))
             rc, reason = _verify_artifact_digest_continuity(
                 client,
                 artifact_dir=artifact_dir,
@@ -2481,12 +2582,25 @@ def main(argv: Sequence[str] | None = None) -> int:
                     if str(getattr(args, "artifact_file") or "").strip()
                     else None
                 ),
+                portable_only=portable_only,
             )
             if rc != cli_exit.EX_OK:
                 summary_verdict = "ERROR"
                 summary_codes = [reason or "DIGEST_MISMATCH"]
-                summary_next_action = "Fix evidence_digest_manifest.json / hosted bundle-hash mismatch, then rerun."
+                summary_next_action = (
+                    "Fix evidence_digest_manifest.json / bundle digest mismatch, then rerun."
+                    if portable_only
+                    else "Fix evidence_digest_manifest.json / hosted bundle-hash mismatch, then rerun."
+                )
                 return rc
+            if portable_only:
+                print("PORTABLE_OK")
+                summary_verdict = "VALID"
+                summary_codes = ["PORTABLE_DIGEST_OK"]
+                summary_next_action = (
+                    "Submit pack to operator-hosted runtime when required (GovAI Platform)."
+                )
+                return cli_exit.EX_OK
             code_sum, summary = _compliance_verdict_or_err(client, run_id, timeout=args.timeout)
             if code_sum != cli_exit.EX_OK or summary is None:
                 summary_verdict = "ERROR"
@@ -2860,6 +2974,94 @@ def main(argv: Sequence[str] | None = None) -> int:
             return cli_exit.EX_ERR
         _print_json(out, compact=True)
         return cli_exit.EX_OK
+
+    if args.cmd == "sign-audit-export":
+        try:
+            sign_audit_export_ed25519(
+                str(getattr(args, "in_path")),
+                out_path=str(getattr(args, "out_path")),
+                issuer_id=str(getattr(args, "issuer_id")),
+                signer=str(getattr(args, "signer")),
+                private_key_base64=str(getattr(args, "private_key_base64")),
+                created_at_utc=str(getattr(args, "created_at_utc")),
+                expires_at_utc=getattr(args, "expires_at_utc"),
+            )
+        except Exception as e:  # noqa: BLE001
+            print(f"error: sign-audit-export failed: {e}", file=sys.stderr)
+            return cli_exit.EX_ERR
+        return cli_exit.EX_OK
+
+    if args.cmd == "verify-audit-export":
+        raw = str(getattr(args, "path", "") or "").strip()
+        trust_raw = str(getattr(args, "trust_json", "") or "").strip()
+        if not trust_raw:
+            print(
+                "error: --trust-json or AIGOV_POLICY_TRUST_ED25519_JSON required",
+                file=sys.stderr,
+            )
+            return cli_exit.EX_USAGE
+        try:
+            doc = json.loads(Path(raw).read_text(encoding="utf-8"))
+            if not isinstance(doc, dict):
+                raise ValueError("audit export must be a JSON object")
+            trust = load_trust_from_env_json(trust_raw)
+            payload = verify_signed_audit_export(doc, trust=trust)
+            print(
+                json.dumps(
+                    {
+                        "ok": True,
+                        "run_id": payload.run_id,
+                        "schema_version": payload.schema_version,
+                        "decision_verdict": payload.decision_verdict,
+                        "events_content_sha256": payload.events_content_sha256,
+                        "bundle_sha256": payload.bundle_sha256,
+                    },
+                    indent=2,
+                )
+            )
+        except Exception as e:  # noqa: BLE001
+            print(f"error: verify-audit-export failed: {e}", file=sys.stderr)
+            return cli_exit.EX_ERR
+        return cli_exit.EX_OK
+
+    if args.cmd == "replay-audit-export":
+        from aigov_py.replay_audit_export import format_replay_report, replay_audit_export
+
+        raw = str(getattr(args, "path", "") or "").strip()
+        try:
+            result = replay_audit_export(raw)
+        except Exception as e:  # noqa: BLE001
+            print(f"error: replay-audit-export failed: {e}", file=sys.stderr)
+            return cli_exit.EX_ERR
+        if getattr(args, "json", False):
+            print(json.dumps(result, indent=2, ensure_ascii=False))
+        else:
+            print(format_replay_report(result))
+        return cli_exit.EX_OK if result.get("ok") else cli_exit.EX_ERR
+
+    if args.cmd == "lineage-graph":
+        from aigov_py.lineage_graph import format_lineage_summary, lineage_graph_from_export
+
+        raw = str(getattr(args, "path", "") or "").strip()
+        try:
+            if getattr(args, "mermaid", False):
+                out = lineage_graph_from_export(raw, mermaid=True)
+                print(out if isinstance(out, str) else str(out))
+                return cli_exit.EX_OK
+            doc = lineage_graph_from_export(raw)
+        except Exception as e:  # noqa: BLE001
+            print(f"error: lineage-graph failed: {e}", file=sys.stderr)
+            return cli_exit.EX_ERR
+        if getattr(args, "json", False):
+            print(json.dumps(doc, indent=2, ensure_ascii=False))
+        else:
+            print(format_lineage_summary(doc))
+        graph = doc.get("graph") if isinstance(doc, dict) else {}
+        validation = (
+            graph.get("lineage_validation") if isinstance(graph, dict) else {}
+        ) or {}
+        ok = not validation.get("errors") and not validation.get("delegation_cycle_detected")
+        return cli_exit.EX_OK if ok else cli_exit.EX_ERR
 
     if args.cmd == "usage":
         try:

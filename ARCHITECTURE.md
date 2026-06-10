@@ -119,35 +119,34 @@ flowchart LR
 
 ## Rust service (`rust/`, crate `aigov_audit`)
 
-- **Binary**: run using `cargo run --bin aigov_audit --locked` from `rust/`, or via root `Makefile` targets (`audit` / `audit_bg`), which invoke the same binary with a locked dependency graph.
+- **Binary**: `cargo build --locked --bin aigov_audit` or `make build-audit`; run with `cargo run --bin aigov_audit --locked` from `rust/` or `make run-audit`. GovAI Core does **not** manage a background service lifecycle (`make audit_bg` exits with guidance).
 - **Default bind**: `127.0.0.1:8088` — override with `AIGOV_BIND`.
 - **Startup line**: includes `environment` and `policy_version` (`rust/src/lib.rs`).
 - **Policy version**: `v0.5_dev` / `v0.5_staging` / `v0.5_prod` from [`rust/src/govai_environment.rs`](rust/src/govai_environment.rs) (tier from `AIGOV_ENVIRONMENT` → `AIGOV_ENV` → `GOVAI_ENV`). Full rules: [docs/env-resolution.md](docs/env-resolution.md).
 - **Audit log path** (relative to **process cwd**, typically `rust/`): `audit_log.jsonl` → from repo root: `rust/audit_log.jsonl`.
-- **Database**: `DATABASE_URL` must be set; the server builds a Postgres pool at startup (`sqlx`). Routes under `/api/*` use this pool.
+- **Database**: optional for ledger-only operation. When `DATABASE_URL` / `GOVAI_DATABASE_URL` is set, the server uses Postgres for API-key usage counters and issued keys (`sqlx` migrations under `rust/migrations/`). **`GET /ready`** requires DB ping and migrations only when a database URL is configured.
+- **Ledger**: tenant-scoped append-only JSONL under `GOVAI_LEDGER_DIR` (see `rust/src/project.rs`).
 
-### HTTP routes (implemented)
+### HTTP routes (implemented in `aigov_audit`)
 
 | Method | Path | Purpose |
 |--------|------|---------|
-| GET | `/` | `ok`, `service` (`govai`), `version` (crate version) |
-| GET | `/health` | `{"ok": true}` — **liveness-only** after successful startup; use **`GET /ready`** for DB connectivity, migrations, and writable ledger checks |
-| GET | `/status` | `ok`, `policy_version`, `environment` (`dev` / `staging` / `prod`) — policy file knobs are **not** in this JSON (see `policy.*.json` / `rust/src/policy_config.rs`) |
-| POST | `/evidence` | Ingest `EvidenceEvent`; policy gate; append to log |
-| GET | `/usage` | Usage and limits (`metering` off/on shapes); canonical schema in [`api/govai-http-v1.openapi.yaml`](api/govai-http-v1.openapi.yaml) |
-| GET | `/verify` | Full-chain integrity: `ok` + `policy_version`, or `error` on failure |
-| GET | `/verify-log` | Compact JSON: `{"ok": true}` or `{"ok": false, "error": …}` |
-| GET | `/bundle?run_id=…` | Bundle document (`schema_version`: `aigov.bundle.v1`, includes `events`, `identifiers`, derived sections) |
-| GET | `/bundle-hash?run_id=…` | Canonical `bundle_sha256` for the run |
-| GET | `/compliance-summary?run_id=…` | `ok` + `schema_version` `aigov.compliance_summary.v2`, `policy_version`, `run_id`; when `ok` is true — `verdict` (`VALID` / `INVALID` / `BLOCKED`) and `current_state`; when `ok` is false — `error` |
-| GET | `/api/export/:run_id` | Machine-readable export (`aigov.audit_export.v1`); see OpenAPI |
-| GET | `/api/me` | Supabase JWT — user + teams (each team includes `effective_role` + `permissions` from product RBAC; see `rust/src/rbac.rs`) |
-| POST | `/api/assessments` | Create assessment row (auth + team resolution + **`decision_submit` permission**) |
-| GET | `/api/compliance-workflow` | List workflow rows for resolved team; optional `?state=pending_review` (or other state). **200** includes `decision_authority` (ledger is primary; workflow is queue/override only). |
-| POST | `/api/compliance-workflow` | Register `run_id` in `pending_review` (idempotent if already present); **200** includes `workflow` + `decision_authority`. |
-| GET | `/api/compliance-workflow/:run_id` | Fetch one workflow row for the team; **200** includes `decision_authority`. |
-| POST | `/api/compliance-workflow/:run_id/review` | Body `{"decision":"approve"\|"reject"}` — transitions from `pending_review` only; **200** includes `decision_authority`. |
-| POST | `/api/compliance-workflow/:run_id/promotion` | Body `{"decision":"allow"\|"block"}` — transitions from `approved` only; **200** returns `ok` + `workflow` only (no `decision_authority` field). |
+| GET | `/` | Service banner (`internal`) |
+| GET | `/health` | Liveness (`{"ok": true}`) |
+| GET | `/ready` | Readiness: ledger writable + optional DB/migrations (`internal`) |
+| GET | `/status` | `policy_version`, `environment` |
+| POST | `/evidence` | Ingest `EvidenceEvent`; policy gate; append-only ledger |
+| GET | `/verify` | Full-chain integrity for tenant ledger |
+| GET | `/verify/:run_id` | Chain valid + run exists in tenant ledger |
+| GET | `/bundle?run_id=…` | Bundle document (`aigov.bundle.v1`) |
+| GET | `/bundle/:run_id` | Same as query form |
+| GET | `/bundle-hash?run_id=…` | `bundle_sha256` + `events_content_sha256` |
+| GET | `/bundle-hash/:run_id` | Same as query form |
+| GET | `/compliance-summary?run_id=…` | Ledger-authoritative verdict + `aigov.compliance_summary.v2` |
+| GET | `/compliance-summary/:run_id` | Same as query form |
+| GET | `/api/export/:run_id` | `aigov.audit_export.v1` deterministic export |
+
+Enterprise console routes (`/api/me`, assessments, compliance-workflow, AI decision traces) are **not** mounted by the default Core binary; they belong to the hosted platform boundary (see [docs/architecture/platform-vs-core-boundary.md](docs/architecture/platform-vs-core-boundary.md)).
 
 **HTTP contract (OpenAPI):** [`api/govai-http-v1.openapi.yaml`](api/govai-http-v1.openapi.yaml) — source of truth for v1 request/response shapes and `x-govai-surface` (`stable` vs `internal`). `GET /` is **internal**; all other routes in that file are **stable** for v1.
 

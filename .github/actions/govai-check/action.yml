@@ -1,7 +1,7 @@
 name: "GovAI artifact-bound compliance gate"
 description: >-
-  Posts CI-produced evidence artefacts to the GovAI ledger, verifies digest continuity via
-  events_content_sha256, and fails CI unless hosted evaluation is VALID (production semantics).
+  Posts CI-produced evidence artefacts to a GovAI Core audit endpoint, verifies digest continuity via
+  events_content_sha256, and fails CI unless ledger-authoritative compliance summary is VALID.
 
 branding:
   icon: activity

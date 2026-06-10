@@ -10,8 +10,8 @@
   },
   "preferred_citation": {
     "cff_path": "CITATION.cff",
-    "repository_url": "https://github.com/MonikaDvorackova/aigov-compliance-engine",
-    "software_name": "GovAI (aigov-compliance-engine)",
+    "repository_url": "https://github.com/MonikaDvorackova/govai-core",
+    "software_name": "GovAI Core (govai-core)",
     "version_field": "package_version in research-manifest.json"
   },
   "related_identifiers": [

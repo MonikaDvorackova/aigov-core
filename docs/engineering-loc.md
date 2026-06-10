@@ -2,7 +2,7 @@
 
 Raw line counts over the whole repository (for example ``git ls-files | xargs wc -l``) mix **product source**, **tests**, **documentation**, **CI and package configuration**, **generated bundles**, **experiment outputs**, and **fixtures**. That total is easy to misread for engineering sizing, architecture reviews, or trend tracking.
 
-This repository defines a **categorised LOC report** and three explicit subtotals computed only from tracked paths (`git ls-files`) by `scripts/engineering_loc.py` (Python standard library; no `cloc`).
+GovAI Core documents the **categorised LOC report** contract here. The full `scripts/engineering_loc.py` reporter ships in the proprietary platform repository; this open-core repo validates the documentation contract with `scripts/test_engineering_loc_smoke.py`.
 
 ## Why raw LOC is misleading
 
@@ -28,25 +28,18 @@ Excluded from engineering LOC (but still reported in their own rows): **tests**,
 
 From the repository root:
 
+In the platform repository:
+
 ```bash
 python3 scripts/engineering_loc.py
+make engineering_loc
 ```
 
-Example footer (after the category table):
-
-```text
-Backend/core engineering LOC (core_source): <N>
-Frontend/dashboard LOC (dashboard): <N>
-Product engineering LOC (core_source + dashboard): <N>
-```
-
-Equivalent Make target:
+In GovAI Core, CI runs the documentation smoke check:
 
 ```bash
 make engineering_loc
 ```
-
-The script exits with code **2** if it is not run inside a Git work tree (`git rev-parse --is-inside-work-tree`).
 
 ## Smoke check
 

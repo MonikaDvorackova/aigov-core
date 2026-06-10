@@ -9,10 +9,10 @@ On [govbase.dev/docs](https://govbase.dev/docs), the hub renders **try consoles*
 | Role | Start here |
 |------|------------|
 | **New visitor** | [product/what-is-govai.md](product/what-is-govai.md) → [product/how-govai-works.md](product/how-govai-works.md) |
-| **AI engineer** | [quickstart-5min.md](quickstart-5min.md), [product/integration-patterns.md](product/integration-patterns.md), [github-action.md](github-action.md) |
-| **Platform / CTO** | [architecture/overview.md](architecture/overview.md), [product/open-source-vs-hosted-vs-enterprise.md](product/open-source-vs-hosted-vs-enterprise.md) |
-| **Compliance / legal** | [trust-model.md](trust-model.md), [regulatory/README.md](regulatory/README.md), [trust/trust-center.md](trust/trust-center.md) |
-| **Enterprise buyer** | [pricing/index.md](pricing/index.md), [buyer/README.md](buyer/README.md), [product/enterprise-platform.md](product/enterprise-platform.md) |
+| **AI engineer** | [quickstart-runtime.md](quickstart-runtime.md), [quickstart-5min.md](quickstart-5min.md), [product/integration-patterns.md](product/integration-patterns.md), [github-action.md](github-action.md) |
+| **Platform / CTO** | [architecture/README.md](architecture/README.md), [architecture/overview.md](architecture/overview.md), [architecture/platform-vs-core-boundary.md](architecture/platform-vs-core-boundary.md) |
+| **Compliance / legal** | [trust-model.md](trust-model.md), [regulatory/ai-act-enterprise-positioning.md](regulatory/ai-act-enterprise-positioning.md), [trust/trust-center.md](trust/trust-center.md) |
+| **Enterprise buyer** | [trust/enterprise-trust-package.md](trust/enterprise-trust-package.md), [pricing/index.md](pricing/index.md), [buyer/README.md](buyer/README.md), [terminology.md](terminology.md) |
 | **Contributor** | [project/local_development.md](project/local_development.md), [project/contributor_workflow.md](project/contributor_workflow.md) |
 
 Full product index: [product/README.md](product/README.md).
@@ -21,11 +21,12 @@ Full product index: [product/README.md](product/README.md).
 
 1. **Product** — `docs/product/` (overview, use cases, ROI, positioning)
 2. **Developers** — quickstarts, integrations, runtime SDK, GitHub Action
-3. **Architecture** — `docs/architecture/`, [../ARCHITECTURE.md](../ARCHITECTURE.md)
-4. **Compliance** — regulatory, conformity, trust, evidence standards
-5. **Enterprise** — commercial, hosted, pilots, buyer due diligence (`docs/buyer/`)
-6. **Reference** — [api-reference.md](api-reference.md), [cli-reference.md](cli-reference.md), OpenAPI
-7. **Operations** — deployment, security, runbooks
+3. **Architecture** — `docs/architecture/` (enterprise hub: [architecture/README.md](architecture/README.md)), [../ARCHITECTURE.md](../ARCHITECTURE.md)
+4. **Enterprise governance & trust** — [terminology.md](terminology.md), [architecture/governance-semantics.md](architecture/governance-semantics.md), [trust/enterprise-trust-package.md](trust/enterprise-trust-package.md), [trust/shared-responsibility-model.md](trust/shared-responsibility-model.md)
+5. **Compliance** — regulatory, conformity, trust, evidence standards
+6. **Enterprise** — commercial, hosted, pilots, buyer due diligence (`docs/buyer/`)
+7. **Reference** — [api-reference.md](api-reference.md), [cli-reference.md](cli-reference.md), OpenAPI
+8. **Operations** — deployment, security, runbooks
 
 ## Overview
 

@@ -9,8 +9,20 @@ default = []
 hosted-platform = []
 
 [[bin]]
+name = "aigov_audit"
+path = "src/main.rs"
+
+[[bin]]
 name = "portable_evidence_digest_once"
 path = "src/bin/portable_evidence_digest_once.rs"
+
+[[bin]]
+name = "replay_audit_export_once"
+path = "src/bin/replay_audit_export_once.rs"
+
+[[bin]]
+name = "lineage_graph_once"
+path = "src/bin/lineage_graph_once.rs"
 
 [dependencies]
 axum = "0.7"

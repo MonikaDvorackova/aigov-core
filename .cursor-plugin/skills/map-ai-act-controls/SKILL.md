@@ -15,9 +15,9 @@ Capture:
 - Data categories (training, inference logs, user content).
 - Risk surface (safety, fundamental rights, misuse).
 
-## 2. Map to GovAI artefacts (repository-native)
+## 2. Map to AIGov artefacts (repository-native)
 
-| EU AI Act theme (high level) | GovAI / repo artefact |
+| EU AI Act theme (high level) | AIGov / repo artefact |
 |------------------------------|------------------------|
 | Risk management & logging | Evidence events, audit log, `docs/evidence/` bundles |
 | Human oversight | Human approval events in pipeline; `## Human approval gate` in reports |

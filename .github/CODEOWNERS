@@ -1,6 +1,6 @@
-# GovAI code ownership
+# GovAI Core code ownership
 #
-# This file defines default review ownership for key project areas.
+# Default review ownership for the open-source audit runtime repository.
 
 # Default owner
 * @MonikaDvorackova
@@ -8,17 +8,20 @@
 # Python SDK and CLI
 /python/ @MonikaDvorackova
 
-# Rust audit service and enforcement core
+# Rust audit runtime (aigov_audit)
 /rust/ @MonikaDvorackova
 
-# GitHub Actions and CI governance gates
+# GitHub Actions, issue templates, and CI governance gates
 /.github/ @MonikaDvorackova
 
-# Documentation and reports
+# Documentation and audit reports
 /docs/ @MonikaDvorackova
 
-# Examples and onboarding materials
+# Runtime examples and reference integrations
 /examples/ @MonikaDvorackova
 
 # Project scripts and automation
 /scripts/ @MonikaDvorackova
+
+# HTTP/OpenAPI contract
+/api/ @MonikaDvorackova

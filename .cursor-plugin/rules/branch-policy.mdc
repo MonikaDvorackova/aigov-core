@@ -1,10 +1,10 @@
 ---
-description: GovAI repository branch flow — feature branches, staging, and main.
+description: AIGov repository branch flow — feature branches, staging, and main.
 globs: []
 alwaysApply: true
 ---
 
-# Branch policy (GovAI compliance engine)
+# Branch policy (AIGov compliance engine)
 
 ## Required flow
 

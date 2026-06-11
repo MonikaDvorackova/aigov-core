@@ -7,11 +7,16 @@ from typing import Any
 
 DEFAULT_AUDIT_BASE_URL = "http://127.0.0.1:8088"
 
-CONFIG_ENV = "GOVAI_CONFIG"
+CONFIG_ENV_AIGOV = "AIGOV_CONFIG"
+CONFIG_ENV_LEGACY = "GOVAI_CONFIG"
+CONFIG_ENV = f"{CONFIG_ENV_AIGOV} / {CONFIG_ENV_LEGACY}"
 
 
 def default_config_path() -> Path:
-    override = os.environ.get(CONFIG_ENV, "").strip()
+    override = (
+        os.environ.get(CONFIG_ENV_AIGOV, "").strip()
+        or os.environ.get(CONFIG_ENV_LEGACY, "").strip()
+    )
     if override:
         return Path(override).expanduser().resolve()
     return Path.cwd() / ".govai" / "config.json"
@@ -60,7 +65,14 @@ def resolve_audit_base_url(
     flag: str | None,
     config_path: Path | None = None,
 ) -> str:
-    for env_name in ("GOVAI_AUDIT_BASE_URL", "AIGOV_AUDIT_URL", "AIGOV_AUDIT_ENDPOINT", "GOVAI_BASE_URL"):
+    for env_name in (
+        "AIGOV_AUDIT_BASE_URL",
+        "AIGOV_AUDIT_URL",
+        "AIGOV_AUDIT_ENDPOINT",
+        "AIGOV_BASE_URL",
+        "GOVAI_AUDIT_BASE_URL",
+        "GOVAI_BASE_URL",
+    ):
         raw = os.environ.get(env_name, "").strip()
         if raw:
             return raw.rstrip("/")
@@ -71,9 +83,10 @@ def resolve_audit_base_url(
 
 
 def resolve_api_key(*, flag: str | None, config_path: Path | None = None) -> str | None:
-    raw = os.environ.get("GOVAI_API_KEY", "").strip()
-    if raw:
-        return raw
+    for env_name in ("AIGOV_API_KEY", "GOVAI_API_KEY"):
+        raw = os.environ.get(env_name, "").strip()
+        if raw:
+            return raw
     if flag and flag.strip():
         return flag.strip()
     cfg = load_config(config_path)

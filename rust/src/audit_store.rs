@@ -26,12 +26,12 @@ const CHECKPOINTS_SUFFIX: &str = ".checkpoints.jsonl";
 
 #[cfg(test)]
 thread_local! {
-    static LEDGER_STATE_SCAN_CALLS: Cell<usize> = Cell::new(0);
+    static LEDGER_STATE_SCAN_CALLS: Cell<usize> = const { Cell::new(0) };
 }
 
 #[cfg(test)]
 thread_local! {
-    static RUN_INDEX_REBUILD_CALLS: Cell<usize> = Cell::new(0);
+    static RUN_INDEX_REBUILD_CALLS: Cell<usize> = const { Cell::new(0) };
 }
 
 static LEDGER_LOCKS: Lazy<Mutex<HashMap<String, Arc<Mutex<()>>>>> =
@@ -214,7 +214,7 @@ fn write_state_atomic(log_path: &str, state: &LedgerState) -> Result<(), String>
     f.write_all(b"\n").map_err(|e| e.to_string())?;
     f.flush().map_err(|e| e.to_string())?;
 
-    let skip_fsync = std::env::var("GOVAI_SKIP_FSYNC")
+    let skip_fsync = crate::aigov_env::required("AIGOV_SKIP_FSYNC", "GOVAI_SKIP_FSYNC")
         .ok()
         .map(|v| v == "1" || v.eq_ignore_ascii_case("true"))
         .unwrap_or(false);
@@ -349,7 +349,7 @@ fn repair_trailing_partial_record_fast(log_path: &str) -> Result<bool, String> {
     }
 
     let win: u64 = 64 * 1024;
-    let start = if len > win { len - win } else { 0 };
+    let start = len.saturating_sub(win);
     f.seek(SeekFrom::Start(start)).map_err(|e| e.to_string())?;
     let mut buf = vec![0u8; (len - start) as usize];
     f.read_exact(&mut buf).map_err(|e| e.to_string())?;

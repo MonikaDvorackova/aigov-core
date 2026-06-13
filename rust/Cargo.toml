@@ -57,4 +57,3 @@ tower = { version = "0.5", features = ["util"] }
 tempfile = "3"
 base64 = "0.22"
 rand = "0.8"
-rsa = "0.9"

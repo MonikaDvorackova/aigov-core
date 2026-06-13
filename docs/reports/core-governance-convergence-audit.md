@@ -114,3 +114,20 @@ Verified:
 ## Next step (out of scope for PR A)
 
 Engine should adopt `govai-core` as a dependency (PR C) and delete duplicated governance paths (PR D) once packaging lands (PR B).
+
+## Evaluation gate
+
+Status: pass.
+
+Evidence:
+- cargo test: 110 passed
+- python -m pytest: 404 passed, 2 skipped
+- Core has no Rust, Python, or path dependency on Engine
+- No phase-numbered labels, targets, or comments were introduced
+
+## Human approval gate
+
+Status: pending human review.
+
+Reviewer: Monika Dvořáčková
+Scope: Core governance runtime convergence with Engine fixes

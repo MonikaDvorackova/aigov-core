@@ -43,7 +43,7 @@ fn runtime_tenant_map() -> &'static RwLock<HashMap<String, String>> {
 /// Hosted self-service (`GOVAI_HOSTED_SELF_SERVICE=on`): DB-issued keys resolve by bearer hash.
 pub fn runtime_key_lookup_enabled() -> bool {
     matches!(
-        std::env::var("GOVAI_HOSTED_SELF_SERVICE")
+        crate::aigov_env::required("AIGOV_HOSTED_SELF_SERVICE", "GOVAI_HOSTED_SELF_SERVICE")
             .map(|s| s.trim().to_ascii_lowercase())
             .unwrap_or_default()
             .as_str(),
@@ -139,7 +139,7 @@ pub struct AuditKeyGateState {
 /// - **Dev**: missing/empty config is allowed (ledger tenant defaults to `"default"`).
 /// - **Staging/Prod**: missing/invalid/empty config fails startup.
 pub fn init_api_key_tenant_map(deployment_env: GovaiEnvironment) -> Result<(), String> {
-    let raw = std::env::var("GOVAI_API_KEYS_JSON").ok();
+    let raw = crate::aigov_env::required("AIGOV_API_KEYS_JSON", "GOVAI_API_KEYS_JSON").ok();
     let raw = raw.as_deref().unwrap_or("").trim();
 
     ensure_hosted_hash_map();
@@ -256,10 +256,10 @@ pub struct AuditApiKeyConfig {
 /// Optional `GOVAI_API_KEY_DEFAULT_LIMIT` applies to entries without `:number`.
 impl AuditApiKeyConfig {
     pub fn from_env() -> Self {
-        let default_cap = std::env::var("GOVAI_API_KEY_DEFAULT_LIMIT")
+        let default_cap = crate::aigov_env::required("AIGOV_API_KEY_DEFAULT_LIMIT", "GOVAI_API_KEY_DEFAULT_LIMIT")
             .ok()
             .and_then(|s| s.parse::<u64>().ok());
-        let Ok(raw) = std::env::var("GOVAI_API_KEYS") else {
+        let Ok(raw) = crate::aigov_env::required("AIGOV_API_KEYS", "GOVAI_API_KEYS") else {
             return Self { keys: None };
         };
         let raw = raw.trim();
@@ -354,8 +354,8 @@ pub fn parse_api_key_tenant_map_from_env_value(
 pub fn validate_api_key_allowlist_consistency(
     deployment_env: GovaiEnvironment,
 ) -> Result<(), String> {
-    let json_raw = std::env::var("GOVAI_API_KEYS_JSON").unwrap_or_default();
-    let allowlist_raw = std::env::var("GOVAI_API_KEYS").unwrap_or_default();
+    let json_raw = crate::aigov_env::required("AIGOV_API_KEYS_JSON", "GOVAI_API_KEYS_JSON").unwrap_or_default();
+    let allowlist_raw = crate::aigov_env::required("AIGOV_API_KEYS", "GOVAI_API_KEYS").unwrap_or_default();
     let json_map = parse_api_key_tenant_map_from_env_value(&json_raw)?;
     let allowlist = parse_api_keys_allowlist(&allowlist_raw);
 
@@ -398,11 +398,11 @@ fn log_auth_failure_diagnostic(token: &str, code: &str, method: &Method, path: &
     } else {
         key_fingerprint(token)
     };
-    let keys_configured = std::env::var("GOVAI_API_KEYS")
+    let keys_configured = crate::aigov_env::required("AIGOV_API_KEYS", "GOVAI_API_KEYS")
         .ok()
         .map(|s| !s.trim().is_empty())
         .unwrap_or(false);
-    let json_configured = std::env::var("GOVAI_API_KEYS_JSON")
+    let json_configured = crate::aigov_env::required("AIGOV_API_KEYS_JSON", "GOVAI_API_KEYS_JSON")
         .ok()
         .map(|s| !s.trim().is_empty())
         .unwrap_or(false);

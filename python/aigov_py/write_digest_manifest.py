@@ -70,7 +70,12 @@ def main(argv: list[str] | None = None) -> int:
     )
     p.add_argument(
         "--audit-url",
-        default=os.environ.get("AUDIT_URL") or os.environ.get("GOVAI_AUDIT_BASE_URL") or "http://127.0.0.1:8088",
+        default=(
+            os.environ.get("AUDIT_URL")
+            or os.environ.get("AIGOV_AUDIT_BASE_URL")
+            or os.environ.get("GOVAI_AUDIT_BASE_URL")
+            or "http://127.0.0.1:8088"
+        ),
     )
     p.add_argument(
         "--out-dir",
@@ -79,7 +84,7 @@ def main(argv: list[str] | None = None) -> int:
     )
     p.add_argument(
         "--api-key",
-        default=os.environ.get("GOVAI_API_KEY") or "ci-test-api-key",
+        default=os.environ.get("AIGOV_API_KEY") or os.environ.get("GOVAI_API_KEY") or "ci-test-api-key",
         help="Bearer token for local/hosted CI audit",
     )
     p.add_argument(

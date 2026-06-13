@@ -495,9 +495,8 @@ pub fn derive_current_state_from_events_with_context(
         e.event_type == "risk_reviewed"
             && payload_get_str(&e.payload, "decision").as_deref() == Some("approve")
     });
-    let risk_review_decision = risk_review_approved
-        .map(|e| payload_get_str(&e.payload, "decision"))
-        .flatten();
+    let risk_review_decision =
+        risk_review_approved.and_then(|e| payload_get_str(&e.payload, "decision"));
 
     let model_promoted_present = find_last_event(events, "model_promoted").is_some();
 

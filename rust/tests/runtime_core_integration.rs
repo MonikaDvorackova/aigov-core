@@ -248,6 +248,37 @@ async fn runtime_ingest_projection_verdict_export_suite() {
     assert!(body.get("configuration").is_some());
     assert!(body.get("readiness_components").is_some());
 
+    let ledger_path = dir.path().join("audit_log__default.jsonl");
+    for _ in 0..3 {
+        let req = Request::builder()
+            .uri("/ready")
+            .body(Body::empty())
+            .unwrap();
+        let resp = app.clone().oneshot(req).await.unwrap();
+        assert_eq!(resp.status(), StatusCode::OK);
+        let body = body_json(resp).await;
+        assert_eq!(body["ready"], true);
+        let checks = body.get("checks").expect("checks");
+        assert_eq!(checks["ledger_tenant_readable"], true);
+        assert!(checks.get("tenant_ledger_probe").is_none());
+    }
+    assert_eq!(count_ledger_lines(&ledger_path), 0);
+
+    let req = Request::builder()
+        .uri("/metrics")
+        .body(Body::empty())
+        .unwrap();
+    let resp = app.clone().oneshot(req).await.unwrap();
+    assert_eq!(resp.status(), StatusCode::OK);
+    let bytes = resp
+        .into_body()
+        .collect()
+        .await
+        .expect("body")
+        .to_bytes();
+    let text = String::from_utf8(bytes.to_vec()).expect("utf8 metrics");
+    assert!(text.contains("govai_http_requests_total"));
+
     // duplicate event rejection
     let run_id = "dup-run";
     let ev = discovery_event(run_id, "dup-event-1");
@@ -392,4 +423,13 @@ async fn runtime_ingest_projection_verdict_export_suite() {
         assert_eq!(b["event_id"], e["event_id"]);
         assert_eq!(b["event_type"], e["event_type"]);
     }
+}
+
+fn count_ledger_lines(path: &std::path::Path) -> usize {
+    if !path.exists() {
+        return 0;
+    }
+    std::fs::read_to_string(path)
+        .map(|s| s.lines().filter(|l| !l.trim().is_empty()).count())
+        .unwrap_or(0)
 }

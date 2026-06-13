@@ -5,7 +5,7 @@ Runbook for monitoring GovAI Core in production. Pair with [runtime-observabilit
 ## Health vs ready vs status
 
 - **`/health`** — “Is the process up?” Fail → restart container.
-- **`/ready`** — “Can this instance accept evidence?” Fail → remove from load balancer; check DB, migrations, `GOVAI_LEDGER_DIR` permissions. Note: performs a one-off ledger append probe.
+- **`/ready`** — “Can this instance accept evidence?” Fail → remove from load balancer; check DB, migrations, `GOVAI_LEDGER_DIR` permissions. Read-only: does not append ledger events.
 - **`/status`** — “What is configured and degraded?” Always HTTP 200 when process is up; use `operational_ready` and `readiness_components` for alerting without flapping liveness.
 
 ```bash
@@ -22,6 +22,7 @@ govai runtime-diagnostics --base-url http://127.0.0.1:8088
 | DB unavailable | `readiness_components.database_ping` | `false` when DB required |
 | Migrations pending | `migration_status` | not `complete` / `not_configured` |
 | Ledger not writable | `ledger_writable` | `false` |
+| Default tenant ledger unreadable | `ledger_tenant_readable` | `false` |
 | Auth misconfiguration | `api_key_allowlist_count` vs `api_key_tenant_map_count` | Mismatch at startup (server fails in prod) |
 | Ingest failures | ops log `evidence_ingest` `outcome=rejected` | Spike vs baseline |
 | Invalid API keys | ops log `auth_failure` `INVALID_API_KEY` | Sustained rate |
@@ -32,7 +33,7 @@ govai runtime-diagnostics --base-url http://127.0.0.1:8088
 
 ## Non-mutating readiness
 
-Prefer **`/status`** for frequent polling (every 30–60s). Reserve **`/ready`** for deploy gates and load-balancer checks (lower frequency) because of the ledger append probe.
+Both **`/status`** and **`/ready`** are read-only. Use either for polling; **`/ready`** additionally gates traffic with HTTP **503** when dependencies are unsatisfied.
 
 ## Failed ingest
 

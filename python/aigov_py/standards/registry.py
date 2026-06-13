@@ -9,6 +9,9 @@ _REPO_SCHEMAS: Final[tuple[str, ...]] = (
     "schemas/governance-evidence-pack.schema.json",
     "schemas/governance-policy-module.schema.json",
     "schemas/governance-decision-trace.schema.json",
+    "schemas/delegation-graph.schema.json",
+    "schemas/capability-policy.schema.json",
+    "schemas/trace-verification-plan.schema.json",
 )
 
 
@@ -48,6 +51,24 @@ GOVERNANCE_STANDARDS_REGISTRY: tuple[RegisteredArtifact, ...] = (
         schema_path="schemas/governance-decision-trace.schema.json",
         description="Portable record of gate observables with a recorded verdict checked against authoritative recomputation.",
     ),
+    RegisteredArtifact(
+        artifact_type="delegation_graph",
+        schema_version="govai.standards.delegation_graph.v1",
+        schema_path="schemas/delegation-graph.schema.json",
+        description="Portable delegation graph of principals, agents, and scoped capability edges.",
+    ),
+    RegisteredArtifact(
+        artifact_type="capability_policy",
+        schema_version="govai.standards.capability_policy.v1",
+        schema_path="schemas/capability-policy.schema.json",
+        description="Portable capability definitions with risk class, tool allowlists, and evidence requirements.",
+    ),
+    RegisteredArtifact(
+        artifact_type="trace_verification_plan",
+        schema_version="govai.standards.trace_verification_plan.v1",
+        schema_path="schemas/trace-verification-plan.schema.json",
+        description="Portable trace verification plan with requirements and recorded findings.",
+    ),
 )
 
 
@@ -70,9 +91,12 @@ def schema_files_relative() -> tuple[str, ...]:
 
 def validator_for_schema_version(schema_version: str) -> Callable[[Any], Any] | None:
     """Return the Python validator function for a registered schema_version, if any."""
+    from aigov_py.standards.capability_policy import validate_capability_policy_document
     from aigov_py.standards.decision_trace import validate_governance_decision_trace_document
+    from aigov_py.standards.delegation_graph import validate_delegation_graph_document
     from aigov_py.standards.evidence_pack import validate_governance_evidence_pack_document
     from aigov_py.standards.policy_module import validate_governance_policy_module_document
+    from aigov_py.standards.trace_verification import validate_trace_verification_plan_document
 
     v = (schema_version or "").strip()
     if v == "govai.standards.governance_evidence_pack.v1":
@@ -81,6 +105,12 @@ def validator_for_schema_version(schema_version: str) -> Callable[[Any], Any] | 
         return validate_governance_policy_module_document
     if v == "govai.standards.governance_decision_trace.v1":
         return validate_governance_decision_trace_document
+    if v == "govai.standards.delegation_graph.v1":
+        return validate_delegation_graph_document
+    if v == "govai.standards.capability_policy.v1":
+        return validate_capability_policy_document
+    if v == "govai.standards.trace_verification_plan.v1":
+        return validate_trace_verification_plan_document
     return None
 
 

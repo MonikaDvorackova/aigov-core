@@ -7,7 +7,7 @@ Operator visibility for self-hosted GovAI Core (`aigov_audit`). This is **not** 
 | Endpoint | Purpose | Mutates state? |
 |----------|---------|----------------|
 | `GET /health` | Liveness — process responds | No |
-| `GET /ready` | Readiness — DB, migrations, ledger writable, append probe | Yes (append probe event) |
+| `GET /ready` | Readiness — DB, migrations, ledger writable, read-only tenant ledger path | No |
 | `GET /status` | Diagnostics — config + component states | No |
 
 Use **liveness** for restart decisions. Use **readiness** before routing traffic. Use **status** for dashboards and incident triage without failing load balancers.
@@ -18,7 +18,7 @@ Use **liveness** for restart decisions. Use **readiness** before routing traffic
 - `uptime_seconds`, `started_at_utc`
 - `operational_ready` — derived from non-mutating readiness checks
 - `configuration` — ledger/database/policy paths (redacted labels), API key **counts** only, `signing_trust_configured`
-- `readiness_components` — `database_ping`, `migrations_complete`, `migration_status`, `ledger_writable`
+- `readiness_components` — `database_ping`, `migrations_complete`, `migration_status`, `ledger_writable`, `ledger_tenant_readable`
 - `otel` — trace-linking hooks (no vendor SDK in Core)
 
 Never returned: raw API keys, `DATABASE_URL`, private signing seeds, full tenant identifiers, policy JSON bodies.
@@ -79,5 +79,5 @@ govai runtime-diagnostics --json
 ## Limitations
 
 - No built-in alerting rules or SaaS incident UI
-- `/ready` append probe writes a disposable discovery event (do not use as high-frequency monitor)
+- `/ready` is read-only — safe for deploy gates and load-balancer probes at normal polling intervals
 - Trace linking is payload convention only — not automatic span creation inside Core

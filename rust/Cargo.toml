@@ -30,6 +30,10 @@ path = "src/bin/replay_audit_export_once.rs"
 name = "lineage_graph_once"
 path = "src/bin/lineage_graph_once.rs"
 
+[[bin]]
+name = "verify_audit_export_bundle_once"
+path = "src/bin/verify_audit_export_bundle_once.rs"
+
 [dependencies]
 axum = "0.7"
 tokio = { version = "1", features = ["full"] }
@@ -55,6 +59,7 @@ urlencoding = "2.1"
 ed25519-dalek = { version = "2", features = ["pkcs8"] }
 governor = "0.7"
 rand = "0.8"
+zip = "2.2"
 
 [dev-dependencies]
 hmac = "0.12"

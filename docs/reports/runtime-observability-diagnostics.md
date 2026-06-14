@@ -17,7 +17,7 @@ Extends `GET /status` with non-sensitive operational diagnostics (version, uptim
 | Surface | Role |
 |---------|------|
 | `GET /health` | Liveness |
-| `GET /ready` | Readiness (read-only ledger path + dependency checks) |
+| `GET /ready` | Readiness (includes ledger append probe) |
 | `GET /status` | Safe config + component diagnostics |
 | `govai runtime-diagnostics` | CLI wrapper for all three |
 | stderr JSON ops logs | Ingest, auth, readiness, replay failures |

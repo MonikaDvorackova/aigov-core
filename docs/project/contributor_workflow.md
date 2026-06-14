@@ -140,11 +140,10 @@ make developer-integrations-manifest # validate docs/integrations/developer-inte
 make automation-pack                 # validate examples/integrations/sample-automation-pack.json
 make automation-pack-summary         # automation pack summary generator smoke
 make developer-integrations-platform-check # developer-integrations + developer-integrations-manifest + automation-pack + automation-pack-summary + gate
-make release-manifest               # validate docs/releases/release-manifest.json (stdlib JSON)
 make validate-changelog             # Keep a Changelog gate for CHANGELOG.md
-make generate-release-notes         # deterministic sample notes under examples/releases/
-make release-readiness-report       # aggregated JSON readiness (manifest + changelog + operations + Makefile)
-make release-readiness-check        # release-operations-check + release-manifest + validate-changelog + release-readiness-report + docs-links-strict + gate
+make generate-release-notes         # deterministic notes from CHANGELOG (VERSION=, optional OUT=)
+make release-readiness-report       # aggregated JSON readiness report
+make release-readiness-check        # gate + validate-changelog + release-readiness-report + cargo metadata
 cargo test --manifest-path rust/Cargo.toml
 ```
 
@@ -154,7 +153,6 @@ Python (activate **`python/.venv`** first):
 cd python
 pytest
 python -m pytest \
-  tests/test_validate_release_manifest.py \
   tests/test_validate_changelog.py \
   tests/test_generate_release_notes.py \
   tests/test_release_readiness_report.py \

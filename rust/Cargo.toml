@@ -2,6 +2,12 @@
 name = "aigov_audit"
 version = "0.2.1"
 edition = "2021"
+license = "Apache-2.0"
+description = "Ledger-authoritative AI governance audit runtime for GovAI Core"
+repository = "https://github.com/MonikaDvorackova/govai-core"
+readme = "../README.md"
+keywords = ["governance", "audit", "compliance", "ai", "ledger"]
+categories = ["web-programming", "database"]
 
 [features]
 # Default public core build excludes hosted SaaS, billing, Stripe, onboarding, and tenant console.

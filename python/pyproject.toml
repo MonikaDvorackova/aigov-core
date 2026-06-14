@@ -2,7 +2,21 @@
 name = "aigov-py"
 version = "0.2.1"
 description = "AIGov Python package: thin govai audit HTTP client (import govai) and related tooling."
+readme = "README.md"
+license = "Apache-2.0"
+authors = [{ name = "GovAI Contributors" }]
 requires-python = ">=3.10"
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Developers",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Software Development :: Libraries",
+  "Topic :: System :: Monitoring",
+]
 dependencies = [
   "requests>=2.31.0",
   "scikit-learn>=1.4.0",
@@ -11,6 +25,12 @@ dependencies = [
   "PyNaCl>=1.5.0",
   "sigstore>=4.2.0"
 ]
+
+[project.urls]
+Homepage = "https://github.com/MonikaDvorackova/govai-core"
+Repository = "https://github.com/MonikaDvorackova/govai-core"
+Documentation = "https://github.com/MonikaDvorackova/govai-core/tree/main/docs"
+Changelog = "https://github.com/MonikaDvorackova/govai-core/blob/main/CHANGELOG.md"
 
 [project.scripts]
 govai = "aigov_py.cli:main"

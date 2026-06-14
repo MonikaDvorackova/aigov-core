@@ -7,7 +7,7 @@ Give maintainers a **single path** from merge-ready `staging` (or agreed branch)
 ## Policy
 
 - Releases promote from **`staging`** to **`main`** per [GOVERNANCE.md](../../GOVERNANCE.md); tags are created only on commits that passed the checklist in [release-checklist.md](release-checklist.md).
-- **Deterministic scripts first:** `python3 scripts/release_operations_check.py` and `make release-readiness-check` are mandatory pre-tag steps for documentation and release-structure hygiene; they do **not** replace service-level tests when code changed.
+- **Deterministic scripts first:** `make release-readiness-check` (changelog validation, readiness report, documentation gate) is a mandatory pre-tag step for release-structure hygiene; it does **not** replace service-level tests when code changed.
 - **Cadence:** default expectations live in [release-cadence.md](release-cadence.md); emergency exceptions require security process when applicable.
 
 ## Maintainer actions

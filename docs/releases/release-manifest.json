@@ -9,7 +9,7 @@
     "This manifest does not authorize production promotions by itself.",
     "Release documentation does not replace cargo test, pytest, or hosted audit verification when code changes.",
     "The release subsystem does not mutate billing state, ledgers, or tenant isolation configuration.",
-    "This program does not perform network calls or publish to external channels automatically."
+    "This program does not perform network calls or publish to external registries automatically."
   ],
   "referenced_documents": [
     {"path": "docs/releases/versioning-policy.md", "role": "versioning_policy"},
@@ -25,7 +25,6 @@
   "referenced_examples": [
     {"path": "examples/releases/README.md", "role": "examples_index"},
     {"path": "examples/releases/sample-release-plan.json", "role": "sample_plan"},
-    {"path": "examples/releases/run-release-manifest-validation.sh", "role": "driver_manifest"},
     {"path": "examples/releases/run-changelog-validation.sh", "role": "driver_changelog"},
     {"path": "examples/releases/run-release-notes-generation.sh", "role": "driver_notes"},
     {"path": "examples/releases/run-release-readiness-report.sh", "role": "driver_readiness"}
@@ -36,25 +35,20 @@
     "GitHub Releases (or equivalent) with Markdown body from docs/releases/release-notes-template.md",
     "CHANGELOG.md as canonical consumer-facing history"
   ],
-  "release_program": "GovAI OSS release engineering and version governance: machine-readable manifest, validators, deterministic release note generation, readiness reporting, Makefile gates, and CI JSON artefacts aligned with staging integration and promotion to main.",
+  "release_program": "GovAI Core release engineering: changelog validation, deterministic release note generation, readiness reporting, Makefile gates, and CI artifact builds aligned with staging integration and promotion to main.",
   "required_artifacts": [
     {"path": "CHANGELOG.md", "role": "keep_a_changelog_root"},
     {"path": "docs/releases/release-manifest.json", "role": "release_manifest"},
-    {"path": "scripts/validate_release_manifest.py", "role": "manifest_validator"},
     {"path": "scripts/validate_changelog.py", "role": "changelog_validator"},
     {"path": "scripts/generate_release_notes.py", "role": "release_notes_generator"},
-    {"path": "scripts/release_readiness_report.py", "role": "readiness_report"},
-    {"path": "scripts/release_operations_check.py", "role": "release_operations_diagnostics"},
-    {"path": "docs/reports/repo-debt-audit-and-cleanup.md", "role": "phase12_audit_report"}
+    {"path": "scripts/release_readiness_report.py", "role": "readiness_report"}
   ],
   "required_checks": [
-    "release-operations-check",
-    "release-manifest",
     "validate-changelog",
     "generate-release-notes",
     "release-readiness-report",
-    "gate",
-    "docs-links-strict"
+    "release-readiness-check",
+    "gate"
   ],
   "rollback_policy": {
     "referenced_document": "docs/releases/release-checklist.md",

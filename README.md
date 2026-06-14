@@ -52,6 +52,15 @@ The repository ships **`registry/*.json`** catalogs and **`docs/registry/`** gui
 
 Release **versioning**, **cadence**, **compatibility**, and maintainer **runbooks** live under **`docs/releases/`**. The canonical history is **[CHANGELOG.md](CHANGELOG.md)**. Start with **[docs/releases/versioning-policy.md](docs/releases/versioning-policy.md)** and **[docs/releases/release-checklist.md](docs/releases/release-checklist.md)**.
 
+Before tagging, from the repository root:
+
+```bash
+make release-readiness-check
+make generate-release-notes VERSION=0.2.1 OUT=release-notes.md   # optional draft
+```
+
+CI builds release artefacts (Python wheel/sdist, Rust crate package, Docker image) in **`.github/workflows/release-validation.yml`** without publishing to public registries unless explicitly configured elsewhere.
+
 [![Join Discord](https://img.shields.io/badge/Discord-Join%20Community-5865F2?logo=discord&logoColor=white)](https://discord.gg/sRBSafRtE)
 
 ## Golden path (local demo, 2 min)
@@ -70,6 +79,9 @@ All targets are defined in the repository **`Makefile`**. Common checks:
 | `make gate` | Documentation/report gate (`scripts/gate_reports.py`) |
 | `make standards-conformance` | Registered interchange validators on example JSON |
 | `make enterprise-readiness-check` | Aggregate Core readiness checks (gate, SDK, Cursor plugin, runtime contracts, benchmark) |
+| `make validate-changelog` | Keep a Changelog structure and Rust/Python version alignment |
+| `make release-readiness-check` | Pre-tag gate: documentation gate, changelog validation, readiness report, `cargo metadata` |
+| `make generate-release-notes` | Draft notes from CHANGELOG (`VERSION=` and optional `OUT=`) |
 | `make cursor-plugin-check` | Validate + smoke the bundled Cursor plugin |
 | `make cursor-plugin-smoke` | MCP bridge smoke test only |
 | `make runtime-observability-check` | `/health`, `/ready`, `/status`, `/metrics` contract |

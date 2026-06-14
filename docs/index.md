@@ -331,10 +331,10 @@ Pilot packaging and limits are still often agreed with the operator; self-serve 
 
 ## Release engineering and version governance
 
-- Machine-readable manifest: [`releases/release-manifest.json`](releases/release-manifest.json) (validated by `scripts/validate_release_manifest.py`)
+- Machine-readable manifest: [`releases/release-manifest.json`](releases/release-manifest.json) (checked by `scripts/release_readiness_report.py`)
 - Policies and runbooks: [`releases/versioning-policy.md`](releases/versioning-policy.md), [`releases/release-checklist.md`](releases/release-checklist.md), [`releases/release-runbook.md`](releases/release-runbook.md)
 - Example drivers (shell, stdlib): [`../examples/releases/README.md`](../examples/releases/README.md)
-- Makefile: `make release-manifest`, `make validate-changelog`, `make generate-release-notes`, `make release-readiness-report`, and `make release-readiness-check` (aggregate gate before tagging)
+- Makefile: `make validate-changelog`, `make generate-release-notes`, `make release-readiness-report`, and `make release-readiness-check` (aggregate gate before tagging)
 
 ## Quickstart links
 

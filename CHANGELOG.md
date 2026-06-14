@@ -9,9 +9,21 @@ and this project adheres to the [versioning policy](docs/releases/versioning-pol
 
 ### Added
 
-- Release engineering subsystem: **`docs/releases/release-manifest.json`**, **`scripts/validate_release_manifest.py`**, **`scripts/validate_changelog.py`**, **`scripts/generate_release_notes.py`**, **`scripts/release_readiness_report.py`**, **`examples/releases/`** driver scripts, pytest coverage, Makefile targets (**`release-manifest`**, **`validate-changelog`**, **`generate-release-notes`**, **`release-readiness-report`**, expanded **`release-readiness-check`**), and CI artefacts (**`release-manifest-validation.json`**, **`changelog-validation.json`**, **`release-readiness-report.json`**, **`release-notes-template.md`**).
+- *(none yet)*
+
+## [0.2.1] - 2026-06-10
+
+### Added
+
+- Release packaging metadata for Rust (`rust/Cargo.toml`) and Python (`python/pyproject.toml`).
+- Release validation scripts: `scripts/validate_changelog.py`, `scripts/generate_release_notes.py`, and `scripts/release_readiness_report.py` with Makefile targets and CI artifact build steps.
+- Production-readiness fixes: non-mutating `GET /ready`, mounted `GET /metrics`, standards registry entries, and supply-chain CI (Dependabot, `supply-chain-audit` workflow).
 
 ### Changed
 
-- **`scripts/release_operations_check.py`** now embeds manifest and changelog validation and requires the expanded Makefile release target set.
-- **`README.md`**, **`CONTRIBUTING.md`**, **`docs/index.md`**, **`docs/project/local_development.md`**, and **`docs/project/contributor_workflow.md`** document the new commands and examples.
+- PostgreSQL-only SQLx dependency graph (removed `sqlx-mysql` / `rsa` transitives); runtime migrations use `sqlx_core::migrate::Migrator`.
+- Release documentation and examples aligned with scripts and Makefile targets shipped in GovAI Core (removed references to platform-only release validators).
+
+### Fixed
+
+- Runtime observability contract tests for `/metrics` and read-only readiness probes.

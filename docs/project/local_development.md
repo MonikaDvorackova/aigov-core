@@ -177,11 +177,10 @@ make developer-integrations-manifest # validate docs/integrations/developer-inte
 make automation-pack                 # validate examples/integrations/sample-automation-pack.json
 make automation-pack-summary         # Markdown summary from sample automation pack
 make developer-integrations-platform-check # developer-integrations + developer-integrations-manifest + automation-pack + automation-pack-summary + gate
-make release-manifest                # validate docs/releases/release-manifest.json
 make validate-changelog              # Keep a Changelog gate for CHANGELOG.md
-make generate-release-notes          # writes sample release notes
-make release-readiness-report        # aggregated release readiness
-make release-readiness-check         # release readiness aggregate gate
+make generate-release-notes          # notes from CHANGELOG (VERSION=, optional OUT=)
+make release-readiness-report        # aggregated release readiness JSON
+make release-readiness-check         # gate + changelog + readiness report + cargo metadata
 ```
 
 **Machine-readable JSON (automation / CI mirrors):**
@@ -255,8 +254,8 @@ python3 scripts/developer_integrations_check.py --json
 python3 scripts/validate_developer_integrations_manifest.py --json
 python3 scripts/validate_automation_pack.py --json --pack examples/integrations/sample-automation-pack.json
 python3 scripts/generate_automation_pack_summary.py --pack examples/integrations/sample-automation-pack.json
-python3 scripts/validate_release_manifest.py --json
 python3 scripts/validate_changelog.py --json
+python3 scripts/generate_release_notes.py --version 0.2.1 --json
 python3 scripts/release_readiness_report.py --json
 python3 scripts/validate_docs_links.py --strict --json
 python3 scripts/oss_diagnostics.py --json

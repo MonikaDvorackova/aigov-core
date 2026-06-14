@@ -224,18 +224,11 @@ pub fn validate_chain_continuity(export: &Value, report: &mut ReplayValidationRe
             );
             continue;
         }
-        let prev = row.get("prev_hash");
         if i == 0 {
-            let prev_s = prev.and_then(|v| v.as_str()).unwrap_or("").trim();
-            if !prev_s.is_empty() && prev_s != "null" {
-                ok = false;
-                report.push_error(
-                    "chain_invalid_genesis",
-                    "first log_chain row must have empty prev_hash",
-                );
-            }
+            // Run-scoped exports may start mid-ledger; prev_hash may link outside this chain.
             continue;
         }
+        let prev = row.get("prev_hash");
         let prev_s = prev
             .and_then(|v| v.as_str())
             .map(|s| s.trim().to_string())
@@ -418,38 +411,220 @@ pub fn events_for_projection(events: &[EvidenceEvent]) -> Vec<EvidenceEvent> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::bundle::portable_evidence_digest_v1;
+    use crate::schema::EvidenceEvent;
     use serde_json::json;
 
-    fn minimal_export(events: Vec<Value>, chain: Vec<Value>) -> Value {
+    fn sample_event(id: &str, et: &str, ts: &str, run_id: &str, payload: serde_json::Value) -> EvidenceEvent {
+        EvidenceEvent {
+            event_id: id.to_string(),
+            event_type: et.to_string(),
+            ts_utc: ts.to_string(),
+            actor: "a".to_string(),
+            system: "s".to_string(),
+            run_id: run_id.to_string(),
+            environment: None,
+            payload,
+            parent_run_id: None,
+            root_run_id: None,
+            delegated_from_event_id: None,
+            agent_id: None,
+            agent_role: None,
+            delegation_reason: None,
+        }
+    }
+
+    fn events_to_json(events: &[EvidenceEvent]) -> Vec<serde_json::Value> {
+        events
+            .iter()
+            .map(|e| serde_json::to_value(e).expect("event json"))
+            .collect()
+    }
+
+    fn build_export(
+        run_id: &str,
+        events: &[EvidenceEvent],
+        chain: Vec<serde_json::Value>,
+        schema_version: &str,
+        events_content_sha256: Option<&str>,
+    ) -> serde_json::Value {
+        let digest = events_content_sha256
+            .map(|s| s.to_string())
+            .unwrap_or_else(|| portable_evidence_digest_v1(run_id, events));
         json!({
             "ok": true,
-            "schema_version": EXPORT_SCHEMA_V1,
+            "schema_version": schema_version,
             "policy_version": "p1",
             "environment": "dev",
-            "run": { "run_id": "r1", "policy_version": "p1", "log_path": "l", "identifiers": {} },
+            "run": { "run_id": run_id, "policy_version": "p1", "log_path": "l", "identifiers": {} },
             "evidence_hashes": {
                 "bundle_sha256": "a".repeat(64),
-                "events_content_sha256": "",
+                "events_content_sha256": digest,
                 "log_chain": chain,
             },
             "decision": { "verdict": "BLOCKED", "blocked_reasons": [] },
-            "evidence_events": events,
+            "evidence_events": events_to_json(events),
         })
+    }
+
+    fn minimal_discovery(run_id: &str) -> EvidenceEvent {
+        sample_event(
+            "e1",
+            "ai_discovery_reported",
+            "2026-01-01T00:00:01Z",
+            run_id,
+            json!({"openai": false, "transformers": false, "model_artifacts": false}),
+        )
     }
 
     #[test]
     fn detects_duplicate_event_ids() {
-        let ev = json!({
-            "event_id": "e1",
-            "event_type": "ai_discovery_reported",
-            "ts_utc": "2026-01-01T00:00:01Z",
-            "actor": "a",
-            "system": "s",
-            "run_id": "r1",
-            "payload": { "openai": false, "transformers": false, "model_artifacts": false }
-        });
-        let export = minimal_export(vec![ev.clone(), ev], vec![]);
+        let run_id = "r1";
+        let ev = minimal_discovery(run_id);
+        let events = vec![ev.clone(), ev];
+        let export = build_export(run_id, &events, vec![], EXPORT_SCHEMA_V1, None);
         let (report, _) = run_export_validations(&export);
         assert!(!report.duplicate_event_ids.is_empty());
+        assert!(!report.is_ok());
+    }
+
+    #[test]
+    fn rejects_unsupported_schema_version() {
+        let run_id = "r-schema";
+        let events = vec![minimal_discovery(run_id)];
+        let export = build_export(run_id, &events, vec![], "aigov.audit_export.v0", None);
+        let (report, _) = run_export_validations(&export);
+        assert!(!report.is_ok());
+        assert!(report
+            .errors
+            .iter()
+            .any(|e| e.code == "unsupported_schema_version"));
+    }
+
+    #[test]
+    fn detects_tampered_events_content_sha256() {
+        let run_id = "r-tamper";
+        let events = vec![minimal_discovery(run_id)];
+        let export = build_export(
+            run_id,
+            &events,
+            vec![],
+            EXPORT_SCHEMA_V1,
+            Some(&"b".repeat(64)),
+        );
+        let (report, _) = run_export_validations(&export);
+        assert!(!report.events_content_sha256_ok);
+        assert!(report
+            .errors
+            .iter()
+            .any(|e| e.code == "events_content_sha256_mismatch"));
+    }
+
+    #[test]
+    fn detects_mid_chain_hash_break() {
+        let run_id = "r-chain";
+        let events = vec![minimal_discovery(run_id)];
+        let chain = vec![
+            json!({
+                "event_id": "e1",
+                "ts_utc": "2026-01-01T00:00:01Z",
+                "event_type": "ai_discovery_reported",
+                "prev_hash": "",
+                "record_hash": "hash-a",
+            }),
+            json!({
+                "event_id": "e2",
+                "ts_utc": "2026-01-01T00:00:02Z",
+                "event_type": "human_approved",
+                "prev_hash": "wrong-prev",
+                "record_hash": "hash-b",
+            }),
+        ];
+        let export = build_export(run_id, &events, chain, EXPORT_SCHEMA_V1, None);
+        let (report, _) = run_export_validations(&export);
+        assert!(!report.chain_continuity_ok);
+        assert!(report.errors.iter().any(|e| e.code == "chain_break"));
+    }
+
+    #[test]
+    fn detects_lifecycle_violation_promotion_before_approval() {
+        let run_id = "r-life";
+        let events = vec![
+            sample_event(
+                "promote",
+                "model_promoted",
+                "2026-01-01T00:00:01Z",
+                run_id,
+                json!({}),
+            ),
+            sample_event(
+                "human",
+                "human_approved",
+                "2026-01-01T00:00:02Z",
+                run_id,
+                json!({"scope": "model_promoted", "decision": "approve"}),
+            ),
+        ];
+        let export = build_export(run_id, &events, vec![], EXPORT_SCHEMA_V1, None);
+        let (report, _) = run_export_validations(&export);
+        assert!(!report.lifecycle_transitions_ok);
+        assert!(report
+            .errors
+            .iter()
+            .any(|e| e.code == "invalid_lifecycle_transition"));
+    }
+
+    #[test]
+    fn detects_lineage_delegation_missing_agent_id() {
+        let run_id = "run-a";
+        let events = vec![sample_event(
+            "d1",
+            "agent_delegated",
+            "2026-01-01T00:00:01Z",
+            run_id,
+            json!({"child_run_id": "child-1"}),
+        )];
+        let export = build_export(run_id, &events, vec![], EXPORT_SCHEMA_V1, None);
+        let (report, _) = run_export_validations(&export);
+        assert!(!report.is_ok());
+        assert!(report
+            .errors
+            .iter()
+            .any(|e| e.code == "lineage_delegation_missing_agent_id"));
+    }
+
+    #[test]
+    fn accepts_run_scoped_chain_with_external_genesis_link() {
+        let run_id = "r-scoped";
+        let events = vec![minimal_discovery(run_id)];
+        let chain = vec![json!({
+            "event_id": "e1",
+            "ts_utc": "2026-01-01T00:00:01Z",
+            "event_type": "ai_discovery_reported",
+            "prev_hash": "prior-run-record-hash",
+            "record_hash": "hash-a",
+        })];
+        let export = build_export(run_id, &events, chain, EXPORT_SCHEMA_V1, None);
+        let (report, _) = run_export_validations(&export);
+        assert!(report.chain_continuity_ok, "errors: {:?}", report.errors);
+    }
+
+    #[test]
+    fn accepts_valid_minimal_export() {
+        let run_id = "r-ok";
+        let events = vec![minimal_discovery(run_id)];
+        let chain = vec![json!({
+            "event_id": "e1",
+            "ts_utc": "2026-01-01T00:00:01Z",
+            "event_type": "ai_discovery_reported",
+            "prev_hash": "",
+            "record_hash": "hash-a",
+        })];
+        let export = build_export(run_id, &events, chain, EXPORT_SCHEMA_V1, None);
+        let (report, parsed) = run_export_validations(&export);
+        assert!(report.is_ok(), "errors: {:?}", report.errors);
+        assert_eq!(parsed.len(), 1);
+        assert!(report.events_content_sha256_ok);
+        assert!(report.run_id_consistent);
     }
 }

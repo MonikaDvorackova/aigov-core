@@ -75,10 +75,7 @@ async fn pool_from_env() -> Result<DbPool, String> {
             .as_str(),
         "1" | "true" | "yes" | "on"
     ) {
-        sqlx::migrate!("./migrations")
-            .run(&pool)
-            .await
-            .map_err(|e| format!("migration failed: {e}"))?;
+        db::run_sqlx_migrations(&pool).await?;
     }
     Ok(pool)
 }

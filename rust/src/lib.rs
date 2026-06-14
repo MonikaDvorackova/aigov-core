@@ -1,6 +1,10 @@
 pub mod aigov_env;
 pub mod audit_store;
 pub mod bundle;
+pub mod canonical_json;
+pub mod audit_export_signing;
+pub mod audit_export_bundle;
+pub mod audit_export_verification;
 pub mod govai_environment;
 pub mod immutable_store;
 pub mod ledger_storage;

@@ -1593,14 +1593,40 @@ def build_parser() -> GovaiArgumentParser:
     s_verify_pack = sub.add_parser(
         "verify-evidence-pack",
         help="Hosted gate: /bundle-hash events_content_sha256 (mandatory) vs CI digest manifest; optional "
-        "/api/export cross-check unless --require-export; then compliance-summary VALID.",
+        "/api/export cross-check unless --require-export; then compliance-summary VALID. "
+        "With --bundle, verify an offline signed audit export zip (Rust-native verifier).",
     )
     s_verify_pack.add_argument(
         "--path",
         dest="verify_pack_dir",
-        required=True,
+        required=False,
         type=Path,
         help="Directory with evidence_digest_manifest.json and <run_id>.json (CI artifacts).",
+    )
+    s_verify_pack.add_argument(
+        "--bundle",
+        default=None,
+        type=Path,
+        help="Offline signed audit export zip bundle (.zip) for Rust-native verification.",
+    )
+    s_verify_pack.add_argument(
+        "--json",
+        dest="verify_bundle_json",
+        action="store_true",
+        help="Emit structured JSON verification output (offline --bundle mode).",
+    )
+    s_verify_pack.add_argument(
+        "--trust-json",
+        dest="verify_bundle_trust_json",
+        default=os.environ.get("AIGOV_POLICY_TRUST_ED25519_JSON"),
+        help="Trusted Ed25519 public keys JSON for --bundle mode "
+        "(default: env AIGOV_POLICY_TRUST_ED25519_JSON).",
+    )
+    s_verify_pack.add_argument(
+        "--expected-issuer-id",
+        dest="verify_bundle_expected_issuer",
+        default=None,
+        help="Optional expected signature issuer_id for --bundle mode.",
     )
     s_verify_pack.add_argument("--run-id", default=None, help="Run id (fallback: env GOVAI_RUN_ID or RUN_ID).")
     s_verify_pack.add_argument(
@@ -2532,6 +2558,57 @@ def main(argv: Sequence[str] | None = None) -> int:
         return cli_exit.EX_OK
 
     if args.cmd == "verify-evidence-pack":
+        bundle_path = getattr(args, "bundle", None)
+        if bundle_path is not None and str(bundle_path).strip():
+            from aigov_py.verify_audit_export_bundle import verify_audit_export_bundle
+
+            trust_raw = str(getattr(args, "verify_bundle_trust_json", "") or "").strip()
+            if trust_raw:
+                os.environ["AIGOV_POLICY_TRUST_ED25519_JSON"] = trust_raw
+            try:
+                result = verify_audit_export_bundle(
+                    Path(str(bundle_path)).expanduser().resolve(),
+                    json_output=True,
+                    expected_issuer_id=getattr(args, "verify_bundle_expected_issuer", None),
+                )
+            except Exception as e:  # noqa: BLE001
+                print(f"error: bundle verification failed: {e}", file=sys.stderr)
+                return cli_exit.EX_ERR
+            if getattr(args, "verify_bundle_json", False):
+                print(json.dumps(result, indent=2))
+            else:
+                print(f"overall_status={result.get('overall_status')}")
+                for key in (
+                    "canonical_bundle_digest_verified",
+                    "signature_verified",
+                    "schema_version_supported",
+                    "manifest_complete",
+                    "all_manifest_hashes_match",
+                    "all_evidence_references_resolve",
+                    "replay_validation_passed",
+                    "unsigned_dependency_detected",
+                ):
+                    print(f"{key}={result.get(key)}")
+                failures = result.get("failures") or []
+                if failures:
+                    print("failures:")
+                    for item in failures:
+                        if isinstance(item, dict):
+                            print(
+                                f"  - [{item.get('stage')}] {item.get('code')}: {item.get('message')}"
+                            )
+            if str(result.get("overall_status") or "") != "success":
+                return cli_exit.EX_ERR
+            return cli_exit.EX_OK
+
+        verify_pack_dir = getattr(args, "verify_pack_dir", None)
+        if verify_pack_dir is None or not str(verify_pack_dir).strip():
+            print(
+                "error: pass --path (CI artefacts directory) or --bundle (signed export zip)",
+                file=sys.stderr,
+            )
+            return cli_exit.EX_USAGE
+
         summary_verdict = "ERROR"
         summary_obj: dict[str, Any] | None = None
         summary_codes: list[str] = ["INTEGRATION_ERROR"]
@@ -2547,7 +2624,7 @@ def main(argv: Sequence[str] | None = None) -> int:
                 repro=repro,
             )
             return cli_exit.EX_USAGE
-        artifact_dir = Path(getattr(args, "verify_pack_dir")).expanduser().resolve()
+        artifact_dir = Path(verify_pack_dir).expanduser().resolve()
 
         # Optional local enrichment for summary output (append-only).
         raw_scan_path = (os.environ.get("GOVAI_DISCOVERY_PATH") or "").strip()

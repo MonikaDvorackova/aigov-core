@@ -231,16 +231,16 @@ fn export_timestamps(events: &[EvidenceEvent]) -> Value {
 mod tests {
     use super::*;
     use crate::audit_store::append_record_atomic_with_run_count;
+    use crate::replay_validation::{run_export_validations, EXPORT_SCHEMA_V1};
     use crate::schema::EvidenceEvent;
+    use sha2::{Digest, Sha256};
     use tempfile::TempDir;
 
-    fn write_minimal_valid_run(_dir: &std::path::Path, tenant: &str, run_id: &str) -> String {
-        let log_path = crate::project::resolve_ledger_path("audit_log.jsonl", tenant);
-        let _ = std::fs::create_dir_all(
-            std::path::Path::new(&log_path)
-                .parent()
-                .unwrap_or(std::path::Path::new(".")),
-        );
+    fn append_event(log_path: &str, event: EvidenceEvent) {
+        append_record_atomic_with_run_count(log_path, event).expect("append");
+    }
+
+    fn write_golden_path_run(log_path: &str, run_id: &str) {
         let events = vec![
             EvidenceEvent {
                 event_id: format!("{run_id}-disc"),
@@ -258,12 +258,194 @@ mod tests {
                 agent_role: None,
                 delegation_reason: None,
             },
+            EvidenceEvent {
+                event_id: format!("{run_id}-data"),
+                event_type: "data_registered".to_string(),
+                ts_utc: "2026-01-01T00:00:02Z".to_string(),
+                actor: "t".to_string(),
+                system: "t".to_string(),
+                run_id: run_id.to_string(),
+                environment: None,
+                payload: json!({
+                    "ai_system_id": "as-1",
+                    "dataset_id": "ds-1",
+                    "dataset_version": "v1",
+                    "governance_status": "registered"
+                }),
+                parent_run_id: None,
+                root_run_id: None,
+                delegated_from_event_id: None,
+                agent_id: None,
+                agent_role: None,
+                delegation_reason: None,
+            },
+            EvidenceEvent {
+                event_id: format!("{run_id}-eval"),
+                event_type: "evaluation_reported".to_string(),
+                ts_utc: "2026-01-01T00:00:03Z".to_string(),
+                actor: "t".to_string(),
+                system: "t".to_string(),
+                run_id: run_id.to_string(),
+                environment: None,
+                payload: json!({
+                    "ai_system_id": "as-1",
+                    "dataset_id": "ds-1",
+                    "model_version_id": "mv-1",
+                    "passed": true
+                }),
+                parent_run_id: None,
+                root_run_id: None,
+                delegated_from_event_id: None,
+                agent_id: None,
+                agent_role: None,
+                delegation_reason: None,
+            },
+            EvidenceEvent {
+                event_id: format!("{run_id}-risk"),
+                event_type: "risk_recorded".to_string(),
+                ts_utc: "2026-01-01T00:00:04Z".to_string(),
+                actor: "t".to_string(),
+                system: "t".to_string(),
+                run_id: run_id.to_string(),
+                environment: None,
+                payload: json!({
+                    "risk_id": "risk-1",
+                    "risk_class": "high",
+                    "ai_system_id": "as-1",
+                    "dataset_id": "ds-1",
+                    "model_version_id": "mv-1"
+                }),
+                parent_run_id: None,
+                root_run_id: None,
+                delegated_from_event_id: None,
+                agent_id: None,
+                agent_role: None,
+                delegation_reason: None,
+            },
+            EvidenceEvent {
+                event_id: format!("{run_id}-review"),
+                event_type: "risk_reviewed".to_string(),
+                ts_utc: "2026-01-01T00:00:05Z".to_string(),
+                actor: "t".to_string(),
+                system: "t".to_string(),
+                run_id: run_id.to_string(),
+                environment: None,
+                payload: json!({
+                    "risk_id": "risk-1",
+                    "decision": "approve",
+                    "reviewer": "risk_officer"
+                }),
+                parent_run_id: None,
+                root_run_id: None,
+                delegated_from_event_id: None,
+                agent_id: None,
+                agent_role: None,
+                delegation_reason: None,
+            },
+            EvidenceEvent {
+                event_id: format!("{run_id}-human"),
+                event_type: "human_approved".to_string(),
+                ts_utc: "2026-01-01T00:00:06Z".to_string(),
+                actor: "t".to_string(),
+                system: "t".to_string(),
+                run_id: run_id.to_string(),
+                environment: None,
+                payload: json!({
+                    "scope": "model_promoted",
+                    "decision": "approve",
+                    "approver": "compliance_officer"
+                }),
+                parent_run_id: None,
+                root_run_id: None,
+                delegated_from_event_id: None,
+                agent_id: None,
+                agent_role: None,
+                delegation_reason: None,
+            },
+            EvidenceEvent {
+                event_id: format!("{run_id}-promote"),
+                event_type: "model_promoted".to_string(),
+                ts_utc: "2026-01-01T00:00:07Z".to_string(),
+                actor: "t".to_string(),
+                system: "t".to_string(),
+                run_id: run_id.to_string(),
+                environment: None,
+                payload: json!({
+                    "model_version_id": "mv-1",
+                    "artifact_path": "registry://test/model"
+                }),
+                parent_run_id: None,
+                root_run_id: None,
+                delegated_from_event_id: None,
+                agent_id: None,
+                agent_role: None,
+                delegation_reason: None,
+            },
         ];
         for e in events {
-            append_record_atomic_with_run_count(&log_path, e).expect("append");
+            append_event(log_path, e);
         }
+    }
+
+    fn write_minimal_valid_run(_dir: &std::path::Path, tenant: &str, run_id: &str) -> String {
+        let log_path = crate::project::resolve_ledger_path("audit_log.jsonl", tenant);
+        let _ = std::fs::create_dir_all(
+            std::path::Path::new(&log_path)
+                .parent()
+                .unwrap_or(std::path::Path::new(".")),
+        );
+        append_event(
+            &log_path,
+            EvidenceEvent {
+                event_id: format!("{run_id}-disc"),
+                event_type: "ai_discovery_reported".to_string(),
+                ts_utc: "2026-01-01T00:00:01Z".to_string(),
+                actor: "t".to_string(),
+                system: "t".to_string(),
+                run_id: run_id.to_string(),
+                environment: None,
+                payload: json!({"openai": false, "transformers": false, "model_artifacts": false}),
+                parent_run_id: None,
+                root_run_id: None,
+                delegated_from_event_id: None,
+                agent_id: None,
+                agent_role: None,
+                delegation_reason: None,
+            },
+        );
         log_path
     }
+
+    fn export_doc(
+        run_id: &str,
+        log_path: &str,
+        tenant: &str,
+    ) -> Value {
+        build_audit_export_v1(
+            run_id,
+            tenant,
+            log_path,
+            "test-policy",
+            GovaiEnvironment::Dev,
+            &PolicyConfig::default(),
+        )
+        .expect("export")
+    }
+
+    const SCHEMA_REQUIRED_TOP_LEVEL: &[&str] = &[
+        "ok",
+        "schema_version",
+        "policy_version",
+        "environment",
+        "exported_at_utc",
+        "tenant",
+        "run",
+        "evidence_hashes",
+        "decision",
+        "evidence_requirements",
+        "evidence_events",
+        "timestamps",
+    ];
 
     #[test]
     fn export_schema_version_and_hashes() {
@@ -271,15 +453,7 @@ mod tests {
         std::env::set_var("GOVAI_LEDGER_DIR", tmp.path());
         let run_id = "export-run-1";
         let log_path = write_minimal_valid_run(tmp.path(), "tenant-x", run_id);
-        let doc = build_audit_export_v1(
-            run_id,
-            "tenant-x",
-            &log_path,
-            "test-policy",
-            GovaiEnvironment::Dev,
-            &PolicyConfig::default(),
-        )
-        .expect("export");
+        let doc = export_doc(run_id, &log_path, "tenant-x");
         assert_eq!(
             doc.get("schema_version").and_then(|v| v.as_str()),
             Some("aigov.audit_export.v1")
@@ -287,5 +461,89 @@ mod tests {
         let hashes = doc.get("evidence_hashes").expect("hashes");
         assert!(hashes.get("bundle_sha256").is_some());
         assert!(hashes.get("events_content_sha256").is_some());
+    }
+
+    #[test]
+    fn export_full_event_chain_and_schema_shape() {
+        let tmp = TempDir::new().unwrap();
+        std::env::set_var("GOVAI_LEDGER_DIR", tmp.path());
+        let run_id = "export-full-chain";
+        let log_path = crate::project::resolve_ledger_path("audit_log.jsonl", "tenant-full");
+        let _ = std::fs::create_dir_all(
+            std::path::Path::new(&log_path)
+                .parent()
+                .unwrap_or(std::path::Path::new(".")),
+        );
+        write_golden_path_run(&log_path, run_id);
+        let doc = export_doc(run_id, &log_path, "tenant-full");
+
+        for key in SCHEMA_REQUIRED_TOP_LEVEL {
+            assert!(doc.get(key).is_some(), "missing top-level key {key}");
+        }
+        assert_eq!(
+            doc.get("schema_version").and_then(|v| v.as_str()),
+            Some(EXPORT_SCHEMA_V1)
+        );
+
+        let events = doc
+            .get("evidence_events")
+            .and_then(|v| v.as_array())
+            .expect("evidence_events array");
+        assert_eq!(events.len(), 7);
+
+        let chain = doc
+            .get("evidence_hashes")
+            .and_then(|h| h.get("log_chain"))
+            .and_then(|v| v.as_array())
+            .expect("log_chain");
+        assert_eq!(chain.len(), events.len());
+
+        assert_eq!(doc["decision"]["verdict"], "VALID");
+    }
+
+    #[test]
+    fn export_is_deterministic_for_identical_ledger() {
+        let tmp = TempDir::new().unwrap();
+        std::env::set_var("GOVAI_LEDGER_DIR", tmp.path());
+        let run_id = "export-deterministic";
+        let log_path = write_minimal_valid_run(tmp.path(), "tenant-det", run_id);
+        let first = export_doc(run_id, &log_path, "tenant-det");
+        let second = export_doc(run_id, &log_path, "tenant-det");
+
+        assert_eq!(
+            first["evidence_hashes"]["events_content_sha256"],
+            second["evidence_hashes"]["events_content_sha256"]
+        );
+        assert_eq!(
+            first["evidence_hashes"]["bundle_sha256"],
+            second["evidence_hashes"]["bundle_sha256"]
+        );
+
+        let stable = serde_json::to_string(&first["evidence_events"]).expect("serialize");
+        let digest = Sha256::digest(stable.as_bytes());
+        let digest_hex = hex::encode(digest);
+        let digest2 = Sha256::digest(
+            serde_json::to_string(&second["evidence_events"])
+                .expect("serialize")
+                .as_bytes(),
+        );
+        assert_eq!(digest_hex, hex::encode(digest2));
+    }
+
+    #[test]
+    fn export_includes_lineage_block_and_passes_replay_validation() {
+        let tmp = TempDir::new().unwrap();
+        std::env::set_var("GOVAI_LEDGER_DIR", tmp.path());
+        let run_id = "export-lineage";
+        let log_path = write_minimal_valid_run(tmp.path(), "tenant-lin", run_id);
+        let doc = export_doc(run_id, &log_path, "tenant-lin");
+
+        let lineage = doc.get("lineage").expect("lineage block");
+        assert!(lineage.get("root_run_id").is_some());
+        assert!(lineage.get("graph").is_some());
+
+        let (report, _) = run_export_validations(&doc);
+        assert!(report.is_ok(), "replay validation errors: {:?}", report.errors);
+        assert!(report.events_content_sha256_ok);
     }
 }

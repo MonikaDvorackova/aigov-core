@@ -423,6 +423,28 @@ async fn runtime_ingest_projection_verdict_export_suite() {
         assert_eq!(b["event_id"], e["event_id"]);
         assert_eq!(b["event_type"], e["event_type"]);
     }
+
+    // replay validation on exported document
+    let run_id = "replay-run";
+    ingest_all(&app, &golden_path_valid_events(run_id), "tenant-a-key").await;
+    let (_, export_for_replay) = send(
+        &app,
+        "GET",
+        &format!("/api/export/{run_id}"),
+        None,
+        "tenant-a-key",
+    )
+    .await;
+    let (replay_report, replay_events) =
+        aigov_audit::replay_validation::run_export_validations(&export_for_replay);
+    assert!(
+        replay_report.is_ok(),
+        "replay validation failed: {:?}",
+        replay_report.errors
+    );
+    assert!(replay_report.events_content_sha256_ok);
+    assert_eq!(replay_events.len(), golden_path_valid_events(run_id).len());
+    assert!(export_for_replay.get("lineage").is_some());
 }
 
 fn count_ledger_lines(path: &std::path::Path) -> usize {

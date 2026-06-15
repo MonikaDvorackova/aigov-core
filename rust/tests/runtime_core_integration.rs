@@ -17,6 +17,46 @@ async fn body_json(response: axum::response::Response) -> Value {
     serde_json::from_slice(&bytes).expect("json body")
 }
 
+fn postgres_url_configured() -> bool {
+    ["GOVAI_DATABASE_URL", "DATABASE_URL", "AIGOV_DATABASE_URL"]
+        .into_iter()
+        .any(|key| {
+            std::env::var(key)
+                .ok()
+                .map(|s| !s.trim().is_empty())
+                .unwrap_or(false)
+        })
+}
+
+/// Isolate ledger-focused integration tests from CI-wide `DATABASE_URL` unless migrations run.
+fn configure_runtime_core_test_env(ledger_dir: &std::path::Path) {
+    std::fs::create_dir_all(ledger_dir).expect("ledger parent directory");
+    std::env::set_var(
+        "GOVAI_LEDGER_DIR",
+        ledger_dir.to_string_lossy().to_string(),
+    );
+    if postgres_url_configured() {
+        std::env::set_var("GOVAI_AUTO_MIGRATE", "true");
+    }
+}
+
+async fn assert_ready_ok(app: &axum::Router) -> Value {
+    let req = Request::builder()
+        .uri("/ready")
+        .body(Body::empty())
+        .unwrap();
+    let resp = app.clone().oneshot(req).await.unwrap();
+    let status = resp.status();
+    let body = body_json(resp).await;
+    assert_eq!(
+        status,
+        StatusCode::OK,
+        "/ready expected HTTP 200, got {status}; body: {body}"
+    );
+    assert_eq!(body["ready"], true, "/ready body: {body}");
+    body
+}
+
 async fn send(
     app: &axum::Router,
     method: &str,
@@ -216,7 +256,7 @@ async fn ingest_all(app: &axum::Router, events: &[Value], api_key: &str) {
 #[tokio::test]
 async fn runtime_ingest_projection_verdict_export_suite() {
     let dir = tempfile::tempdir().expect("tempdir");
-    std::env::set_var("GOVAI_LEDGER_DIR", dir.path());
+    configure_runtime_core_test_env(dir.path());
     std::env::set_var("GOVAI_API_KEYS", "tenant-a-key,tenant-b-key");
     std::env::set_var(
         "GOVAI_API_KEYS_JSON",
@@ -250,16 +290,12 @@ async fn runtime_ingest_projection_verdict_export_suite() {
 
     let ledger_path = dir.path().join("audit_log__default.jsonl");
     for _ in 0..3 {
-        let req = Request::builder()
-            .uri("/ready")
-            .body(Body::empty())
-            .unwrap();
-        let resp = app.clone().oneshot(req).await.unwrap();
-        assert_eq!(resp.status(), StatusCode::OK);
-        let body = body_json(resp).await;
-        assert_eq!(body["ready"], true);
+        let body = assert_ready_ok(&app).await;
         let checks = body.get("checks").expect("checks");
-        assert_eq!(checks["ledger_tenant_readable"], true);
+        assert_eq!(
+            checks["ledger_tenant_readable"], true,
+            "ledger_tenant_readable check failed; /ready body: {body}"
+        );
         assert!(checks.get("tenant_ledger_probe").is_none());
     }
     assert_eq!(count_ledger_lines(&ledger_path), 0);

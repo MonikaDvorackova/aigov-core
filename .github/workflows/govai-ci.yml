@@ -41,11 +41,23 @@ jobs:
           cd rust
           cargo build --locked --bin aigov_audit
           cargo build --locked --bin portable_evidence_digest_once
+          cargo build --locked --bin verify_audit_export_bundle_once
 
       - name: Rust unit and integration tests
         run: |
           set -euo pipefail
           cd rust && cargo test --locked
+
+      - name: Downstream Rust consumption smoke
+        run: |
+          set -euo pipefail
+          cd tests/downstream-consumption/rust-consumer
+          cargo test --locked
+
+      - name: Downstream Python consumption smoke
+        run: |
+          set -euo pipefail
+          python3 scripts/downstream_python_consumption_smoke.py
 
       - name: Governance standards (offline)
         run: |

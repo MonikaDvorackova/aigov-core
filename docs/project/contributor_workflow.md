@@ -39,6 +39,7 @@ From repo root:
 
 ```bash
 python3 scripts/gate_reports.py   # or: make gate
+make downstream-consumption-smoke   # external Rust path dep + fresh-venv pip install
 make oss-health                     # key OSS files on disk (stdlib; no network)
 make oss-metrics                    # repository size metrics (stdout only)
 make docs-links                     # local Markdown links (non-strict; see --strict in Makefile)

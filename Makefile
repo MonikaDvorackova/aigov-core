@@ -24,6 +24,7 @@ AIGOV_MODE ?= ci
 	public-sdk-packages-check oss-ecosystem-check enterprise-readiness-check \
 	validate-changelog generate-release-notes release-readiness-report release-readiness-check \
 	cursor-plugin-validate cursor-plugin-smoke cursor-plugin-check cursor-marketplace-listing-check \
+	downstream-consumption-smoke \
 	local-demo local-demo-curl
 
 .PHONY: discovery_scan
@@ -114,6 +115,11 @@ cursor-plugin-validate:
 
 cursor-plugin-smoke:
 	@python3 scripts/smoke_cursor_plugin.py
+
+downstream-consumption-smoke:
+	@cd tests/downstream-consumption/rust-consumer && cargo test --locked
+	@cd rust && cargo build --locked --bin verify_audit_export_bundle_once
+	@python3 scripts/downstream_python_consumption_smoke.py
 
 cursor-plugin-check: cursor-plugin-validate cursor-plugin-smoke
 	@echo "cursor-plugin-check: OK"

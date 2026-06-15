@@ -240,6 +240,17 @@ mod tests {
         append_record_atomic_with_run_count(log_path, event).expect("append");
     }
 
+    /// Tenant-scoped ledger file under an isolated temp directory (no `GOVAI_LEDGER_DIR`).
+    fn isolated_ledger_path(tmp: &std::path::Path, tenant: &str) -> std::path::PathBuf {
+        tmp.join(format!("audit_log__{tenant}.jsonl"))
+    }
+
+    fn ensure_ledger_parent(log_path: &std::path::Path) {
+        if let Some(parent) = log_path.parent() {
+            let _ = std::fs::create_dir_all(parent);
+        }
+    }
+
     fn write_golden_path_run(log_path: &str, run_id: &str) {
         let events = vec![
             EvidenceEvent {
@@ -387,15 +398,11 @@ mod tests {
         }
     }
 
-    fn write_minimal_valid_run(_dir: &std::path::Path, tenant: &str, run_id: &str) -> String {
-        let log_path = crate::project::resolve_ledger_path("audit_log.jsonl", tenant);
-        let _ = std::fs::create_dir_all(
-            std::path::Path::new(&log_path)
-                .parent()
-                .unwrap_or(std::path::Path::new(".")),
-        );
+    fn write_minimal_valid_run(tmp: &std::path::Path, tenant: &str, run_id: &str) -> String {
+        let log_path = isolated_ledger_path(tmp, tenant);
+        ensure_ledger_parent(&log_path);
         append_event(
-            &log_path,
+            &log_path.to_string_lossy(),
             EvidenceEvent {
                 event_id: format!("{run_id}-disc"),
                 event_type: "ai_discovery_reported".to_string(),
@@ -413,7 +420,7 @@ mod tests {
                 delegation_reason: None,
             },
         );
-        log_path
+        log_path.to_string_lossy().into_owned()
     }
 
     fn export_doc(
@@ -450,7 +457,6 @@ mod tests {
     #[test]
     fn export_schema_version_and_hashes() {
         let tmp = TempDir::new().unwrap();
-        std::env::set_var("GOVAI_LEDGER_DIR", tmp.path());
         let run_id = "export-run-1";
         let log_path = write_minimal_valid_run(tmp.path(), "tenant-x", run_id);
         let doc = export_doc(run_id, &log_path, "tenant-x");
@@ -466,15 +472,11 @@ mod tests {
     #[test]
     fn export_full_event_chain_and_schema_shape() {
         let tmp = TempDir::new().unwrap();
-        std::env::set_var("GOVAI_LEDGER_DIR", tmp.path());
         let run_id = "export-full-chain";
-        let log_path = crate::project::resolve_ledger_path("audit_log.jsonl", "tenant-full");
-        let _ = std::fs::create_dir_all(
-            std::path::Path::new(&log_path)
-                .parent()
-                .unwrap_or(std::path::Path::new(".")),
-        );
-        write_golden_path_run(&log_path, run_id);
+        let log_path = isolated_ledger_path(tmp.path(), "tenant-full");
+        ensure_ledger_parent(&log_path);
+        write_golden_path_run(&log_path.to_string_lossy(), run_id);
+        let log_path = log_path.to_string_lossy().into_owned();
         let doc = export_doc(run_id, &log_path, "tenant-full");
 
         for key in SCHEMA_REQUIRED_TOP_LEVEL {
@@ -504,7 +506,6 @@ mod tests {
     #[test]
     fn export_is_deterministic_for_identical_ledger() {
         let tmp = TempDir::new().unwrap();
-        std::env::set_var("GOVAI_LEDGER_DIR", tmp.path());
         let run_id = "export-deterministic";
         let log_path = write_minimal_valid_run(tmp.path(), "tenant-det", run_id);
         let first = export_doc(run_id, &log_path, "tenant-det");
@@ -533,7 +534,6 @@ mod tests {
     #[test]
     fn export_includes_lineage_block_and_passes_replay_validation() {
         let tmp = TempDir::new().unwrap();
-        std::env::set_var("GOVAI_LEDGER_DIR", tmp.path());
         let run_id = "export-lineage";
         let log_path = write_minimal_valid_run(tmp.path(), "tenant-lin", run_id);
         let doc = export_doc(run_id, &log_path, "tenant-lin");

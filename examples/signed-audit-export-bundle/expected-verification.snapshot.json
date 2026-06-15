@@ -1,0 +1,17 @@
+{
+  "overall_status": "success",
+  "canonical_bundle_digest_verified": true,
+  "signature_verified": true,
+  "schema_version_supported": true,
+  "manifest_complete": true,
+  "all_manifest_hashes_match": true,
+  "all_evidence_references_resolve": true,
+  "replay_validation_passed": true,
+  "unsigned_dependency_detected": false,
+  "run_id": "demo-signed-export",
+  "export_schema_version": "aigov.audit_export.v1",
+  "bundle_schema_version": "aigov.audit_export_bundle.v1",
+  "signature_issuer_id": "govai-export-signer",
+  "replay_ok": true,
+  "failures": []
+}

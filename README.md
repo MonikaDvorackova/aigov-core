@@ -16,6 +16,66 @@ GovAI Core is the **open-source**, ledger-authoritative audit runtime for recons
 
 License terms: [`LICENSE`](LICENSE). Contributor expectations: [`CONTRIBUTING.md`](CONTRIBUTING.md), [`GOVERNANCE.md`](GOVERNANCE.md), [`SECURITY.md`](SECURITY.md).
 
+## Try GovAI Core locally
+
+From a clean clone with **Rust** and **Python 3** only — no hosted platform or external services.
+
+### 1. Install the CLI and configure the runtime
+
+```bash
+cd python && python3 -m venv .venv && source .venv/bin/activate && pip install -e . && cd ..
+
+export GOVAI_LEDGER_DIR="$(pwd)/.govai-ledger"
+mkdir -p "$GOVAI_LEDGER_DIR"
+export GOVAI_API_KEY="$(python3 -c 'import secrets; print(secrets.token_urlsafe(32))')"
+export GOVAI_API_KEYS="$GOVAI_API_KEY"
+export GOVAI_API_KEYS_JSON="{\"$GOVAI_API_KEY\":\"local-dev\"}"
+export AIGOV_ENVIRONMENT=dev
+export AIGOV_POLICY_DIR="$(pwd)/rust"
+```
+
+### 2. Start the audit runtime and ingest sample evidence
+
+Terminal A:
+
+```bash
+make run-audit
+```
+
+Terminal B:
+
+```bash
+export GOVAI_AUDIT_BASE_URL="http://127.0.0.1:8088"
+export GOVAI_API_KEY="<same value as above>"
+export GOVAI_RUN_ID="local-$(date +%s)"
+./examples/basic-runtime-client/smoke-runtime.sh
+```
+
+The smoke script posts one discovery event, then reads compliance summary, audit export, and verify routes. A single discovery event typically yields verdict **BLOCKED** — that is expected.
+
+### 3. Export (included in smoke)
+
+The smoke script already calls `GET /api/export/:run_id`. To save the JSON:
+
+```bash
+curl -sS -H "Authorization: Bearer $GOVAI_API_KEY" \
+  "$GOVAI_AUDIT_BASE_URL/api/export/$GOVAI_RUN_ID" | jq . > "/tmp/$GOVAI_RUN_ID-export.json"
+```
+
+### 4. Verify a signed export bundle (offline)
+
+```bash
+cd rust && cargo build --bin verify_audit_export_bundle_once && cd ..
+export AIGOV_POLICY_TRUST_ED25519_JSON="$(cat examples/signed-audit-export-bundle/trust-demo.json)"
+govai verify-evidence-pack \
+  --bundle examples/signed-audit-export-bundle/demo.valid.zip \
+  --json
+```
+
+Regenerate the demo fixture locally: `python3 scripts/generate_signed_audit_export_bundle_demo.py`
+
+Verifier reference: [`docs/signed-audit-export-verifier.md`](docs/signed-audit-export-verifier.md) · Full runtime walkthrough: [`docs/quickstart-runtime.md`](docs/quickstart-runtime.md)
+
 Historical documentation under `docs/hosted/`, `docs/billing/`, `docs/pricing/`, and `dashboard/` describes the **GovAI Platform** and is retained for reference only — it is **not** part of the core runtime surface mounted by `aigov_audit`.
 
 ## Strategy: audit engine, portable standards, interchange, and offline validation

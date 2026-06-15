@@ -75,6 +75,8 @@ Calls, in order:
 
 With a single discovery event, the verdict is usually **BLOCKED** (missing required lifecycle evidence). That is normal for a minimal smoke.
 
+**Offline signed bundle verification** (no running server): [`signed-audit-export-verifier.md`](signed-audit-export-verifier.md) and `examples/signed-audit-export-bundle/demo.valid.zip`.
+
 ### Python (stdlib SDK)
 
 ```bash

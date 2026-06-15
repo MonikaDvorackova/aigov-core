@@ -20,6 +20,9 @@ def test_examples_validate_via_conformance() -> None:
         "evidence-pack.valid.json",
         "policy-module.valid.json",
         "decision-trace.valid.json",
+        "delegation_graph.valid.json",
+        "capability_policy.valid.json",
+        "trace_verification_plan.valid.json",
     ):
         data = _load_example(fname)
         rep = validate_conformance(data)

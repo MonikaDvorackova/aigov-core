@@ -12,7 +12,12 @@ on:
       - "dashboard/**"
       - "docs/**"
       - "Makefile"
+      - "CHANGELOG.md"
+      - "Dockerfile"
   workflow_dispatch:
+  push:
+    tags:
+      - "v*"
 
 env:
   AIGOV_POLICY_STRICT: "true"
@@ -74,6 +79,12 @@ jobs:
           set -euo pipefail
           make gate
 
+      - name: Release metadata validation
+        run: |
+          set -euo pipefail
+          python3 scripts/validate_changelog.py --json | tee changelog-validation.json
+          python3 scripts/release_readiness_report.py --json | tee release-readiness-report.json
+
       - name: Full Rust tests
         run: |
           set -euo pipefail
@@ -113,3 +124,65 @@ jobs:
             echo "4. Enterprise readiness check"
             echo "5. TypeScript SDK build and tests"
           } >> "${GITHUB_STEP_SUMMARY}"
+
+  release-artifacts:
+    name: release-artifacts
+    if: github.event_name == 'workflow_dispatch' || startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Rust dependencies
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: rust -> target
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Release readiness (dry-run)
+        run: |
+          set -euo pipefail
+          make release-readiness-check
+          python3 scripts/validate_changelog.py --json | tee changelog-validation.json
+          python3 scripts/release_readiness_report.py --json | tee release-readiness-report.json
+          mkdir -p dist
+
+      - name: Build Python wheel and sdist
+        run: |
+          set -euo pipefail
+          python -m pip install --upgrade pip build
+          mkdir -p dist/python
+          python -m build --outdir dist/python python
+          ls -la dist/python
+
+      - name: Validate Rust crate package (no publish)
+        working-directory: rust
+        run: |
+          set -euo pipefail
+          cargo package --allow-dirty --no-verify
+          mkdir -p ../dist/rust
+          cp target/package/aigov_audit-*.crate ../dist/rust/
+          ls -la ../dist/rust
+
+      - name: Build Docker image (local artifact only)
+        run: |
+          set -euo pipefail
+          docker build -t govai-core:ci-${{ github.sha }} .
+          docker save govai-core:ci-${{ github.sha }} -o dist/govai-core-image.tar
+
+      - name: Upload release artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: govai-core-release-artifacts
+          path: |
+            dist/python/
+            dist/rust/
+            dist/govai-core-image.tar
+            changelog-validation.json
+            release-readiness-report.json
+          if-no-files-found: error

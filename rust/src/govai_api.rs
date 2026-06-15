@@ -17,6 +17,7 @@ use crate::compliance_summary::{
 };
 use crate::db::{self, DbPool};
 use crate::govai_environment::{self, GovaiEnvironment};
+use crate::http_observability;
 use crate::ledger_storage;
 use crate::ledger_view::FileLedgerView;
 use crate::metering;
@@ -74,10 +75,7 @@ async fn pool_from_env() -> Result<DbPool, String> {
             .as_str(),
         "1" | "true" | "yes" | "on"
     ) {
-        sqlx::migrate!("./migrations")
-            .run(&pool)
-            .await
-            .map_err(|e| format!("migration failed: {e}"))?;
+        db::run_sqlx_migrations(&pool).await?;
     }
     Ok(pool)
 }
@@ -144,6 +142,7 @@ pub fn build_router(state: AppState) -> Router {
         .route("/health", get(get_health))
         .route("/ready", get(get_ready))
         .route("/status", get(get_status))
+        .route("/metrics", get(http_observability::metrics_handler))
         .merge(ledger_routes)
         .with_state(state)
 }
@@ -198,58 +197,33 @@ async fn get_status(State(st): State<AppState>) -> Json<Value> {
 }
 
 async fn get_ready(State(st): State<AppState>) -> impl IntoResponse {
-    let checks = runtime_diagnostics::readiness_components(&st, true).await;
-    let database_ping = checks
+    let components = runtime_diagnostics::readiness_components(&st).await;
+    let database_ping = components
         .get("database_ping")
         .and_then(|v| v.as_bool())
         .unwrap_or(false);
-    let migrations_complete = checks
+    let migrations_complete = components
         .get("migrations_complete")
         .and_then(|v| v.as_bool())
         .unwrap_or(false);
-    let ledger_writable = checks
+    let ledger_writable = components
         .get("ledger_writable")
         .and_then(|v| v.as_bool())
         .unwrap_or(false);
-    let tenant_ledger_probe = checks
-        .get("tenant_ledger_probe")
+    let ledger_tenant_readable = components
+        .get("ledger_tenant_readable")
         .and_then(|v| v.as_bool())
         .unwrap_or(false);
-    let mut tenant_ledger_probe = false;
-    if ledger_writable {
-        let probe_path = project::resolve_ledger_path(LEDGER_STEM, "__ready_probe__");
-        let probe = EvidenceEvent {
-            event_id: format!("ready-probe-{}", uuid::Uuid::new_v4()),
-            event_type: "ai_discovery_reported".to_string(),
-            ts_utc: chrono::Utc::now().to_rfc3339_opts(chrono::SecondsFormat::Secs, true),
-            actor: "ready_probe".to_string(),
-            system: "govai".to_string(),
-            run_id: format!("ready-probe-{}", uuid::Uuid::new_v4()),
-            environment: Some(st.deployment_env.as_str().to_string()),
-            payload: json!({
-                "openai": false,
-                "transformers": false,
-                "model_artifacts": false,
-                "status": "probe",
-            }),
-            parent_run_id: None,
-            root_run_id: None,
-            delegated_from_event_id: None,
-            agent_id: None,
-            agent_role: None,
-            delegation_reason: None,
-        };
-        tenant_ledger_probe = append_record_atomic_with_run_count(&probe_path, probe).is_ok();
-    }
 
     let checks = json!({
         "database_ping": database_ping,
         "migrations_complete": migrations_complete,
         "ledger_writable": ledger_writable,
-        "tenant_ledger_probe": tenant_ledger_probe,
+        "ledger_tenant_readable": ledger_tenant_readable,
     });
 
-    let ready = database_ping && migrations_complete && ledger_writable && tenant_ledger_probe;
+    let ready =
+        database_ping && migrations_complete && ledger_writable && ledger_tenant_readable;
     if ready {
         return (
             StatusCode::OK,

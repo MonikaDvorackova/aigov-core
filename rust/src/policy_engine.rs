@@ -10,12 +10,14 @@ pub enum UnknownEventTypeBehavior {
     Reject,
 }
 
-impl UnknownEventTypeBehavior {
-    pub fn from_str(s: &str) -> Option<Self> {
+impl std::str::FromStr for UnknownEventTypeBehavior {
+    type Err = ();
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s.trim().to_ascii_lowercase().as_str() {
-            "allow" => Some(Self::Allow),
-            "reject" => Some(Self::Reject),
-            _ => None,
+            "allow" => Ok(Self::Allow),
+            "reject" => Ok(Self::Reject),
+            _ => Err(()),
         }
     }
 }
@@ -407,5 +409,24 @@ fn enforce_gate(
                 })
             }
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::UnknownEventTypeBehavior;
+    use std::str::FromStr;
+
+    #[test]
+    fn unknown_event_type_behavior_from_str() {
+        assert_eq!(
+            UnknownEventTypeBehavior::from_str("allow").unwrap(),
+            UnknownEventTypeBehavior::Allow
+        );
+        assert_eq!(
+            UnknownEventTypeBehavior::from_str("REJECT").unwrap(),
+            UnknownEventTypeBehavior::Reject
+        );
+        assert!(UnknownEventTypeBehavior::from_str("nope").is_err());
     }
 }

@@ -10,6 +10,7 @@ This directory holds **illustrative** scripts, compose snippets, and sample payl
 |------|---------|
 | [reconstructible-agent-demo/](reconstructible-agent-demo/) | **Reconstructible agent** — full agent lifecycle demo, export replay viewer; see [docs/reconstructible-agent-demo.md](../docs/reconstructible-agent-demo.md). |
 | [basic-runtime-client/](basic-runtime-client/) | **Core runtime** — curl smoke (`POST /evidence`, summary, export, verify); see [docs/quickstart-runtime.md](../docs/quickstart-runtime.md). |
+| [signed-audit-export-bundle/](signed-audit-export-bundle/) | **Offline verifier demo** — signed zip fixture + trust keys for `govai verify-evidence-pack --bundle`; see [docs/signed-audit-export-verifier.md](../docs/signed-audit-export-verifier.md). |
 | [python-runtime-client/](python-runtime-client/) | **Core runtime** — stdlib Python smoke + optional LangChain hook adapter example. |
 | [runtime-governance/](runtime-governance/) | Stdlib Python runtime SDK, FastAPI/LangChain/gateway adapters, `make runtime-sdk-check`. |
 | [ci/](ci/) | Downstream GitHub Actions pattern for the artefact-bound composite action. |

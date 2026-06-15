@@ -21,7 +21,7 @@ REQUIRED_PATHS = (
     ROOT / "examples/observability/json-ops-log.example.jsonl",
 )
 
-REQUIRED_ROUTES = ("/health", "/ready", "/status")
+REQUIRED_ROUTES = ("/health", "/ready", "/status", "/metrics")
 
 FORBIDDEN_TERMS = (
     "stripe",

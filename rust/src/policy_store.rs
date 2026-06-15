@@ -192,8 +192,9 @@ fn load_bundle_doc(doc: &GovaiPolicyV1) -> Result<RuntimePolicy, String> {
 
     // Minimal semantic validation + normalization.
     let unknown = doc.ingest_rules.unknown_event_types.behavior.as_str();
-    let unknown_behavior = UnknownEventTypeBehavior::from_str(unknown)
-        .ok_or_else(|| format!("invalid unknown_event_types.behavior: {unknown:?}"))?;
+    let unknown_behavior = unknown
+        .parse::<UnknownEventTypeBehavior>()
+        .map_err(|()| format!("invalid unknown_event_types.behavior: {unknown:?}"))?;
 
     // Interpret the v1 doc's `schema` and `gates` as a typed subset.
     let mut event_rules: BTreeMap<String, EventTypeRule> = BTreeMap::new();

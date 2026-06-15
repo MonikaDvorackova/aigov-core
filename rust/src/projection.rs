@@ -495,9 +495,8 @@ pub fn derive_current_state_from_events_with_context(
         e.event_type == "risk_reviewed"
             && payload_get_str(&e.payload, "decision").as_deref() == Some("approve")
     });
-    let risk_review_decision = risk_review_approved
-        .map(|e| payload_get_str(&e.payload, "decision"))
-        .flatten();
+    let risk_review_decision =
+        risk_review_approved.and_then(|e| payload_get_str(&e.payload, "decision"));
 
     let model_promoted_present = find_last_event(events, "model_promoted").is_some();
 
@@ -586,4 +585,327 @@ pub fn derive_current_state_from_bundle_doc(bundle_doc: &Value) -> Option<Compli
     let events_val = bundle_doc.get("events")?.clone();
     let events: Vec<EvidenceEvent> = serde_json::from_value(events_val).ok()?;
     Some(derive_current_state_from_events(&run_id, &events))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::compliance_summary::derive_verdict_from_state;
+    use crate::policy_config::PolicyConfig;
+    use crate::schema::EvidenceEvent;
+    use serde_json::json;
+
+    fn ev(id: &str, et: &str, ts: &str, rid: &str, payload: serde_json::Value) -> EvidenceEvent {
+        EvidenceEvent {
+            event_id: id.to_string(),
+            event_type: et.to_string(),
+            ts_utc: ts.to_string(),
+            actor: "test".to_string(),
+            system: "test".to_string(),
+            run_id: rid.to_string(),
+            environment: None,
+            payload,
+            parent_run_id: None,
+            root_run_id: None,
+            delegated_from_event_id: None,
+            agent_id: None,
+            agent_role: None,
+            delegation_reason: None,
+        }
+    }
+
+    fn discovery(rid: &str, id: &str, openai: bool, transformers: bool, model_artifacts: bool) -> EvidenceEvent {
+        ev(
+            id,
+            "ai_discovery_reported",
+            "2026-01-01T00:00:01Z",
+            rid,
+            json!({
+                "openai": openai,
+                "transformers": transformers,
+                "model_artifacts": model_artifacts
+            }),
+        )
+    }
+
+    fn golden_lifecycle_events(rid: &str) -> Vec<EvidenceEvent> {
+        vec![
+            discovery(rid, &format!("{rid}-disc"), false, false, false),
+            ev(
+                &format!("{rid}-data"),
+                "data_registered",
+                "2026-01-01T00:00:02Z",
+                rid,
+                json!({
+                    "ai_system_id": "as-1",
+                    "dataset_id": "ds-1",
+                    "dataset_version": "v1",
+                    "dataset_fingerprint": "fp",
+                    "dataset_governance_id": "dg-1",
+                    "governance_status": "registered"
+                }),
+            ),
+            ev(
+                &format!("{rid}-train"),
+                "model_trained",
+                "2026-01-01T00:00:03Z",
+                rid,
+                json!({
+                    "model_version_id": "mv-1",
+                    "ai_system_id": "as-1",
+                    "dataset_id": "ds-1",
+                    "artifact_path": "registry://test/model",
+                    "artifact_sha256": "abc1234567890123456789012345678901234567890123456789012345678901234"
+                }),
+            ),
+            ev(
+                &format!("{rid}-eval"),
+                "evaluation_reported",
+                "2026-01-01T00:00:04Z",
+                rid,
+                json!({
+                    "ai_system_id": "as-1",
+                    "dataset_id": "ds-1",
+                    "model_version_id": "mv-1",
+                    "passed": true
+                }),
+            ),
+            ev(
+                &format!("{rid}-risk"),
+                "risk_recorded",
+                "2026-01-01T00:00:05Z",
+                rid,
+                json!({
+                    "risk_id": "risk-1",
+                    "risk_class": "high",
+                    "severity": 4.0,
+                    "likelihood": 0.3,
+                    "status": "submitted",
+                    "ai_system_id": "as-1",
+                    "dataset_id": "ds-1",
+                    "model_version_id": "mv-1"
+                }),
+            ),
+            ev(
+                &format!("{rid}-review"),
+                "risk_reviewed",
+                "2026-01-01T00:00:06Z",
+                rid,
+                json!({
+                    "risk_id": "risk-1",
+                    "decision": "approve",
+                    "reviewer": "risk_officer",
+                    "justification": "acceptable",
+                    "ai_system_id": "as-1",
+                    "dataset_id": "ds-1",
+                    "model_version_id": "mv-1"
+                }),
+            ),
+            ev(
+                &format!("{rid}-human"),
+                "human_approved",
+                "2026-01-01T00:00:07Z",
+                rid,
+                json!({
+                    "scope": "model_promoted",
+                    "decision": "approve",
+                    "approver": "compliance_officer",
+                    "risk_id": "risk-1",
+                    "ai_system_id": "as-1",
+                    "dataset_id": "ds-1",
+                    "model_version_id": "mv-1"
+                }),
+            ),
+            ev(
+                &format!("{rid}-promote"),
+                "model_promoted",
+                "2026-01-01T00:00:08Z",
+                rid,
+                json!({
+                    "ai_system_id": "as-1",
+                    "dataset_id": "ds-1",
+                    "model_version_id": "mv-1",
+                    "artifact_path": "registry://test/model",
+                    "approved_human_event_id": format!("{rid}-human")
+                }),
+            ),
+        ]
+    }
+
+    #[test]
+    fn valid_lifecycle_projection() {
+        let rid = "proj-valid";
+        let events = golden_lifecycle_events(rid);
+        let state = derive_current_state_from_events(rid, &events);
+        assert_eq!(state.schema_version, "aigov.compliance_current_state.v2");
+        assert_eq!(state.identifiers.ai_system_id.as_deref(), Some("as-1"));
+        assert_eq!(state.model.evaluation_passed, Some(true));
+        assert_eq!(state.model.promotion.state, "promoted");
+        assert!(state.model.promotion.model_promoted_present);
+        assert!(state.requirements.missing.is_empty());
+        assert_eq!(state.evidence.events_total, events.len());
+
+        let outcome = derive_verdict_from_state(&state, &PolicyConfig::default());
+        assert_eq!(outcome.verdict, "VALID");
+    }
+
+    #[test]
+    fn blocked_missing_evidence_projection() {
+        let rid = "proj-blocked";
+        let events = vec![
+            discovery(rid, "d1", true, false, false),
+            // openai discovery requires model_registered + usage_policy_defined
+        ];
+        let state = derive_current_state_from_events(rid, &events);
+        assert!(state
+            .requirements
+            .missing
+            .contains(&"model_registered".to_string()));
+        assert!(state
+            .requirements
+            .missing
+            .contains(&"usage_policy_defined".to_string()));
+        assert_eq!(state.model.promotion.state, "awaiting_risk_review");
+
+        let outcome = derive_verdict_from_state(&state, &PolicyConfig::default());
+        assert_eq!(outcome.verdict, "BLOCKED");
+    }
+
+    #[test]
+    fn invalid_evaluation_projection() {
+        let rid = "proj-invalid";
+        let events = vec![
+            discovery(rid, "d1", false, false, false),
+            ev(
+                "e1",
+                "evaluation_reported",
+                "2026-01-01T00:00:02Z",
+                rid,
+                json!({
+                    "ai_system_id": "as-1",
+                    "dataset_id": "ds-1",
+                    "model_version_id": "mv-1",
+                    "passed": false
+                }),
+            ),
+        ];
+        let state = derive_current_state_from_events(rid, &events);
+        assert_eq!(state.model.evaluation_passed, Some(false));
+
+        let outcome = derive_verdict_from_state(&state, &PolicyConfig::default());
+        assert_eq!(outcome.verdict, "INVALID");
+    }
+
+    #[test]
+    fn promotion_edge_cases() {
+        let rid = "proj-promo";
+        let base = || {
+            vec![
+                discovery(rid, "d1", false, false, false),
+                ev(
+                    "risk",
+                    "risk_recorded",
+                    "2026-01-01T00:00:02Z",
+                    rid,
+                    json!({"risk_id": "r1", "risk_class": "low"}),
+                ),
+            ]
+        };
+
+        let awaiting_risk = derive_current_state_from_events(rid, &base());
+        assert_eq!(awaiting_risk.model.promotion.state, "awaiting_risk_review");
+
+        let mut after_review = base();
+        after_review.push(ev(
+            "review",
+            "risk_reviewed",
+            "2026-01-01T00:00:03Z",
+            rid,
+            json!({"risk_id": "r1", "decision": "approve"}),
+        ));
+        let awaiting_human = derive_current_state_from_events(rid, &after_review);
+        assert_eq!(awaiting_human.model.promotion.state, "awaiting_human_approval");
+
+        let mut after_human = after_review.clone();
+        after_human.push(ev(
+            "human",
+            "human_approved",
+            "2026-01-01T00:00:04Z",
+            rid,
+            json!({"scope": "model_promoted", "decision": "approve"}),
+        ));
+        let awaiting_eval = derive_current_state_from_events(rid, &after_human);
+        assert_eq!(
+            awaiting_eval.model.promotion.state,
+            "awaiting_evaluation_passed"
+        );
+
+        after_human.push(ev(
+            "eval",
+            "evaluation_reported",
+            "2026-01-01T00:00:05Z",
+            rid,
+            json!({"passed": true, "model_version_id": "mv-1"}),
+        ));
+        let awaiting_exec = derive_current_state_from_events(rid, &after_human);
+        assert_eq!(
+            awaiting_exec.model.promotion.state,
+            "awaiting_promotion_execution"
+        );
+
+        after_human.push(ev(
+            "promote",
+            "model_promoted",
+            "2026-01-01T00:00:06Z",
+            rid,
+            json!({"model_version_id": "mv-1"}),
+        ));
+        let promoted = derive_current_state_from_events(rid, &after_human);
+        assert_eq!(promoted.model.promotion.state, "promoted");
+    }
+
+    #[test]
+    fn risk_review_decision_propagation() {
+        let rid = "proj-risk";
+        let events = vec![
+            discovery(rid, "d1", false, false, false),
+            ev(
+                "rec",
+                "risk_recorded",
+                "2026-01-01T00:00:02Z",
+                rid,
+                json!({
+                    "risk_id": "risk-9",
+                    "risk_class": "medium",
+                    "severity": 2.0,
+                    "likelihood": 0.5,
+                    "status": "open"
+                }),
+            ),
+            ev(
+                "rev",
+                "risk_reviewed",
+                "2026-01-01T00:00:03Z",
+                rid,
+                json!({
+                    "risk_id": "risk-9",
+                    "decision": "approve",
+                    "reviewer": "alice",
+                    "justification": "mitigated"
+                }),
+            ),
+        ];
+        let state = derive_current_state_from_events(rid, &events);
+        assert_eq!(state.approval.risk_review_decision.as_deref(), Some("approve"));
+
+        let risks = state.risks.expect("risk summary");
+        assert_eq!(risks.total_risks, 1);
+        let review = risks.risks[0]
+            .latest_review
+            .as_ref()
+            .expect("latest review");
+        assert_eq!(review.decision.as_deref(), Some("approve"));
+        assert_eq!(review.reviewer.as_deref(), Some("alice"));
+        assert_eq!(review.risk_review_event_id.as_deref(), Some("rev"));
+    }
 }

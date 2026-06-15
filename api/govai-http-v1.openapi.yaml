@@ -130,9 +130,9 @@ paths:
       operationId: getReady
       x-govai-surface: internal
       description: |
-        Verifies database connectivity, applied SQLx migrations, writable ledger (`GOVAI_LEDGER_DIR` or dev cwd), and a tenant-scoped ledger append probe.
+        Verifies database connectivity, applied SQLx migrations, writable ledger (`GOVAI_LEDGER_DIR` or dev cwd), and read-only access to the default tenant ledger path.
 
-        Success responses include **`runtime_governance_enforcement`** diagnostics (Phase 3). These fields are **informational**: readiness HTTP **`200`** is **not** conditioned on **`enforceable`** — use them only for rollout / operator dashboards.
+        Does **not** append evidence or mutate ledger files. Success responses include **`runtime_governance_enforcement`** diagnostics (informational only).
       security: []
       responses:
         "200":
@@ -1212,7 +1212,7 @@ components:
           type: object
           additionalProperties: false
           required:
-            [database_ping, migrations_complete, ledger_writable, tenant_ledger_probe]
+            [database_ping, migrations_complete, ledger_writable, ledger_tenant_readable]
           properties:
             database_ping:
               type: boolean
@@ -1220,7 +1220,7 @@ components:
               type: boolean
             ledger_writable:
               type: boolean
-            tenant_ledger_probe:
+            ledger_tenant_readable:
               type: boolean
         runtime_governance_enforcement:
           $ref: "#/components/schemas/RuntimeGovernanceEnforcementDiag"

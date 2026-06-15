@@ -39,6 +39,7 @@ From repo root:
 
 ```bash
 python3 scripts/gate_reports.py   # or: make gate
+make downstream-consumption-smoke   # external Rust path dep + fresh-venv pip install
 make oss-health                     # key OSS files on disk (stdlib; no network)
 make oss-metrics                    # repository size metrics (stdout only)
 make docs-links                     # local Markdown links (non-strict; see --strict in Makefile)
@@ -140,11 +141,10 @@ make developer-integrations-manifest # validate docs/integrations/developer-inte
 make automation-pack                 # validate examples/integrations/sample-automation-pack.json
 make automation-pack-summary         # automation pack summary generator smoke
 make developer-integrations-platform-check # developer-integrations + developer-integrations-manifest + automation-pack + automation-pack-summary + gate
-make release-manifest               # validate docs/releases/release-manifest.json (stdlib JSON)
 make validate-changelog             # Keep a Changelog gate for CHANGELOG.md
-make generate-release-notes         # deterministic sample notes under examples/releases/
-make release-readiness-report       # aggregated JSON readiness (manifest + changelog + operations + Makefile)
-make release-readiness-check        # release-operations-check + release-manifest + validate-changelog + release-readiness-report + docs-links-strict + gate
+make generate-release-notes         # deterministic notes from CHANGELOG (VERSION=, optional OUT=)
+make release-readiness-report       # aggregated JSON readiness report
+make release-readiness-check        # gate + validate-changelog + release-readiness-report + cargo metadata
 cargo test --manifest-path rust/Cargo.toml
 ```
 
@@ -154,7 +154,6 @@ Python (activate **`python/.venv`** first):
 cd python
 pytest
 python -m pytest \
-  tests/test_validate_release_manifest.py \
   tests/test_validate_changelog.py \
   tests/test_generate_release_notes.py \
   tests/test_release_readiness_report.py \
@@ -199,6 +198,42 @@ pip install -e ".[dev]"
 ```
 
 inside **`python/`**.
+
+## Signed audit export verifier (contributors)
+
+Offline bundle verification lives in Rust (`rust/src/audit_export_verification.rs`) with CLI wiring via `govai verify-evidence-pack --bundle --json`. See [`docs/signed-audit-export-verifier.md`](../signed-audit-export-verifier.md).
+
+### Adding or changing failure reason codes
+
+1. Emit failures with stable `{stage, code, message}` in `audit_export_verification.rs` (or the stage module you extend).
+2. Map new `code` values in `derive_overall_status` when they need a distinct `overall_status`.
+3. Add a **negative-path unit test** in `audit_export_verification.rs` tests (mirror existing scenarios: tamper, missing ref, schema mismatch, replay failure).
+4. If the change affects the demo fixture, regenerate:
+   ```bash
+   python3 scripts/generate_signed_audit_export_bundle_demo.py
+   ```
+5. Update [`docs/signed-audit-export-verifier.md`](../signed-audit-export-verifier.md) if user-visible `overall_status` or stage semantics change.
+
+### Snapshot tests
+
+The serialized **`AuditExportVerificationResult`** JSON is a **stable contract** for auditors and downstream tooling. Field names and boolean stage flags should remain backward compatible; prefer additive changes.
+
+- Demo fixture: `examples/signed-audit-export-bundle/demo.valid.zip`
+- Golden output: `examples/signed-audit-export-bundle/expected-verification.snapshot.json`
+- Tests: `python/tests/test_signed_audit_export_bundle_demo.py`
+
+After intentional output changes, refresh the snapshot from a successful verify run and commit it with the code change:
+
+```bash
+cd rust && cargo build --bin verify_audit_export_bundle_once && cd ..
+export AIGOV_POLICY_TRUST_ED25519_JSON="$(cat examples/signed-audit-export-bundle/trust-demo.json)"
+./rust/target/debug/verify_audit_export_bundle_once --json \
+  examples/signed-audit-export-bundle/demo.valid.zip > /tmp/out.json
+# Copy stable fields into expected-verification.snapshot.json, then:
+python -m pytest python/tests/test_signed_audit_export_bundle_demo.py -q
+```
+
+Rust integration tests in `audit_export_verification.rs` remain the primary negative-path coverage; Python snapshot tests guard the committed demo fixture and CLI contract.
 
 ## Advisory vs enforcement (terminology)
 

@@ -22,7 +22,9 @@ AIGOV_MODE ?= ci
 	engineering_loc \
 	standards-conformance governance-standards-check \
 	public-sdk-packages-check oss-ecosystem-check enterprise-readiness-check \
+	validate-changelog generate-release-notes release-readiness-report release-readiness-check \
 	cursor-plugin-validate cursor-plugin-smoke cursor-plugin-check cursor-marketplace-listing-check \
+	downstream-consumption-smoke \
 	local-demo local-demo-curl
 
 .PHONY: discovery_scan
@@ -114,12 +116,33 @@ cursor-plugin-validate:
 cursor-plugin-smoke:
 	@python3 scripts/smoke_cursor_plugin.py
 
+downstream-consumption-smoke:
+	@cd tests/downstream-consumption/rust-consumer && cargo test --locked
+	@cd rust && cargo build --locked --bin verify_audit_export_bundle_once
+	@python3 scripts/downstream_python_consumption_smoke.py
+
 cursor-plugin-check: cursor-plugin-validate cursor-plugin-smoke
 	@echo "cursor-plugin-check: OK"
 
 cursor-marketplace-listing-check:
 	@python3 scripts/validate_cursor_marketplace_listing.py
 	@echo "cursor-marketplace-listing-check: OK"
+
+validate-changelog:
+	@python3 scripts/validate_changelog.py
+
+generate-release-notes:
+	@python3 scripts/generate_release_notes.py --version $(or $(VERSION),0.2.1) $(if $(OUT),--out $(OUT),)
+
+release-readiness-report:
+	@python3 scripts/release_readiness_report.py --json
+
+release-readiness-check:
+	@$(MAKE) gate
+	@$(MAKE) validate-changelog
+	@$(MAKE) release-readiness-report
+	@cd rust && cargo metadata --format-version=1 --locked >/dev/null
+	@echo "release-readiness-check: OK"
 
 # Optional: read-only probe against operator-configured GOVAI_AUDIT_BASE_URL (Platform/self-host). Core does not start a server.
 local-demo:

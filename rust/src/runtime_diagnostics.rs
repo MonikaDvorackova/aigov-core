@@ -165,7 +165,7 @@ pub fn configuration_block(st: &AppState, policy_source: &PolicySource) -> Value
     })
 }
 
-pub async fn readiness_components(st: &AppState, include_ledger_probe: bool) -> Value {
+pub async fn readiness_components(st: &AppState) -> Value {
     let db_configured = db::postgres_url_configured_nonempty().is_ok();
     let mut database_ping = !db_configured;
     let mut migrations_complete = !db_configured;
@@ -205,41 +205,14 @@ pub async fn readiness_components(st: &AppState, include_ledger_probe: bool) -> 
         .map(|_| true)
         .unwrap_or(false);
 
-    let mut tenant_ledger_probe = Value::Null;
-    if include_ledger_probe && ledger_writable {
-        let probe_path = crate::project::resolve_ledger_path("audit_log.jsonl", "__ready_probe__");
-        let probe = crate::schema::EvidenceEvent {
-            event_id: format!("ready-probe-{}", uuid::Uuid::new_v4()),
-            event_type: "ai_discovery_reported".to_string(),
-            ts_utc: chrono::Utc::now().to_rfc3339_opts(chrono::SecondsFormat::Secs, true),
-            actor: "ready_probe".to_string(),
-            system: "govai".to_string(),
-            run_id: format!("ready-probe-{}", uuid::Uuid::new_v4()),
-            environment: Some(st.deployment_env.as_str().to_string()),
-            payload: json!({
-                "openai": false,
-                "transformers": false,
-                "model_artifacts": false,
-                "status": "probe",
-            }),
-            parent_run_id: None,
-            root_run_id: None,
-            delegated_from_event_id: None,
-            agent_id: None,
-            agent_role: None,
-            delegation_reason: None,
-        };
-        let ok =
-            crate::audit_store::append_record_atomic_with_run_count(&probe_path, probe).is_ok();
-        tenant_ledger_probe = json!(ok);
-    }
+    let ledger_tenant_readable = ledger_storage::default_tenant_ledger_readable();
 
     json!({
         "database_ping": database_ping,
         "migrations_complete": migrations_complete,
         "migration_status": migration_status,
         "ledger_writable": ledger_writable,
-        "tenant_ledger_probe": tenant_ledger_probe,
+        "ledger_tenant_readable": ledger_tenant_readable,
     })
 }
 
@@ -258,7 +231,7 @@ pub async fn build_status_body(
     started: ProcessStartedAt,
     policy_source: &PolicySource,
 ) -> Value {
-    let components = readiness_components(st, false).await;
+    let components = readiness_components(st).await;
     let db_ping = components
         .get("database_ping")
         .and_then(|v| v.as_bool())

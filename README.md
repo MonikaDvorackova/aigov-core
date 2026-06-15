@@ -16,6 +16,66 @@ GovAI Core is the **open-source**, ledger-authoritative audit runtime for recons
 
 License terms: [`LICENSE`](LICENSE). Contributor expectations: [`CONTRIBUTING.md`](CONTRIBUTING.md), [`GOVERNANCE.md`](GOVERNANCE.md), [`SECURITY.md`](SECURITY.md).
 
+## Try GovAI Core locally
+
+From a clean clone with **Rust** and **Python 3** only — no hosted platform or external services.
+
+### 1. Install the CLI and configure the runtime
+
+```bash
+cd python && python3 -m venv .venv && source .venv/bin/activate && pip install -e . && cd ..
+
+export GOVAI_LEDGER_DIR="$(pwd)/.govai-ledger"
+mkdir -p "$GOVAI_LEDGER_DIR"
+export GOVAI_API_KEY="$(python3 -c 'import secrets; print(secrets.token_urlsafe(32))')"
+export GOVAI_API_KEYS="$GOVAI_API_KEY"
+export GOVAI_API_KEYS_JSON="{\"$GOVAI_API_KEY\":\"local-dev\"}"
+export AIGOV_ENVIRONMENT=dev
+export AIGOV_POLICY_DIR="$(pwd)/rust"
+```
+
+### 2. Start the audit runtime and ingest sample evidence
+
+Terminal A:
+
+```bash
+make run-audit
+```
+
+Terminal B:
+
+```bash
+export GOVAI_AUDIT_BASE_URL="http://127.0.0.1:8088"
+export GOVAI_API_KEY="<same value as above>"
+export GOVAI_RUN_ID="local-$(date +%s)"
+./examples/basic-runtime-client/smoke-runtime.sh
+```
+
+The smoke script posts one discovery event, then reads compliance summary, audit export, and verify routes. A single discovery event typically yields verdict **BLOCKED** — that is expected.
+
+### 3. Export (included in smoke)
+
+The smoke script already calls `GET /api/export/:run_id`. To save the JSON:
+
+```bash
+curl -sS -H "Authorization: Bearer $GOVAI_API_KEY" \
+  "$GOVAI_AUDIT_BASE_URL/api/export/$GOVAI_RUN_ID" | jq . > "/tmp/$GOVAI_RUN_ID-export.json"
+```
+
+### 4. Verify a signed export bundle (offline)
+
+```bash
+cd rust && cargo build --bin verify_audit_export_bundle_once && cd ..
+export AIGOV_POLICY_TRUST_ED25519_JSON="$(cat examples/signed-audit-export-bundle/trust-demo.json)"
+govai verify-evidence-pack \
+  --bundle examples/signed-audit-export-bundle/demo.valid.zip \
+  --json
+```
+
+Regenerate the demo fixture locally: `python3 scripts/generate_signed_audit_export_bundle_demo.py`
+
+Verifier reference: [`docs/signed-audit-export-verifier.md`](docs/signed-audit-export-verifier.md) · Full runtime walkthrough: [`docs/quickstart-runtime.md`](docs/quickstart-runtime.md)
+
 Historical documentation under `docs/hosted/`, `docs/billing/`, `docs/pricing/`, and `dashboard/` describes the **GovAI Platform** and is retained for reference only — it is **not** part of the core runtime surface mounted by `aigov_audit`.
 
 ## Strategy: audit engine, portable standards, interchange, and offline validation
@@ -25,7 +85,7 @@ GovAI is positioned at four complementary ideas:
 1. **Audit-backed governance engine** — hosted or self-hosted service that ingests evidence, enforces policy at write time, and exposes **`GET /compliance-summary`** with **VALID / INVALID / BLOCKED** semantics (**evidence-first**, **fail-closed** where configured).
 2. **Portable AI governance standards layer** — machine-readable artefacts (capability policies, delegation graphs, trace verification plans, governance evidence packs) with **deterministic validators** and **canonical digests** under `python/aigov_py/standards/` and `docs/standards/`.
 3. **Standards interchange format** — partners can exchange JSON/YAML documents and digests **without** implying a hosted verdict; the same shapes can be validated offline and later bound to audit evidence when appropriate.
-4. **Offline validator toolkit** — `govai standards …` and `python -m aigov_py.standards.cli` validate files locally; the evaluation harness (`python/aigov_py/standards/evaluation.py`) regression-checks `examples/standards/*.valid.json`, including registry interchange examples (`evidence-pack.valid.json`, `policy-module.valid.json`, `decision-trace.valid.json`).
+4. **Offline validator toolkit** — `govai standards …` and `python -m aigov_py.standards.cli` validate files locally; the evaluation harness (`python/aigov_py/standards/evaluation.py`) regression-checks all `examples/standards/*.valid.json` files.
 
 **Hosted vs portable:** the **hosted audit service** (or self-hosted equivalent) proves append-only ledger behaviour, tenant isolation, and artefact-bound CI paths. **Portable standards** prove **structural** conformance and digest stability on disk — they do **not** by themselves prove ledger history or billing state.
 
@@ -33,23 +93,33 @@ GovAI is positioned at four complementary ideas:
 
 ### Governance standards registry (interchange)
 
-GovAI publishes an **explicit, versioned registry** of portable governance JSON artefacts (`governance_evidence_pack`, `governance_policy_module`, `governance_decision_trace`) with matching **JSON Schema** files under `schemas/` and deterministic validators in `python/aigov_py/standards/`. External implementers should start with `docs/standards/interchange-specification.md`, `docs/standards/registry.md`, and `docs/standards/conformance.md`.
+GovAI publishes an **explicit, versioned registry** of portable governance JSON artefacts (`governance_evidence_pack`, `governance_policy_module`, `governance_decision_trace`, `delegation_graph`, `capability_policy`, `trace_verification_plan`) with matching **JSON Schema** files under `schemas/` and deterministic validators in `python/aigov_py/standards/`. External implementers should start with `docs/standards/interchange-specification.md`, `docs/standards/registry.md`, and `docs/standards/conformance.md`.
 
 **Conformance validation** (one JSON object on stdout with `--json`; fields include `ok`, `artifact_type`, `version`, `checks`, `failures`, `warnings`, `digest`):
 
 ```bash
-python3 scripts/validate_standard_conformance.py --json examples/standards/evidence-pack.valid.json
+govai standards validate --json examples/standards/evidence-pack.valid.json
 make standards-conformance
-make governance-standards-check
 ```
 
-### Standards registry and policy pack ecosystem (catalogs)
+`make governance-standards-check` is a no-op placeholder in Core (platform-specific validation lives in GovAI Platform).
 
-The repository ships **`registry/*.json`** catalogs (standards, policy packs, benchmarks, certification levels, capabilities), **`scripts/registry_check.py`**, and **`docs/registry/`** guides for public/private registries, signing concepts, submissions, and review. Curated example packs are listed in **`marketplace/manifest.json`** with matching **`registry/policy-pack-catalog.json`** metadata. Validate with **`python3 scripts/registry_check.py`**, **`make registry-check`**, or **`make customer-analytics-check`** (registry validation plus **`make gate`**). Start with **`docs/registry/overview.md`**, **`docs/registry/certification-program.md`**, and **`docs/community/policy-pack-submissions.md`**.
+### Standards registry and policy pack catalogs
+
+The repository ships **`registry/*.json`** catalogs and **`docs/registry/`** guides. Curated example packs are listed in **`marketplace/manifest.json`**. See **`docs/registry/overview.md`** and **`docs/standards/registry.md`**.
 
 ## Releases
 
-Release **versioning**, **cadence**, **compatibility**, and maintainer **runbooks** live under **`docs/releases/`**, including the machine-readable **[release manifest](docs/releases/release-manifest.json)**. The canonical history is **[CHANGELOG.md](CHANGELOG.md)**. Start with **[docs/releases/versioning-policy.md](docs/releases/versioning-policy.md)** and **[docs/releases/release-checklist.md](docs/releases/release-checklist.md)**; before tagging, run **`make release-readiness-check`**. Example drivers: **`examples/releases/README.md`**.
+Release **versioning**, **cadence**, **compatibility**, and maintainer **runbooks** live under **`docs/releases/`**. The canonical history is **[CHANGELOG.md](CHANGELOG.md)**. Start with **[docs/releases/versioning-policy.md](docs/releases/versioning-policy.md)** and **[docs/releases/release-checklist.md](docs/releases/release-checklist.md)**.
+
+Before tagging, from the repository root:
+
+```bash
+make release-readiness-check
+make generate-release-notes VERSION=0.2.1 OUT=release-notes.md   # optional draft
+```
+
+CI builds release artefacts (Python wheel/sdist, Rust crate package, Docker image) in **`.github/workflows/release-validation.yml`** without publishing to public registries unless explicitly configured elsewhere.
 
 [![Join Discord](https://img.shields.io/badge/Discord-Join%20Community-5865F2?logo=discord&logoColor=white)](https://discord.gg/sRBSafRtE)
 
@@ -60,119 +130,36 @@ Minimal deterministic local example using the **existing evidence-pack format**:
 - `docs/golden-path.md`
 - `docs/evidence-pack.md` (generate a minimal customer-ready evidence pack)
 
-## OSS developer tools (optional)
+## Makefile targets (GovAI Core)
 
-- **Read-only local audit probe** (requires a running service on **`127.0.0.1:8088`** by default): `make local-demo` or `make local-demo-curl` — see **`examples/local-demo/README.md`** and **`docs/project/local_development.md`**. No API keys; no evidence POST; no ledger writes.
-- **Fail-closed BLOCKED demo (Python wrapper)** — same contract as **`examples/blocked_deployment.sh`**: after Compose + `python/.venv` + `GOVAI_*` are aligned, run **`make fail-closed-demo`** (runs **`scripts/run_fail_closed_demo.py`**). It checks **`GET /ready`**, runs the bash example, and prints **one deterministic JSON line** on stdout; exit **0** only when BLOCKED (exit code **3** from **`govai check`**) was confirmed inside the script.
-- **`make oss-diagnostics`** ( **`python3 scripts/oss_diagnostics.py --json`** ) — one JSON line aggregating repo layout, **`repo_health_check`**, strict doc links, presence of Compose / demo scripts / Python+Rust roots, and a **generic** **`docs/reports/*.md`** drift check vs **`origin/staging`** (three-dot diff plus worktree and untracked paths; **exactly one** changed markdown report must appear — **no** hardcoded phase basenames; override base with **`GOVAI_OSS_DIAGNOSTICS_BASE_REF`** when needed). Included in **`make oss-diagnostics`** (and therefore in **`make enterprise-readiness-check`**).
-- **`make stabilization-readiness-check`** — bounded checks for **stabilization readiness v1**: Rust Prometheus metrics smoke (`runtime-audit-metrics-check`), deterministic disaster-recovery script tests, **`scripts/evidence_map_check.py`**, and **`scripts/security_program_check.py`**. Aggregated into **`make enterprise-readiness-check`**.
-- **Machine-readable OSS checks** (stdlib scripts; stdout is one JSON object when **`--json`** is set):
-  - **`python3 scripts/repo_health_check.py --json`** — `ok`, `required_files_present`, `missing_required`, `checked_paths`, etc. (sorted keys).
-  - **`python3 scripts/security_trust_check.py --json`** — structured enterprise readiness diagnostics: required security/trust docs, **`CODEOWNERS`**, Makefile targets (**`security-trust`**, **`trust-manifest`**, **`enterprise-readiness-check`**), OSS workflow wiring, **`examples/security-review/`**, plus **`ok`**, **`checks`**, **`failures`**, **`warnings`**, **`score`**, **`checked_paths`** (sorted keys).
-  - **`python3 scripts/validate_trust_manifest.py --json`** — validates **`docs/trust/trust-manifest.json`** (required fields and on-disk references); deterministic JSON; exits non-zero on failure.
-  - **`python3 scripts/trust_chain_check.py --json`** — validates **`trust/*.json`** and **`examples/trust/*.json`** cryptographic trust shapes and cross references; deterministic JSON; exits non-zero on failure.
-  - **`make trust-chain-check`** / **`make immutable-trust-check`** — Makefile wrappers; **`immutable-trust-check`** runs **`trust-chain-check`** then **`make gate`**.
-  - **`python3 scripts/pilot_execution_check.py --json`** — pilot and sales package diagnostics: **`ok`**, **`checks`**, **`failures`**, **`warnings`**, **`score`**, **`checked_paths`** (sorted keys).
-  - **`python3 scripts/customer_operations_check.py --json`** — customer operations diagnostics: **`ok`**, **`score`**, **`checks`**, **`failures`**, **`warnings`**, **`checked_paths`** (sorted keys).
-  - **`python3 scripts/validate_pilot_manifest.py --json`** — validates **`docs/pilots/pilot-manifest.json`** (schema and on-disk references); deterministic JSON; exits non-zero on failure.
-  - **`python3 scripts/validate_customer_operations_manifest.py --json`** — validates **`docs/operations/customer-operations-manifest.json`**; deterministic JSON; exits non-zero on failure.
-  - **`python3 scripts/partner_ecosystem_check.py --json`** — partner ecosystem diagnostics: **`ok`**, **`score`**, **`checks`**, **`failures`**, **`warnings`**, **`checked_paths`** (sorted keys).
-  - **`python3 scripts/validate_partner_ecosystem_manifest.py --json`** — validates **`docs/partners/partner-ecosystem-manifest.json`**; deterministic JSON; exits non-zero on failure.
-  - **`python3 scripts/regulatory_evidence_check.py --json`** — regulatory diagnostics: **`ok`**, **`score`**, **`checks`**, **`failures`**, **`warnings`**, **`checked_paths`** (sorted keys).
-  - **`python3 scripts/validate_regulatory_evidence_manifest.py --json`** — validates **`docs/regulatory/regulatory-evidence-manifest.json`**; deterministic JSON; exits non-zero on failure.
-  - **`python3 scripts/validate_ai_act_obligations.py --json`** — validates **`docs/regulatory/ai-act-obligations.json`**; deterministic JSON; exits non-zero on failure.
-  - **`python3 scripts/generate_regulatory_evidence_export.py --manifest docs/regulatory/regulatory-evidence-manifest.json`** — deterministic Markdown export to stdout (optional **`--out`**).
-  - **`python3 scripts/observability_check.py --json`** — runtime observability contract diagnostics for **`observability/runtime-event-schema.json`**, event examples, dashboard metrics, incident taxonomy, and sample JSONL: **`ok`**, **`score`**, **`checks`**, **`failures`**, **`warnings`**, **`checked_paths`** (sorted keys).
-  - **`python3 scripts/validate_observability_manifest.py --json`** — validates **`docs/observability/observability-manifest.json`**; deterministic JSON; exits non-zero on failure.
-  - **`python3 scripts/validate_operational_snapshot.py --input examples/observability/sample-operational-snapshot.json --json`** — validates an operational snapshot; deterministic JSON; exits non-zero on failure.
-  - **`python3 scripts/operational_health_score.py --input examples/observability/sample-operational-snapshot.json`** — deterministic scoring with **`ok`**, **`health_score`**, **`readiness_score`**, **`evidence_score`**, **`diagnostics_score`**, **`risk_level`**, **`findings`** (sorted keys).
-  - **`python3 scripts/generate_operational_intelligence_report.py --input examples/observability/sample-operational-snapshot.json`** — deterministic Markdown operational intelligence report to stdout (optional **`--out`**).
-  - **`python3 scripts/runtime_safety_check.py --json`** — runtime safety diagnostics: **`ok`**, **`score`**, **`checks`**, **`failures`**, **`warnings`**, **`checked_paths`** (sorted keys).
-  - **`python3 scripts/validate_runtime_safety_manifest.py --json`** — validates **`docs/runtime-safety/runtime-safety-manifest.json`**; deterministic JSON; exits non-zero on failure.
-  - **`python3 scripts/validate_runtime_safety_snapshot.py --input examples/runtime-safety/sample-runtime-safety-snapshot.json --json`** — validates a runtime safety snapshot; deterministic JSON; exits non-zero on failure.
-  - **`python3 scripts/runtime_safety_score.py --input examples/runtime-safety/sample-runtime-safety-snapshot.json`** — deterministic scoring with **`ok`**, **`runtime_safety_score`**, pillar scores, **`risk_level`**, **`findings`**, **`recommendations`** (sorted keys).
-  - **`python3 scripts/generate_runtime_safety_report.py --input examples/runtime-safety/sample-runtime-safety-snapshot.json`** — deterministic Markdown runtime safety report to stdout (optional **`--out`**).
-  - **`python3 scripts/hosted_platform_check.py --json`** — hosted platform diagnostics (hosted platform manifest and snapshot, plus repository-root **`hosted/`** SaaS models, **`docs/hosted/`**, and **`examples/hosted/`**): **`ok`**, **`score`**, **`checks`**, **`failures`**, **`warnings`**, **`checked_paths`** (sorted keys).
-  - **`python3 scripts/validate_hosted_platform_manifest.py --json`** — validates **`docs/hosted-platform/hosted-platform-manifest.json`**; deterministic JSON; exits non-zero on failure.
-  - **`python3 scripts/validate_hosted_readiness_snapshot.py --input examples/hosted-platform/sample-hosted-readiness-snapshot.json --json`** — validates a hosted readiness snapshot; deterministic JSON; exits non-zero on failure.
-  - **`python3 scripts/hosted_readiness_score.py --input examples/hosted-platform/sample-hosted-readiness-snapshot.json`** — deterministic scoring with **`ok`**, **`hosted_readiness_score`**, **`deployment_score`**, **`tenant_onboarding_score`**, **`operations_score`**, **`support_score`**, **`risk_level`**, **`findings`**, **`recommendations`** (sorted keys).
-  - **`python3 scripts/generate_hosted_readiness_export.py --input examples/hosted-platform/sample-hosted-readiness-snapshot.json`** — deterministic customer-facing Markdown to stdout (optional **`--out`**).
-  - **`python3 scripts/conformity_workflow_check.py --json`** — AI Act conformity workflow diagnostics: **`ok`**, **`score`**, **`checks`**, **`failures`**, **`warnings`**, **`checked_paths`**, **`regulatory_workflow_only`**, **`version`** (sorted keys).
-  - **`python3 scripts/multi_tenant_check.py --json`** — multi-tenant governance diagnostics: **`ok`**, **`score`**, **`checks`**, **`failures`**, **`warnings`**, **`checked_paths`**, **`tenant_isolation_only`**, **`version`** (sorted keys).
-  - **`python3 scripts/validate_marketplace_manifest.py --json`** — validates **`docs/marketplace/marketplace-manifest.json`**; deterministic JSON; exits non-zero on failure.
-  - **`python3 scripts/validate_extension_package.py --json`** — validates a marketplace extension package JSON (sample: **`examples/marketplace/sample-extension-package.json`**); deterministic JSON; exits non-zero on failure.
-  - **`python3 scripts/marketplace_check.py --json`** — marketplace diagnostics: **`ok`**, **`score`**, **`checks`**, **`failures`**, **`warnings`**, **`checked_paths`** (sorted keys).
-  - **`python3 scripts/release_operations_check.py --json`** — release operations diagnostics (required **`docs/releases/`** policy files, **`docs/releases/release-manifest.json`**, embedded manifest/changelog validators, **`CHANGELOG.md`** **Unreleased**, README/CONTRIBUTING cross-links, Makefile release targets): **`ok`**, **`score`**, **`checks`**, **`failures`**, **`warnings`**, **`checked_paths`** (sorted keys).
-  - **`python3 scripts/validate_release_manifest.py --json`** — validates **`docs/releases/release-manifest.json`** (required fields + on-disk references); deterministic JSON; exits non-zero on failure.
-  - **`python3 scripts/validate_changelog.py --json`** — **Keep a Changelog** structure gate for **`CHANGELOG.md`**; deterministic JSON; exits non-zero on failure.
-  - **`python3 scripts/generate_release_notes.py --version X.Y.Z`** — deterministic Markdown release notes (optional **`--out`**); **`make generate-release-notes`** writes the sample under **`examples/releases/`**.
-  - **`python3 scripts/release_readiness_report.py --json`** — aggregated readiness (**manifest** + **changelog** + **release_operations_check** + Makefile wiring); deterministic JSON; exits non-zero on failure.
-  - **`python3 scripts/validate_docs_links.py --strict --json`** — `ok`, `checked_files`, `broken_links`, `strict`, `warnings` (sorted keys).
-  - **`python3 scripts/developer_integrations_check.py --json`** — developer integration docs/examples diagnostics: **`ok`**, **`failures`**, **`present`**, **`checked_paths`**, **`version`** (sorted keys).
-  - **`python3 scripts/validate_marketplace_manifest.py --json`** — validates **`docs/marketplace/marketplace-manifest.json`** by default; deterministic JSON; exits non-zero on failure. Use **`marketplace/manifest.json`** for the policy pack catalog.
-  - **`python3 scripts/validate_extension_package.py --json`** — validates a marketplace extension package JSON (sample: **`examples/marketplace/sample-extension-package.json`**); deterministic JSON; exits non-zero on failure.
-  - **`python3 scripts/validate_policy_pack.py --json`** — validates one policy pack directory (see **`examples/marketplace/`**); deterministic JSON; exits non-zero on failure.
-  - **`python3 scripts/registry_check.py --json`** — validates **`registry/*.json`** catalogs, cross-references, and marketplace alignment; deterministic JSON; exits non-zero on failure.
-  - **`python3 scripts/marketplace_check.py --json`** — marketplace diagnostics, including extension marketplace, policy pack marketplace assets, and registry alignment: **`ok`**, **`score`**, **`checks`**, **`failures`**, **`warnings`**, **`checked_paths`** (sorted keys).
-  - **`python3 scripts/customer_analytics_check.py --json`** — customer analytics diagnostics: **`ok`**, **`score`**, **`checks`**, **`failures`**, **`warnings`**, **`checked_paths`** (sorted keys).
-  - **`python3 scripts/validate_customer_analytics_manifest.py --json`** — validates **`docs/analytics/customer-analytics-manifest.json`**; deterministic JSON; exits non-zero on failure.
-  - **`python3 scripts/customer_health_score.py --input examples/customer-analytics/sample-customer-health.json`** — deterministic health, adoption, risk, expansion scores and renewal signal.
-  - **`python3 scripts/generate_executive_business_review.py --input examples/customer-analytics/sample-customer-health.json`** — deterministic Executive Business Review Markdown.
-  - **`python3 scripts/revenue_intelligence_check.py --json`** — revenue intelligence and customer success analytics diagnostics: **`ok`**, **`score`**, **`checks`**, **`failures`**, **`warnings`**, **`checked_paths`** (sorted keys).
-  - **`python3 scripts/validate_revenue_intelligence_manifest.py --json`** — validates **`revenue/revenue-intelligence-manifest.json`**; deterministic JSON; exits non-zero on failure.
-- **`python3 scripts/evidence_quality_check.py --json`** — evidence quality diagnostics (manifest, snapshot validators, scoring, report wiring, Makefile **`evidence-quality-check`**, OSS workflow artefacts): **`ok`**, **`score`**, **`checks`**, **`failures`**, **`warnings`**, **`checked_paths`**, **`version`** (sorted keys).
-- **`python3 scripts/validate_evidence_quality_manifest.py --json`** — validates **`docs/evidence-quality/evidence-quality-manifest.json`**; deterministic JSON; exits non-zero on failure.
-- **`python3 scripts/validate_dataset_provenance_snapshot.py --json`** — validates dataset provenance snapshot JSON (sample: **`examples/evidence-quality/sample-dataset-provenance-snapshot.json`**); deterministic JSON; exits non-zero on failure.
-- **`python3 scripts/evidence_quality_score.py --input examples/evidence-quality/sample-dataset-provenance-snapshot.json`** — deterministic evidence quality, provenance, lineage, and retention scores plus **`risk_level`**.
-- **`python3 scripts/generate_dataset_governance_report.py --input examples/evidence-quality/sample-dataset-provenance-snapshot.json`** — deterministic dataset governance Markdown (optional **`--out`**).
-- **`python3 scripts/policy_intelligence_check.py --json`** — policy intelligence diagnostics: **`ok`**, **`score`**, **`checks`**, **`failures`**, **`warnings`**, **`checked_paths`** (sorted keys).
-- **`python3 scripts/validate_policy_intelligence_manifest.py --json`** — validates **`docs/policy-intelligence/policy-intelligence-manifest.json`**; deterministic JSON; exits non-zero on failure.
-- **`python3 scripts/validate_governance_control_snapshot.py --json`** — validates a governance control snapshot JSON (sample: **`examples/policy-intelligence/sample-governance-control-snapshot.json`**); deterministic JSON; exits non-zero on failure.
-- **`python3 scripts/policy_coverage_score.py --input examples/policy-intelligence/sample-governance-control-snapshot.json --json`** — deterministic policy coverage, control maturity, and gap risk scores with findings and recommendations.
-- **`python3 scripts/generate_governance_control_report.py --input examples/policy-intelligence/sample-governance-control-snapshot.json`** — deterministic governance control Markdown report.
-- **`python3 scripts/developer_integrations_check.py --json`** — developer integrations diagnostics: **`ok`**, **`score`**, **`checks`**, **`failures`**, **`warnings`**, **`checked_paths`** (sorted keys).
-- **`python3 scripts/validate_developer_integrations_manifest.py --json`** — validates **`docs/integrations/developer-integrations-manifest.json`**; deterministic JSON; exits non-zero on failure.
-- **`python3 scripts/validate_automation_pack.py --json --pack examples/integrations/sample-automation-pack.json`** — validates the sample automation pack schema and references.
-- **`python3 scripts/generate_automation_pack_summary.py --pack examples/integrations/sample-automation-pack.json`** — deterministic Markdown summary for the sample automation pack.
+All targets are defined in the repository **`Makefile`**. Common checks:
 
-The **`.github/workflows/oss-developer-experience.yml`** workflow runs **`make cursor-plugin-check`** (lightweight manifest and MCP smoke), then **`make enterprise-readiness-check`** (**`security-trust`**, **`trust-manifest`**, then **`oss-diagnostics`**), and writes **`repo-health.json`**, **`security-trust.json`**, **`trust-manifest.json`**, **`trust-manifest-validation.json`**, **`docs-links.json`**, **`oss-diagnostics.json`**, **`commercial-readiness.json`**, **`pilot-execution.json`**, **`pilot-manifest-validation.json`**, **`revenue-manifest-validation.json`**, **`revenue-roi.json`**, **`revenue-enablement.json`**, **`customer-operations.json`**, **`customer-operations-manifest-validation.json`**, **`production-readiness-checklist.md`**, **`partner-ecosystem.json`**, **`partner-ecosystem-manifest-validation.json`**, **`partner-certification-package.md`**, **`regulatory-evidence.json`**, **`regulatory-manifest-validation.json`**, **`ai-act-obligations-validation.json`**, **`regulatory-evidence-export.md`**, **`observability.json`**, **`observability-manifest-validation.json`**, **`operational-snapshot-validation.json`**, **`operational-health-score.json`**, **`operational-intelligence-report.md`**, **`runtime-safety.json`**, **`runtime-safety-manifest-validation.json`**, **`runtime-safety-snapshot-validation.json`**, **`runtime-safety-score.json`**, **`runtime-safety-report.md`**, **`hosted-platform.json`**, **`hosted-platform-manifest-validation.json`**, **`hosted-readiness-snapshot-validation.json`**, **`hosted-readiness-score.json`**, **`hosted-readiness-export.md`**, **`model-risk.json`**, **`model-risk-manifest-validation.json`**, **`model-evaluation-snapshot-validation.json`**, **`model-risk-score.json`**, **`model-assurance-report.md`**, **`agent-governance.json`**, **`agent-governance-manifest-validation.json`**, **`agent-delegation-snapshot-validation.json`**, **`agent-governance-score.json`**, **`agent-governance-report.md`**, **`autonomous-governance.json`**, **`autonomous-multi-agent-governance.json`**, **`revenue-intelligence-manifest-validation.json`**, **`revenue-intelligence.json`**, **`marketplace.json`**, **`marketplace-manifest-validation.json`**, **`policy-pack-marketplace-manifest-validation.json`**, **`registry-validation.json`**, **`policy-pack-eu-ai-act-basic-validation.json`**, **`policy-pack-financial-services-ai-validation.json`**, **`policy-pack-healthcare-ai-validation.json`**, **`policy-pack-internal-model-risk-validation.json`**, **`policy-pack-vendor-evaluation-validation.json`**, **`policy-pack-vendor-risk-validation.json`**, **`extension-package-validation.json`**, **`marketplace-listing.md`**, **`customer-analytics.json`**, **`customer-analytics-manifest-validation.json`**, **`customer-health-score.json`**, **`executive-business-review.md`**, **`evidence-quality.json`**, **`evidence-quality-manifest-validation.json`**, **`dataset-provenance-snapshot-validation.json`**, **`evidence-quality-score.json`**, **`dataset-governance-report.md`**, **`policy-intelligence.json`**, **`policy-intelligence-manifest-validation.json`**, **`governance-control-snapshot-validation.json`**, **`policy-coverage-score.json`**, **`governance-control-report.md`**, **`developer-integrations.json`**, **`developer-integrations-manifest-validation.json`**, **`automation-pack-validation.json`**, **`automation-pack-summary.md`**, **`release-manifest-validation.json`**, **`changelog-validation.json`**, **`release-readiness-report.json`**, **`release-notes-template.md`**, **`public-launch.json`**, **`public-launch-manifest-validation.json`**, **`standardization-readiness-snapshot-validation.json`**, **`public-launch-readiness-score.json`**, **`public-launch-report.md`**, **`research-package.json`**, and **`research-manifest-validation.json`** into the **`oss-check-json`** artifact.
-- **Security review driver (stdlib, no network)** — **`examples/security-review/run-security-review-check.sh`** runs the same JSON probes as above; see **`examples/security-review/README.md`**.
-- **Pilot execution driver (stdlib, no network)** — **`bash examples/pilot-execution/run-pilot-execution-check.sh`**; **`make pilot-execution`**, **`make pilot-manifest`**, and aggregated **`make pilot-check`** (includes **`make gate`**).
-- **Customer operations driver (stdlib, no network)** — **`examples/customer-operations/`**; **`make customer-operations`**, **`make customer-operations-manifest`**, **`make production-readiness-checklist`**, and aggregated **`make customer-operations-check`** (includes **`make gate`**).
-- **Partner ecosystem driver (stdlib, no network)** — **`examples/partner-ecosystem/`**; **`make partner-ecosystem`**, **`make partner-ecosystem-manifest`**, **`make partner-certification-package`**, **`make partner-ecosystem-check`** (includes **`make gate`**), and **`make integration-marketplace-check`** (integration JSON bundle plus **`make gate`**). Machine-readable ecosystem index: **`partner-ecosystem/`**; worked examples: **`examples/partners/`**.
-- **Product analytics and growth instrumentation (stdlib, no network)** — **`product-analytics/`** JSON bundle, **`docs/product-analytics/`**, **`examples/product-analytics/`**; **`python3 scripts/validate_product_analytics_manifest.py`**, **`python3 scripts/product_analytics_check.py`**, **`make product-analytics-check`**, and **`make growth-instrumentation-check`** (includes **`make gate`**). Next.js **`dashboard/`** enables **`@vercel/analytics`** and **`@vercel/speed-insights`** globally in **`dashboard/app/layout.tsx`**.
-- **Regulatory evidence driver (stdlib, no network)** — **`examples/regulatory-evidence/`**; **`make regulatory-evidence`**, **`make regulatory-manifest`**, **`make ai-act-obligations`**, **`make regulatory-export`**, and aggregated **`make regulatory-check`** (includes **`make gate`**).
-- **Runtime observability and operational intelligence driver (stdlib, no network)** — **`examples/observability/`**; **`make observability`**, **`make observability-manifest`**, **`make operational-snapshot`**, **`make operational-health-score`**, **`make operational-intelligence-report`**, and aggregated **`make observability-check`** (includes **`make gate`**). Deterministic JSON scoring with **`ok`**, **`health_score`**, **`readiness_score`**, **`evidence_score`**, **`diagnostics_score`**, **`risk_level`**, and **`findings`** (sorted keys); deterministic Markdown intelligence report.
-- **Runtime safety, guardrails, and human oversight driver (stdlib, no network)** — **`examples/runtime-safety/`**; **`make runtime-safety`**, **`make runtime-safety-manifest`**, **`make runtime-safety-snapshot`**, **`make runtime-safety-score`**, **`make runtime-safety-report`**, and aggregated **`make runtime-safety-check`** (includes **`make gate`**). Deterministic JSON with **`runtime_safety_score`**, **`guardrail_score`**, **`escalation_score`**, **`human_oversight_score`**, **`override_readiness_score`**, **`risk_level`**, **`findings`**, and **`recommendations`**; deterministic Markdown oversight report.
-- **Hosted platform readiness driver (stdlib, no network)** — **`examples/hosted-platform/`**; **`make hosted-platform`**, **`make hosted-platform-manifest`**, **`make hosted-readiness-snapshot`**, **`make hosted-readiness-score`**, **`make hosted-readiness-export`**, and aggregated **`make hosted-platform-check`** (includes **`make gate`**). **`make production-readiness-check`** validates **`hosted/production-readiness-checklist.json`** and **`docs/hosted/production-readiness.md`**. Deterministic JSON scoring with **`hosted_readiness_score`**, pillar scores, **`risk_level`**, **`findings`**, and **`recommendations`**; deterministic customer-facing Markdown export. Canonical SaaS docs: **`docs/hosted/overview.md`**, machine-readable models: **`hosted/README.md`**, samples: **`examples/hosted/README.md`**.
-- **GovBase hosted SaaS foundation (govbase.dev, stdlib, no network)** — **`hosted-saas/`** contracts (tenant service boundary, roles, API key scopes, billing provider boundary, monitoring, backup/DR, production topology, onboarding flow); **`python3 scripts/hosted_saas_readiness_check.py --json`**; **`make hosted-saas-readiness-check`** (includes **`hosted-platform-check`**); dashboard **`/onboarding`** checklist; audit report **`docs/reports/hosted-saas-readiness.md`**.
-- **AI Act conformity automation and regulatory workflows driver (stdlib, no network)** — **`conformity/`** JSON bundle, **`docs/conformity/`**, **`examples/conformity/`**; **`python3 scripts/conformity_workflow_check.py --json`**, **`make conformity-workflow-check`** (includes **`make gate`**), and **`make regulatory-workflow-check`** (manifest plus conformity assessment workflow and AI Act control mapping focus). Cross-references AI Act obligations in **`docs/regulatory/ai-act-obligations.json`** so unknown obligation identifiers are rejected.
-- **Multi-tenant governance and enterprise RBAC driver (stdlib, no network)** — **`multi-tenant/`** JSON bundle, **`docs/multi-tenant/`**, **`examples/multi-tenant/`**; **`python3 scripts/multi_tenant_check.py --json`**, **`make multi-tenant`**, **`make multi-tenant-check`** (includes **`make gate`**), and **`make tenant-isolation-check`**. OSS CI emits **`multi-tenant.json`** and **`tenant-isolation-check.json`**.
-- **AI Act conformity automation and regulatory workflows driver (stdlib, no network)** — **`conformity/`** JSON bundle, **`docs/conformity/`**, **`examples/conformity/`**; **`python3 scripts/conformity_workflow_check.py --json`**, **`make conformity-workflow-check`** (includes **`make gate`**), and **`make regulatory-workflow-check`**. Cross-references AI Act obligations in **`docs/regulatory/ai-act-obligations.json`** so unknown obligation identifiers are rejected.
-- **Developer integrations and automation platform driver (stdlib, no network)** — **`docs/integrations/`** guides, **`docs/integrations/developer-integrations-manifest.json`**, automation pack sample **`examples/integrations/sample-automation-pack.json`**, validators **`scripts/validate_developer_integrations_manifest.py`**, **`scripts/validate_automation_pack.py`**, **`scripts/generate_automation_pack_summary.py`**, and aggregate **`make developer-integrations-platform-check`**.
-- **Runtime governance SDK (Python, stdlib HTTP)** — **`docs/runtime/`** (overview, SDK, FastAPI, LangChain, gateway, policy patterns, errors, deployment), package **`python/aigov_py/runtime/`**, examples **`examples/runtime-governance/`**, validation **`make runtime-sdk-check`**, and aggregate **`make runtime-sdk-platform-check`** (includes **`make gate`**).
-- **Marketplace and developer platform driver (stdlib, no network)** — **`examples/marketplace/`**; **`make marketplace`**, **`make marketplace-check`**, **`make marketplace-manifest`**, **`make extension-package`**, and **`make marketplace-listing`**.
-- **Policy pack marketplace driver (stdlib, no network)** — **`marketplace/manifest.json`**, **`examples/marketplace/*/`** packs, **`python3 scripts/validate_policy_pack.py`**, and **`make policy-pack-check`**; catalog validation via **`python3 scripts/validate_marketplace_manifest.py --manifest marketplace/manifest.json`**.
-- **Customer analytics and expansion intelligence driver (stdlib, no network)** — **`docs/analytics/`** and **`examples/customer-analytics/`**; **`make customer-analytics`**, **`make customer-analytics-manifest`**, **`make customer-health-score`**, **`make executive-business-review`**, and aggregated **`make customer-analytics-check`** (includes **`make gate`**).
-- **Revenue intelligence and customer success analytics driver (stdlib, no network)** — **`revenue/`** JSON, **`docs/revenue/`**, **`examples/revenue/`**; **`make revenue-intelligence`**, **`make revenue-intelligence-manifest`**, **`make revenue-intelligence-check`**, and **`make customer-success-check`** (chains the revenue intelligence aggregate including **`make gate`**).
-- **Policy intelligence and governance control plane driver (stdlib, no network)** — **`docs/policy-intelligence/`** and **`examples/policy-intelligence/`**; **`make policy-intelligence`**, **`make policy-intelligence-manifest`**, **`make governance-control-snapshot`**, **`make policy-coverage-score`**, **`make governance-control-report`**, and aggregated **`make policy-intelligence-check`** (includes **`make gate`**).
-- **Enterprise governance control plane (machine-readable JSON, stdlib, no network)** — repository root **`control-plane/`** (roles, delegation, escalation, ownership, examples); validate with **`python3 scripts/control_plane_check.py`**, **`make control-plane-check`**, or aggregated **`make enterprise-governance-check`** (runs **`control-plane-check`** then **`make gate`**). Operator narrative: **`docs/control-plane/overview.md`** and companion pages under **`docs/control-plane/`**; worked examples under **`examples/control-plane/`**.
-- **Autonomous governance posture driver (stdlib, no network)** — **`docs/control-plane/control-plane-manifest.json`**, **`examples/control-plane/sample-governance-posture-snapshot.json`**, and narrative docs under **`docs/control-plane/`**; **`make control-plane`**, **`make control-plane-manifest`**, **`make governance-posture-snapshot`**, **`make governance-posture-score`**, **`make control-plane-report`**, and aggregated **`make control-plane-check`** (includes **`make gate`**).
-- **Model risk, evaluation, and assurance driver (stdlib, no network)** — **`docs/model-risk/`**, **`examples/model-risk/`**; **`make model-risk`**, **`make model-risk-manifest`**, **`make model-evaluation-snapshot`**, **`make model-risk-score`**, **`make model-assurance-report`**, and aggregated **`make model-risk-assurance-check`** (includes **`make gate`**). Deterministic JSON with **`model_risk_score`**, pillar scores, **`assurance_level`**, **`findings`**, and **`recommendations`**; deterministic Markdown assurance report.
-- **Agent governance, delegation, and multi-agent control driver (stdlib, no network)** — **`docs/agent-governance/`**, **`examples/agent-governance/`**; **`make agent-governance`**, **`make agent-governance-manifest`**, **`make agent-delegation-snapshot`**, **`make agent-governance-score`**, **`make agent-governance-report`**, and aggregated **`make agent-governance-check`** (includes **`make gate`**). Deterministic JSON with **`agent_governance_score`**, sub-scores, **`risk_level`**, **`findings`**, and **`recommendations`**; deterministic Markdown governance report.
-- **Autonomous and multi-agent governance driver (stdlib, no network)** — repository root **`autonomous/`** (manifest, role models, delegation and approval boundaries, autonomy limits, intervention points), operator docs **`docs/autonomous/`**, examples **`examples/autonomous/`**; **`python3 scripts/autonomous_governance_check.py`**, **`make autonomous-governance-check`**, and **`make multi-agent-governance-check`** (each includes **`make gate`**). Deterministic JSON with **`ok`**, **`score`**, **`checks`**, **`failures`**, **`warnings`**, **`checked_paths`**, **`multi_agent`**, **`version`** (sorted keys with `--json`).
-- **Public launch and ecosystem standardization driver (stdlib, no network)** — **`docs/launch/`**, **`examples/launch/`**; **`make public-launch`**, **`make public-launch-manifest`**, **`make standardization-readiness-snapshot`**, **`make public-launch-readiness-score`**, **`make public-launch-report`**, and aggregated **`make public-launch-check`** (includes **`make gate`**). OSS CI emits **`public-launch.json`**, **`public-launch-manifest-validation.json`**, **`standardization-readiness-snapshot-validation.json`**, **`public-launch-readiness-score.json`**, and **`public-launch-report.md`**.
-- **Research and academic publication driver (stdlib, no network)** — **`research/`** JSON bundle, **`docs/research/`**, **`examples/research/`**; **`python3 scripts/validate_research_manifest.py --json`**, **`python3 scripts/research_package_check.py --json`**, **`make research-package-check`**, and **`make academic-publication-check`** (chains **`research-package-check`** and **`make gate`**). Start with **`docs/research/README.md`**, **`docs/research/benchmark-methodology.md`**, and **`docs/research/reproducibility.md`**.
-- **Research support and operational evidence (stdlib, no network)** — quantitative feasibility notes, synthetic audit microbenchmarks, threat-matrix sample JSON, legal evidentiary positioning, privacy patterns, provider cooperation roadmap, scalability docs; **`docs/research/research-support-manifest.json`**, **`python3 scripts/research_support_check.py --json`**, **`make research-support-check`**, granular **`make microbenchmark-check`**, **`make threat-model-check`**, **`make legal-positioning-check`**, **`make privacy-architecture-check`**, **`make provider-cooperation-check`**, **`make scalability-patterns-check`**, and aggregate **`make manuscript-evidence-check`** (runs **`scripts/manuscript_evidence_runner.py`**, including **`make gate`**). CI writes JSON artefacts to **`.oss-ci-out/`** when **`MANUSCRIPT_EVIDENCE_DIR`** is set. Audit report: **`docs/reports/research-support-and-operational-evidence.md`**.
-- **Developer integrations and automation platform driver (stdlib, no network)** — **`docs/integrations/`** guides, **`docs/integrations/developer-integrations-manifest.json`**, **`examples/integrations/`**, automation pack sample **`examples/integrations/sample-automation-pack.json`**, validators **`scripts/validate_developer_integrations_manifest.py`**, **`scripts/validate_automation_pack.py`**, **`scripts/generate_automation_pack_summary.py`**, and aggregated **`make developer-integrations-check`** and **`make sdk-ecosystem-check`**.
-- **Marketplace and developer platform driver (stdlib, no network)** — **`examples/marketplace/`**; **`make marketplace`**, **`make marketplace-check`**, **`make marketplace-manifest`**, **`make extension-package`**, and **`make marketplace-listing`**.
-- **Policy pack marketplace driver (stdlib, no network)** — **`marketplace/manifest.json`**, **`registry/policy-pack-catalog.json`**, **`examples/marketplace/*/`** packs, **`python3 scripts/validate_policy_pack.py`**, **`python3 scripts/registry_check.py`**, **`make policy-pack-check`**, **`make registry-check`**; catalog validation via **`python3 scripts/validate_marketplace_manifest.py --json --manifest marketplace/manifest.json`**.
-- **Customer analytics and expansion intelligence driver (stdlib, no network)** — **`docs/analytics/`** and **`examples/customer-analytics/`**; **`make customer-analytics`**, **`make customer-analytics-manifest`**, **`make customer-health-score`**, **`make executive-business-review`**, and aggregated **`make customer-analytics-check`**.
-- **Revenue intelligence and customer success analytics driver (stdlib, no network)** — **`revenue/`** JSON, **`docs/revenue/`**, **`examples/revenue/`**; **`make revenue-intelligence`**, **`make revenue-intelligence-manifest`**, **`make revenue-intelligence-check`**, and **`make customer-success-check`**.
-- **Evidence quality, provenance, and dataset governance driver (stdlib, no network)** — **`docs/evidence-quality/`** and **`examples/evidence-quality/`**; **`make evidence-quality`**, **`make evidence-quality-manifest`**, **`make dataset-provenance-snapshot`**, **`make evidence-quality-score`**, **`make dataset-governance-report`**, and aggregated **`make evidence-quality-check`** (includes **`make gate`**).
-- **Release engineering driver (stdlib, no network)** — **`examples/releases/`**; **`make release-manifest`**, **`make validate-changelog`**, **`make generate-release-notes`**, **`make release-readiness-report`**, and aggregate **`make release-readiness-check`** (chains **`release-operations-check`**, manifest/changelog validators, readiness JSON, **`docs-links-strict`**, and **`gate`**).
-- **Local demo contract** — read-only **`make local-demo`** vs **`make fail-closed-demo`**, exit codes, and env vars: **`examples/local-demo/CONTRACT.md`**.
-- **Public documentation (production)** — reader-facing **`/docs`** and **`/help`** on **[govbase.dev](https://govbase.dev)** are served by the **`dashboard/`** Next.js app from canonical Markdown in **`docs/`** (same files as in GitHub). The public **`/`** landing explains **How GovAI Works** (icon cards + flow) without requiring Supabase connectivity. Local preview: `cd dashboard && npm ci && npm run dev`. Authenticated **tenant console** UI: **`/tenant-console`** loads **`GET /api/tenant-console/snapshot`** (stable **`snapshot_version: 3`** JSON, including **`ai_decision_audit`** with per-trace integrity and verdict rollups when bound to Postgres). Set **`AIGOV_AUDIT_URL`** or **`NEXT_PUBLIC_GOVAI_API_BASE_URL`**. The audit service also returns shared **`product_positioning`** on **`GET /`**, **`GET /status`**, and **`GET /api/me`**. See **`docs/tenant-console/overview.md`**.
+| Target | Purpose |
+|--------|---------|
+| `make gate` | Documentation/report gate (`scripts/gate_reports.py`) |
+| `make standards-conformance` | Registered interchange validators on example JSON |
+| `make enterprise-readiness-check` | Aggregate Core readiness checks (gate, SDK, Cursor plugin, runtime contracts, benchmark) |
+| `make validate-changelog` | Keep a Changelog structure and Rust/Python version alignment |
+| `make release-readiness-check` | Pre-tag gate: documentation gate, changelog validation, readiness report, `cargo metadata` |
+| `make generate-release-notes` | Draft notes from CHANGELOG (`VERSION=` and optional `OUT=`) |
+| `make cursor-plugin-check` | Validate + smoke the bundled Cursor plugin |
+| `make cursor-plugin-smoke` | MCP bridge smoke test only |
+| `make runtime-observability-check` | `/health`, `/ready`, `/status`, `/metrics` contract |
+| `make core-runtime-examples-check` | Adoption examples must not reference platform-only routes |
+| `make reference-integrations-check` | Reference integration route drift |
+| `make reconstructible-demo-check` | Reconstructible demo contract |
+| `make runtime-packaging-check` | Runtime packaging contract |
+| `make lineage-governance-check` | Lineage governance graph contract |
+| `make public-sdk-packages-check` | Public Python SDK package layout |
+| `make oss-ecosystem-check` | Auditability benchmark + gate |
+
+**Local demo:** read-only probes against an **operator-provided** audit URL — see **`examples/local-demo/README.md`**. `make local-demo` exits with instructions when Platform scripts are absent (Core does not start a server).
+
+**Fail-closed BLOCKED demo:** after Compose + `python/.venv` + `GOVAI_*` are aligned, run **`bash examples/blocked_deployment.sh`** (checks **`GET /ready`**, posts minimal evidence, asserts **`govai check`** exit code **3**). See **`examples/local-demo/CONTRACT.md`**.
+
+**CI workflows:** `.github/workflows/govai-ci.yml` (portable Core CI), `.github/workflows/oss-developer-experience.yml` (`make cursor-plugin-check`, `make enterprise-readiness-check`), `.github/workflows/supply-chain-audit.yml` (`cargo audit`, `pip-audit`), `.github/workflows/security-scan.yml` (gitleaks, Trivy).
+
+Contributor-oriented Makefile targets also include evidence-pack flows (`make bundle`, `make verify_cli`), demo drivers (`make demo`, `make flow`), and engineering helpers (`make env_check`, `make engineering_loc`). These require **`GOVAI_AUDIT_BASE_URL`** / **`RUN_ID`** where noted in the Makefile — Core does not background-manage a localhost audit server.
 
 ## Cursor / IDE integration
 
@@ -229,12 +216,12 @@ export GOVAI_API_KEY=test-key
 bash examples/blocked_deployment.sh
 ```
 
-Equivalent wrapper (JSON summary on stdout, progress on stderr):
+Equivalent wrapper (same script; JSON summary on stdout, progress on stderr):
 
 ```bash
 export GOVAI_AUDIT_BASE_URL=http://127.0.0.1:8088
 export GOVAI_API_KEY=test-key
-make fail-closed-demo
+bash examples/blocked_deployment.sh
 ```
 
 **Expected:**
@@ -653,10 +640,8 @@ Publication-ready **channel playbooks**, **FAQ**, and **positioning** live under
 
 **Readiness checks**
 
-- `make launch-readiness` — core launch narratives present
-- `make ecosystem-adoption-check` — launch + examples + community + consolidated audit report paths
-- `make adoption-kits-check` — adoption kits + `docs/adoption/` + offline conformance validation
-- `make reference-implementations-check` — `docs/adoption/` trio only
+- `make enterprise-readiness-check` — aggregate Core readiness checks (see Makefile targets section above)
+- `make gate` — documentation/report gate
 
 **Repository cleanup audit:** [`docs/reports/repo-debt-audit-and-cleanup.md`](docs/reports/repo-debt-audit-and-cleanup.md) (launch + adoption kits)
 
@@ -691,14 +676,6 @@ Structured **contributor funnel**, **issue triage**, maintainer cadence, label p
 - [docs/community/contributor-funnel.md](docs/community/contributor-funnel.md)
 - [docs/community/issue-triage.md](docs/community/issue-triage.md)
 - [docs/community/maintainer-operating-model.md](docs/community/maintainer-operating-model.md)
-
-Validate locally (stdlib only):
-
-```bash
-python3 scripts/community_operations_check.py
-make community-operations-check
-make contributor-funnel-check
-```
 
 ## Project governance
 

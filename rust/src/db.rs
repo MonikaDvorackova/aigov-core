@@ -1,6 +1,7 @@
 use chrono::{DateTime, Utc};
 use sqlx::Row;
 use sqlx::{postgres::PgPoolOptions, PgPool};
+use std::path::Path;
 use uuid::Uuid;
 
 pub type DbPool = PgPool;
@@ -47,6 +48,18 @@ pub async fn verify_sqlx_migrations_complete(pool: &DbPool) -> Result<(), String
         ));
     }
     Ok(())
+}
+
+/// Apply SQL migrations from `rust/migrations` using runtime discovery (PostgreSQL-only).
+pub async fn run_sqlx_migrations(pool: &DbPool) -> Result<(), String> {
+    let migrations_dir = Path::new(env!("CARGO_MANIFEST_DIR")).join("migrations");
+    let migrator = sqlx_core::migrate::Migrator::new(migrations_dir)
+        .await
+        .map_err(|e| format!("migration source error: {e}"))?;
+    migrator
+        .run(pool)
+        .await
+        .map_err(|e| format!("migration failed: {e}"))
 }
 
 pub async fn init_pool_from_env() -> Result<DbPool, String> {

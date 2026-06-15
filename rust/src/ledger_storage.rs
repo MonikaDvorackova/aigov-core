@@ -86,6 +86,16 @@ pub fn validate_ledger_dir(dir: &Path) -> Result<(), String> {
     Ok(())
 }
 
+/// Read-only check: default tenant ledger file can be opened for read (missing file is OK).
+pub fn default_tenant_ledger_readable() -> bool {
+    let path = crate::project::resolve_ledger_path("audit_log.jsonl", "default");
+    let p = Path::new(&path);
+    if !p.exists() {
+        return true;
+    }
+    std::fs::File::open(p).is_ok()
+}
+
 /// Startup validation:
 /// - **staging/prod**: `GOVAI_LEDGER_DIR` is required and must be a writable directory
 /// - **dev**: missing `GOVAI_LEDGER_DIR` is allowed but warns about ephemeral storage risk
@@ -157,6 +167,28 @@ mod tests {
         assert_eq!(out.as_deref(), Some(sub.as_path()));
         assert!(sub.exists());
         assert!(sub.is_dir());
+        clear_env();
+    }
+
+    #[test]
+    fn default_tenant_ledger_readable_missing_file_ok() {
+        let _g = ENV_LOCK.lock().unwrap();
+        clear_env();
+        let dir = tempfile::tempdir().unwrap();
+        std::env::set_var(LEDGER_DIR_ENV, dir.path().to_string_lossy().to_string());
+        assert!(default_tenant_ledger_readable());
+        clear_env();
+    }
+
+    #[test]
+    fn default_tenant_ledger_readable_existing_file_ok() {
+        let _g = ENV_LOCK.lock().unwrap();
+        clear_env();
+        let dir = tempfile::tempdir().unwrap();
+        std::env::set_var(LEDGER_DIR_ENV, dir.path().to_string_lossy().to_string());
+        let path = dir.path().join("audit_log__default.jsonl");
+        std::fs::write(&path, b"{}\n").unwrap();
+        assert!(default_tenant_ledger_readable());
         clear_env();
     }
 

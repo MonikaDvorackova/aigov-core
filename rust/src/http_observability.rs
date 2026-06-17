@@ -53,11 +53,11 @@ pub fn route_metric_key(method: &Method, path: &str) -> String {
         return out;
     }
     if p.starts_with("/api/export/") {
-        out.push_str("/api/export/:run_id");
+        out.push_str("/api/export/{run_id}");
         return out;
     }
     if p.starts_with("/api/ai-decision-traces/") && p.ends_with("/events") {
-        out.push_str("/api/ai-decision-traces/:run_id/events");
+        out.push_str("/api/ai-decision-traces/{run_id}/events");
         return out;
     }
     if p.starts_with("/api/ai-decision-traces") {

@@ -22,6 +22,7 @@ pub mod audit_export;
 pub mod replay_validation;
 pub mod replay_projection;
 pub mod replay_engine;
+pub mod epistemic_readiness;
 pub mod lineage_projection;
 pub mod lineage_validation;
 pub mod governance_graph;

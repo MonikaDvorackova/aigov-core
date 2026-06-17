@@ -1788,6 +1788,21 @@ def build_parser() -> GovaiArgumentParser:
         help="Emit full ReplayResult JSON (default: human-readable summary).",
     )
 
+    s_epistemic = sub.add_parser(
+        "epistemic-readiness",
+        help="Derived epistemic readiness from aigov.audit_export.v1 JSON.",
+    )
+    s_epistemic.add_argument(
+        "--export",
+        required=True,
+        help="Audit export JSON path.",
+    )
+    s_epistemic.add_argument(
+        "--json",
+        action="store_true",
+        help="Emit full epistemic readiness JSON (default: human-readable summary).",
+    )
+
     s_lineage_graph = sub.add_parser(
         "lineage-graph",
         help="Build governance lineage graph from aigov.audit_export.v1 JSON.",
@@ -3115,6 +3130,25 @@ def main(argv: Sequence[str] | None = None) -> int:
         else:
             print(format_replay_report(result))
         return cli_exit.EX_OK if result.get("ok") else cli_exit.EX_ERR
+
+    if args.cmd == "epistemic-readiness":
+        from aigov_py.epistemic_readiness import (
+            epistemic_readiness_from_export,
+            format_epistemic_summary,
+        )
+
+        raw = str(getattr(args, "export", "") or "").strip()
+        try:
+            result = epistemic_readiness_from_export(raw)
+        except Exception as e:  # noqa: BLE001
+            print(f"error: epistemic-readiness failed: {e}", file=sys.stderr)
+            return cli_exit.EX_ERR
+        if getattr(args, "json", False):
+            print(json.dumps(result, indent=2, ensure_ascii=False))
+        else:
+            print(format_epistemic_summary(result))
+        status = str(result.get("status") or "")
+        return cli_exit.EX_OK if status != "not_ready" else cli_exit.EX_ERR
 
     if args.cmd == "lineage-graph":
         from aigov_py.lineage_graph import format_lineage_summary, lineage_graph_from_export

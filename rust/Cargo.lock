@@ -81,6 +81,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "async-trait"
+version = "0.1.89"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c3d036a3c4ab069c7b410a2ce876bd74808d2d0888a82667669f8e783a898bf1"
+dependencies = [
+ "derive_arbitrary",
+]
+
+[[package]]
 name = "atoi"
 version = "2.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -270,7 +279,7 @@ version = "0.4.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "773f3b9af64447d2ce9850330c473515014aa235e6a783b02db81ff39e4a3dad"
 dependencies = [
- "crypto-common 0.1.7",
+"crypto-common 0.1.7",
  "inout",
 ]
 
@@ -1249,7 +1258,7 @@ dependencies = [
  "serde_json",
  "signature",
  "simple_asn1",
- "zeroize",
+"zeroize",
 ]
 
 [[package]]
@@ -1520,8 +1529,8 @@ version = "0.12.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f8ed6a7761f76e3b9f92dfb0a60a6a6477c61024b775147ff0973a02653abaf2"
 dependencies = [
- "digest 0.10.7",
- "hmac 0.12.1",
+"digest 0.10.7",
+"hmac 0.12.1",
 ]
 
 [[package]]
@@ -2124,7 +2133,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "52d1cfed4120b4d927bf7c0f86d2087a4a7d6027c906d9f9d525a80573b9be51"
 dependencies = [
  "libc",
- "windows-sys 0.60.2",
+"windows-sys 0.60.2",
 ]
 
 [[package]]
@@ -3286,7 +3295,7 @@ name = "yoke"
 version = "0.8.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "709fe23a0424b6a435d82152b1bd3fdfb0833487d5fa90d05d42762a9891fef5"
-dependencies = [
+dependencies = [pisovat,chciopravu
  "stable_deref_trait",
  "yoke-derive",
  "zerofrom",
@@ -3414,7 +3423,7 @@ dependencies = [
  "displaydoc",
  "flate2",
  "getrandom 0.3.4",
- "hmac 0.12.1",
+"hmac 0.12.1",episovat, chci opravu
  "indexmap",
  "lzma-rs",
  "memchr",

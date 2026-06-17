@@ -6,6 +6,10 @@ use crate::bundle::{
 use crate::compliance_summary::derive_verdict_from_state;
 use crate::govai_environment::GovaiEnvironment;
 use crate::policy_config::PolicyConfig;
+use crate::epistemic_readiness::{
+    epistemic_readiness_to_json, evaluate_epistemic_readiness_from_export,
+    EpistemicReadinessOptions,
+};
 use crate::governance_graph::{build_governance_graph, lineage_block_from_graph};
 use crate::projection::derive_current_state_from_events_with_context;
 use crate::schema::EvidenceEvent;
@@ -60,7 +64,7 @@ pub fn build_audit_export_v1(
     let graph_doc = build_governance_graph(run_id, &events);
     let lineage = lineage_block_from_graph(&graph_doc);
 
-    Ok(json!({
+    let mut doc = json!({
         "ok": true,
         "schema_version": "aigov.audit_export.v1",
         "policy_version": policy_version,
@@ -97,7 +101,18 @@ pub fn build_audit_export_v1(
         "evidence_events": events,
         "timestamps": timestamps,
         "lineage": lineage,
-    }))
+    });
+    let readiness = evaluate_epistemic_readiness_from_export(
+        &doc,
+        &EpistemicReadinessOptions::for_export_time(policy_cfg),
+    );
+    if let Some(obj) = doc.as_object_mut() {
+        obj.insert(
+            "epistemic_readiness".to_string(),
+            epistemic_readiness_to_json(&readiness),
+        );
+    }
+    Ok(doc)
 }
 
 fn build_log_chain(log_path: &str, run_id: &str) -> Result<Vec<Value>, String> {

@@ -124,14 +124,14 @@ pub fn build_router(state: AppState) -> Router {
     let ledger_routes = Router::new()
         .route("/evidence", post(post_evidence))
         .route("/bundle", get(get_bundle_query))
-        .route("/bundle/:run_id", get(get_bundle_path))
+        .route("/bundle/{run_id}", get(get_bundle_path))
         .route("/bundle-hash", get(get_bundle_hash_query))
-        .route("/bundle-hash/:run_id", get(get_bundle_hash_path))
+        .route("/bundle-hash/{run_id}", get(get_bundle_hash_path))
         .route("/compliance-summary", get(get_compliance_summary_query))
-        .route("/compliance-summary/:run_id", get(get_compliance_summary_path))
-        .route("/api/export/:run_id", get(get_api_export))
+        .route("/compliance-summary/{run_id}", get(get_compliance_summary_path))
+        .route("/api/export/{run_id}", get(get_api_export))
         .route("/verify", get(get_verify))
-        .route("/verify/:run_id", get(get_verify_run))
+        .route("/verify/{run_id}", get(get_verify_run))
         .layer(middleware::from_fn_with_state(
             gate,
             gate_audit_routes_with_state,

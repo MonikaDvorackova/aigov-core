@@ -6,8 +6,7 @@ name: oss-developer-experience
 on:
   pull_request:
     branches: [main, staging]
-  push:
-    branches: [main, staging]
+  workflow_dispatch:
 
 jobs:
   oss-developer-experience-checks:

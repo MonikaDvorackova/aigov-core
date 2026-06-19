@@ -7,12 +7,6 @@ on:
       - "python/**"
       - "scripts/**"
       - ".github/workflows/python-govai.yml"
-  push:
-    branches: [main, staging]
-    paths:
-      - "python/**"
-      - "scripts/**"
-      - ".github/workflows/python-govai.yml"
   workflow_dispatch:
 
 jobs:

@@ -5,8 +5,10 @@ permissions:
 
 on:
   pull_request:
-  push:
     branches: [main, staging]
+  workflow_dispatch:
+  schedule:
+    - cron: "30 3 * * 1"
 
 jobs:
   cargo-audit:

@@ -15,17 +15,6 @@ on:
       - "dashboard/**"
       - "docs/**"
       - "Makefile"
-  push:
-    branches: [main, staging]
-    paths:
-      - ".github/workflows/**"
-      - "rust/**"
-      - "python/**"
-      - "scripts/**"
-      - "typescript-sdk/**"
-      - "dashboard/**"
-      - "docs/**"
-      - "Makefile"
   workflow_dispatch:
 
 env:

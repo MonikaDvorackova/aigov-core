@@ -5,8 +5,10 @@ permissions:
 
 on:
   pull_request:
-  push:
     branches: [main, staging]
+  workflow_dispatch:
+  schedule:
+    - cron: "30 3 * * 1"
 
 jobs:
   cargo-audit:
@@ -17,7 +19,17 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
 
       - name: Install cargo-audit
-        run: cargo install cargo-audit --locked
+        run: |
+          set -euo pipefail
+          export CARGO_HTTP_MULTIPLEXING=false
+          for attempt in 1 2 3; do
+            cargo install cargo-audit --locked && break
+            if [ "$attempt" = "3" ]; then
+              exit 1
+            fi
+            sleep 10
+          done
+          cargo audit --version
 
       - name: cargo audit
         working-directory: rust

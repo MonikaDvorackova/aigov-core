@@ -44,7 +44,8 @@ dev = [
   "pytest>=8.0.0",
   "ruff>=0.6.0",
   "mypy>=1.8.0",
-  "types-requests>=2.31.0.20240106"
+  "types-requests>=2.31.0.20240106",
+  "PyYAML>=6.0.0",
 ]
 runs-postgres = [
   "psycopg[binary]>=3.2.0",

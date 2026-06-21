@@ -46,17 +46,28 @@ The Python (`pip`) block was correctly configured with `target-branch: staging` 
 | `scripts/check_dependabot_config.py` | **Added** — validates YAML, rejects root-level/duplicated `target-branch`, requires `staging` on every `updates` entry |
 | `python/tests/test_dependabot_config.py` | **Added** — regression tests for validator and config |
 | `Makefile` | **Added** `dependabot-config-check` target |
-| `.github/workflows/supply-chain-audit.yml` | **Added** `dependabot-config` job running `make dependabot-config-check` on PRs to `main` and `staging` |
+| `.github/workflows/supply-chain-audit.yml` | **Added** `dependabot-config` job; installs `pip install -e ".[dev]"` before `make dependabot-config-check` |
+| `python/pyproject.toml` | **Added** `PyYAML>=6.0.0` to `[project.optional-dependencies].dev` (also present in main deps for runtime) |
+
+## CI dependency fix (follow-up)
+
+**Symptom:** `dependabot-config` job failed in PR #118 with `PyYAML is required (pip install pyyaml)`.
+
+**Cause:** `scripts/check_dependabot_config.py` uses `yaml.safe_load`, but the `dependabot-config` job ran `make dependabot-config-check` on a bare GitHub Actions Python 3.11 image without installing project dependencies.
+
+**Fix:** Align with the `pip-audit` job pattern — create a venv, `pip install -e ".[dev]"`, activate, then run `make dependabot-config-check`. List `PyYAML` explicitly under `dev` optional dependencies for CI/tooling clarity.
 
 ## Validation performed
 
 ```bash
-python3 scripts/check_dependabot_config.py
+# CI-equivalent (clean venv)
+cd python && python -m venv .venv && . .venv/bin/activate
+pip install -U pip && pip install -e ".[dev]"
+cd .. && make dependabot-config-check
 # dependabot-config-check: OK — 2 update block(s) target 'staging' (cargo, pip)
 
-make dependabot-config-check
-
 cd python && . .venv/bin/activate && pytest tests/test_dependabot_config.py -q
+# 2 passed
 ```
 
 **Pre-fix YAML parse:** fails with `mapping values are not allowed here` (line 5).  

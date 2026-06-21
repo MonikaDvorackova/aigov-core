@@ -21,7 +21,7 @@ AIGOV_MODE ?= ci
 	env_check \
 	engineering_loc \
 	standards-conformance governance-standards-check \
-	public-sdk-packages-check oss-ecosystem-check enterprise-readiness-check \
+	public-sdk-packages-check dependabot-config-check oss-ecosystem-check enterprise-readiness-check \
 	validate-changelog generate-release-notes release-readiness-report release-readiness-check \
 	cursor-plugin-validate cursor-plugin-smoke cursor-plugin-check cursor-marketplace-listing-check \
 	downstream-consumption-smoke \
@@ -89,6 +89,9 @@ governance-standards-check:
 public-sdk-packages-check:
 	@python3 scripts/public_sdk_packages_check.py
 	@echo "public-sdk-packages-check: OK"
+
+dependabot-config-check:
+	@python3 scripts/check_dependabot_config.py
 
 oss-ecosystem-check:
 	@python3 benchmarks/auditability-failures/run_benchmark.py

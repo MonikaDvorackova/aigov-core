@@ -62,8 +62,8 @@ base64 = "0.22"
 urlencoding = "2.1"
 ed25519-dalek = { version = "2", features = ["pkcs8"] }
 governor = "0.10.4"
-rand = "0.10.1"
-zip = "2.2"
+rand = "0.9.4"
+zip = "8.6"
 
 [dev-dependencies]
 hmac = "0.13.0"
@@ -73,4 +73,4 @@ http-body-util = "0.1"
 tower = { version = "0.5", features = ["util"] }
 tempfile = "3"
 base64 = "0.22"
-rand = "0.10.1"
+rand = "0.9.4"

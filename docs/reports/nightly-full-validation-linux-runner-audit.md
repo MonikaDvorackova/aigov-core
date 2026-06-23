@@ -2,59 +2,30 @@
 
 ## Summary
 
-This report documents the fix for nightly full validation failing on a macOS self-hosted runner when starting the Postgres service container.
+This report documents the nightly full validation runner correction.
 
 ## Root cause
 
-`.github/workflows/nightly-full-validation.yml` targeted `runs-on: self-hosted`, which resolved to a macOS self-hosted runner in this repository.
+The nightly full validation workflow used a self hosted runner while also defining a PostgreSQL service container.
 
-The job defines a `postgres` service container. GitHub Actions service containers are supported only on Linux runners, so the workflow failed before any test steps ran:
+GitHub Actions service containers require Linux runner support. When the workflow ran on a non Linux self hosted runner, it failed with:
 
-`Container operations are only supported on Linux runners`
+Container operations are only supported on Linux runners
 
 ## Change
 
-The `full-validation` job now uses `runs-on: ubuntu-latest` so service containers can start and tests can reach Postgres at `127.0.0.1:5432`.
-
-Unchanged:
-
-- `services.postgres` (`postgres:16` with health checks and port `5432:5432`)
-- `DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:5432/postgres`
-- Scheduled and `workflow_dispatch` triggers
-- Full Rust, Python, and enterprise readiness validation steps
-- Slack notification step
-
-## Scope
-
-Changed file:
-
-`/.github/workflows/nightly-full-validation.yml`
-
-No application runtime logic was changed.
-
-No database migrations were changed.
-
-No compliance verdict semantics were changed.
+The workflow .github/workflows/nightly-full-validation.yml was changed to use ubuntu-latest instead of self-hosted.
 
 ## Validation
 
-1. Workflow YAML parses successfully.
-2. The job still defines the `postgres` service container.
-3. `DATABASE_URL` still points to `127.0.0.1:5432`.
-4. The job no longer targets a generic `self-hosted` runner that can resolve to macOS.
+The workflow configuration was reviewed locally.
 
-## Risk assessment
+The nightly full validation workflow now uses ubuntu-latest, which supports the PostgreSQL service container used by the job.
 
-Low.
+## Risk
 
-This change affects only the CI runner platform for nightly full validation. Test coverage and database connectivity expectations are unchanged.
+Low. This is a CI runner configuration change only. It does not modify runtime code, APIs, schemas, or package behavior.
 
-GitHub-hosted `ubuntu-latest` minutes will be consumed for the nightly schedule instead of a self-hosted macOS runner. Other workflows in this repository already use `ubuntu-latest` for Postgres-backed jobs.
+## Expected result
 
-## Evaluation gate
-
-Nightly full validation should complete service container startup and execute the full Rust, Python, and enterprise readiness checks on the next scheduled or manual run.
-
-## Human approval gate
-
-Reviewed before merge. Change scope is limited to workflow runner selection for nightly full validation.
+The nightly full validation workflow should run on a Linux runner and should no longer fail because of unsupported container operations.

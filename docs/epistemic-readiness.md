@@ -15,6 +15,12 @@ See also: [architecture/epistemic-model.md](architecture/epistemic-model.md).
 | Is policy still retrievable for rule set `R`? | `continuity.policy_artifact_retrievable` |
 | Is delegation lineage intact? | `continuity.lineage_resolved` |
 | Overall epistemic posture | `status`: `ready` \| `partial` \| `not_ready` |
+| What is known vs evidenced vs inferred? | `decision_knowledge.{known,evidenced,inferred,changed,unverifiable}` |
+| Structured gaps with remediation | `gap_report` (`aigov.epistemic_gap_report.v1`) |
+| Continuity validation failures | `continuity_validation.failures` |
+| External audit verification plan | `trace_verification_plan` on export and readiness JSON |
+
+See [epistemic-audit-primitives.md](epistemic-audit-primitives.md) for the full primitive reference.
 
 A run may be **compliance-valid** (`VALID` + replay match) but **epistemically partial** — for example when `policy_version` is present but the policy file is no longer archived.
 

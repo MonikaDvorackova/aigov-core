@@ -5,8 +5,11 @@
 use crate::policy_config::PolicyConfig;
 use crate::replay_engine::replay_audit_export_v1;
 use crate::replay_validation::EXPORT_SCHEMA_V1;
+use crate::trace_verification_plan::{
+    build_trace_verification_plan_from_readiness, trace_verification_plan_to_json,
+};
 use serde::Serialize;
-use serde_json::Value;
+use serde_json::{json, Value};
 
 pub const EPISTEMIC_READINESS_SCHEMA_V1: &str = "aigov.epistemic_readiness.v1";
 
@@ -36,6 +39,16 @@ pub struct KnowledgeCoverage {
 }
 
 #[derive(Debug, Clone, Serialize, PartialEq, Eq)]
+pub struct EpistemicTraceClaim {
+    /// Stable identifier for the claim within the export evaluation.
+    pub claim_id: String,
+    /// Human-readable statement of what is known about the run.
+    pub statement: String,
+    /// Provenance pointer: event_id, export field path, or replay projection.
+    pub source: String,
+}
+
+#[derive(Debug, Clone, Serialize, PartialEq, Eq)]
 pub struct KnowledgeContinuity {
     pub chain_continuous: bool,
     pub events_digest_continuous: bool,
@@ -55,6 +68,30 @@ pub struct ReconstructionConfidence {
 }
 
 #[derive(Debug, Clone, Serialize, PartialEq, Eq)]
+pub struct KnowledgeContinuityValidation {
+    pub valid: bool,
+    pub failures: Vec<String>,
+}
+
+#[derive(Debug, Clone, Serialize, PartialEq, Eq)]
+pub struct EpistemicGap {
+    pub code: String,
+    pub category: String,
+    /// `blocking` | `advisory`
+    pub severity: String,
+    pub detail: String,
+    pub remediation: String,
+}
+
+#[derive(Debug, Clone, Serialize, PartialEq, Eq)]
+pub struct EpistemicGapReport {
+    pub schema_version: String,
+    pub gaps: Vec<EpistemicGap>,
+    pub gap_count: usize,
+    pub blocking_count: usize,
+}
+
+#[derive(Debug, Clone, Serialize, PartialEq, Eq)]
 pub struct DecisionKnowledge {
     pub run_id: String,
     pub policy_version: Option<String>,
@@ -62,6 +99,16 @@ pub struct DecisionKnowledge {
     pub reconstructed_verdict: String,
     pub evidence_event_count: usize,
     pub determinism_digest: String,
+    /// Facts asserted directly in the export carrier.
+    pub known: Vec<EpistemicTraceClaim>,
+    /// Claims backed by hash-chained evidence events.
+    pub evidenced: Vec<EpistemicTraceClaim>,
+    /// Conclusions derived by deterministic replay projection.
+    pub inferred: Vec<EpistemicTraceClaim>,
+    /// Drift or mismatch between export claims and replay reconstruction.
+    pub changed: Vec<EpistemicTraceClaim>,
+    /// Claims that cannot be independently verified from retained artifacts.
+    pub unverifiable: Vec<EpistemicTraceClaim>,
 }
 
 #[derive(Debug, Clone, Serialize, PartialEq, Eq)]
@@ -79,6 +126,10 @@ pub struct EpistemicReadiness {
     pub continuity: KnowledgeContinuity,
     pub confidence: ReconstructionConfidence,
     pub replay_ok: bool,
+    pub gap_report: EpistemicGapReport,
+    pub continuity_validation: KnowledgeContinuityValidation,
+    /// Derived trace verification plan for external audit review.
+    pub trace_verification_plan: Value,
 }
 
 /// Optional signals from bundle verification (offline export bundle checks).
@@ -143,25 +194,43 @@ pub fn evaluate_epistemic_readiness_from_export(
         .map(|s| s.to_string())
         .filter(|s| !s.is_empty());
 
-    EpistemicReadiness {
+    let trace_slices = build_decision_knowledge_trace(export, &replay, opts);
+    let gap_report = gap_report_from_requirements(&requirements);
+    let continuity_validation = validate_knowledge_continuity(&continuity);
+
+    let decision_knowledge = DecisionKnowledge {
+        run_id: replay.run_id.clone(),
+        policy_version: policy_version.clone(),
+        exported_verdict: replay.exported_verdict.clone(),
+        reconstructed_verdict: replay.reconstructed_verdict.clone(),
+        evidence_event_count: replay.event_count,
+        determinism_digest: replay.determinism_digest.clone(),
+        known: trace_slices.known,
+        evidenced: trace_slices.evidenced,
+        inferred: trace_slices.inferred,
+        changed: trace_slices.changed,
+        unverifiable: trace_slices.unverifiable,
+    };
+
+    let mut readiness = EpistemicReadiness {
         schema_version: EPISTEMIC_READINESS_SCHEMA_V1.to_string(),
         status,
         compliance_verdict_valid,
         reconstructable,
         readiness_gaps: gaps,
-        decision_knowledge: DecisionKnowledge {
-            run_id: replay.run_id.clone(),
-            policy_version,
-            exported_verdict: replay.exported_verdict.clone(),
-            reconstructed_verdict: replay.reconstructed_verdict.clone(),
-            evidence_event_count: replay.event_count,
-            determinism_digest: replay.determinism_digest.clone(),
-        },
+        decision_knowledge,
         coverage,
         continuity,
         confidence,
         replay_ok: replay.ok,
-    }
+        gap_report,
+        continuity_validation,
+        trace_verification_plan: json!({}),
+    };
+    let trace_plan =
+        build_trace_verification_plan_from_readiness(export, &readiness, &requirements);
+    readiness.trace_verification_plan = trace_verification_plan_to_json(&trace_plan);
+    readiness
 }
 
 pub fn epistemic_readiness_to_json(report: &EpistemicReadiness) -> Value {
@@ -206,6 +275,11 @@ fn build_requirements(
         .projection
         .as_ref()
         .map(|p| p.current_state.requirements.missing.is_empty())
+        .unwrap_or(false);
+
+    let policy_version_drift = policy_version_drift_detected(export);
+    let model_artifact_drift = model_artifact_digests(export)
+        .map(|(trained, promoted)| trained != promoted)
         .unwrap_or(false);
 
     let mut reqs = vec![
@@ -297,6 +371,26 @@ fn build_requirements(
                 "no missing evidence requirements in governance projection"
             } else {
                 "governance projection reports missing evidence"
+            },
+        ),
+        req(
+            "policy_version_drift",
+            "policy",
+            !policy_version_drift,
+            if policy_version_drift {
+                "export policy_version fields disagree across carrier sections"
+            } else {
+                "policy_version consistent across export carrier"
+            },
+        ),
+        req(
+            "model_artifact_drift",
+            "model",
+            !model_artifact_drift,
+            if model_artifact_drift {
+                "model_trained and model_promoted artifact digests differ"
+            } else {
+                "model artifact digest consistent across train and promote"
             },
         ),
     ];
@@ -391,6 +485,317 @@ fn gaps_from_requirements(requirements: &[KnowledgeRequirement]) -> Vec<String> 
     gaps
 }
 
+struct DecisionKnowledgeTraceSlices {
+    known: Vec<EpistemicTraceClaim>,
+    evidenced: Vec<EpistemicTraceClaim>,
+    inferred: Vec<EpistemicTraceClaim>,
+    changed: Vec<EpistemicTraceClaim>,
+    unverifiable: Vec<EpistemicTraceClaim>,
+}
+
+fn trace_claim(claim_id: &str, statement: &str, source: &str) -> EpistemicTraceClaim {
+    EpistemicTraceClaim {
+        claim_id: claim_id.to_string(),
+        statement: statement.to_string(),
+        source: source.to_string(),
+    }
+}
+
+pub fn validate_knowledge_continuity(continuity: &KnowledgeContinuity) -> KnowledgeContinuityValidation {
+    let mut failures = Vec::new();
+    if !continuity.chain_continuous {
+        failures.push("hash chain continuity failed".to_string());
+    }
+    if !continuity.events_digest_continuous {
+        failures.push("events_content_sha256 mismatch".to_string());
+    }
+    if !continuity.policy_reference_present {
+        failures.push("policy_version reference missing".to_string());
+    }
+    if !continuity.policy_artifact_retrievable {
+        failures.push("policy artifact not retrievable".to_string());
+    }
+    if !continuity.lineage_resolved {
+        failures.push("delegation lineage unresolved".to_string());
+    }
+    failures.sort();
+    KnowledgeContinuityValidation {
+        valid: failures.is_empty(),
+        failures,
+    }
+}
+
+fn gap_severity(code: &str, category: &str) -> &'static str {
+    match code {
+        "missing_policy_artifact" | "knowledge_coverage_complete" => "advisory",
+        _ if category == "coverage" => "advisory",
+        _ => "blocking",
+    }
+}
+
+fn gap_remediation(code: &str) -> &'static str {
+    match code {
+        "unsupported_schema_version" => "Re-export using supported aigov.audit_export.v1 schema.",
+        "replay_validation_failure" | "events_digest_continuous" | "chain_continuous" => {
+            "Restore tamper-evident ledger chain or re-export from authoritative log."
+        }
+        "compliance_verdict_reconstructable" => {
+            "Reconcile export verdict with replayed governance projection."
+        }
+        "missing_policy_reference" => "Include policy_version in export metadata.",
+        "missing_policy_artifact" => "Archive policy bytes or digest with export for years-later replay.",
+        "unresolved_lineage" => "Resolve delegation lineage or document orphaned runs.",
+        "missing_evidence_reference" => "Bind bundle evidence references to export events.",
+        "unsigned_dependency" => "Sign required dependencies or record waiver under policy.",
+        "knowledge_coverage_complete" => "Supply missing evidence events required by policy.",
+        "model_artifact_drift" => "Align model_trained and model_promoted artifact digests.",
+        "policy_version_drift" => "Align export policy_version fields across carrier sections.",
+        _ => "Review requirement detail and close the epistemic gap.",
+    }
+}
+
+pub fn gap_report_from_requirements(requirements: &[KnowledgeRequirement]) -> EpistemicGapReport {
+    let mut gaps: Vec<EpistemicGap> = requirements
+        .iter()
+        .filter(|r| !r.satisfied)
+        .map(|r| EpistemicGap {
+            code: r.code.clone(),
+            category: r.category.clone(),
+            severity: gap_severity(&r.code, &r.category).to_string(),
+            detail: r.detail.clone(),
+            remediation: gap_remediation(&r.code).to_string(),
+        })
+        .collect();
+    gaps.sort_by(|a, b| a.code.cmp(&b.code));
+    let blocking_count = gaps.iter().filter(|g| g.severity == "blocking").count();
+    EpistemicGapReport {
+        schema_version: "aigov.epistemic_gap_report.v1".to_string(),
+        gap_count: gaps.len(),
+        blocking_count,
+        gaps,
+    }
+}
+
+fn build_decision_knowledge_trace(
+    export: &Value,
+    replay: &crate::replay_engine::ReplayResult,
+    opts: &EpistemicReadinessOptions<'_>,
+) -> DecisionKnowledgeTraceSlices {
+    let mut known = Vec::new();
+    let mut evidenced = Vec::new();
+    let mut inferred = Vec::new();
+    let mut changed = Vec::new();
+    let mut unverifiable = Vec::new();
+
+    known.push(trace_claim(
+        "known.run_id",
+        &format!("run_id is {}", replay.run_id),
+        "export.run.run_id",
+    ));
+    if let Some(schema) = export.get("schema_version").and_then(|v| v.as_str()) {
+        known.push(trace_claim(
+            "known.schema_version",
+            &format!("export schema_version is {schema}"),
+            "export.schema_version",
+        ));
+    }
+    if let Some(pv) = export.get("policy_version").and_then(|v| v.as_str()) {
+        known.push(trace_claim(
+            "known.policy_version",
+            &format!("export policy_version is {pv}"),
+            "export.policy_version",
+        ));
+    }
+    if let Some(verdict) = replay.exported_verdict.as_deref() {
+        known.push(trace_claim(
+            "known.exported_verdict",
+            &format!("export decision.verdict is {verdict}"),
+            "export.decision.verdict",
+        ));
+    }
+
+    if let Some(events) = export.get("evidence_events").and_then(|v| v.as_array()) {
+        for (i, ev) in events.iter().enumerate() {
+            let event_id = ev
+                .get("event_id")
+                .and_then(|v| v.as_str())
+                .unwrap_or("unknown");
+            let event_type = ev
+                .get("event_type")
+                .and_then(|v| v.as_str())
+                .unwrap_or("unknown");
+            evidenced.push(trace_claim(
+                &format!("evidenced.event.{i}"),
+                &format!("evidence event {event_type} recorded"),
+                &format!("export.evidence_events[{event_id}]"),
+            ));
+        }
+    }
+    if let Some(digest) = export
+        .get("evidence_hashes")
+        .and_then(|h| h.get("events_content_sha256"))
+        .and_then(|v| v.as_str())
+    {
+        evidenced.push(trace_claim(
+            "evidenced.events_digest",
+            &format!("events_content_sha256 is {digest}"),
+            "export.evidence_hashes.events_content_sha256",
+        ));
+    }
+
+    inferred.push(trace_claim(
+        "inferred.reconstructed_verdict",
+        &format!(
+            "replay reconstructed verdict {}",
+            replay.reconstructed_verdict
+        ),
+        "replay_engine.projection",
+    ));
+    inferred.push(trace_claim(
+        "inferred.replay_ok",
+        &format!("replay integrity ok={}", replay.ok),
+        "replay_engine.integrity",
+    ));
+    if let Some(projection) = &replay.projection {
+        inferred.push(trace_claim(
+            "inferred.missing_evidence",
+            &format!(
+                "projection missing evidence count {}",
+                projection.current_state.requirements.missing.len()
+            ),
+            "replay_engine.projection.requirements.missing",
+        ));
+    }
+
+    if let (Some(exported), reconstructed) = (
+        replay.exported_verdict.as_deref(),
+        replay.reconstructed_verdict.as_str(),
+    ) {
+        if exported != reconstructed {
+            changed.push(trace_claim(
+                "changed.replay_verdict_mismatch",
+                &format!("exported verdict {exported} differs from replay {reconstructed}"),
+                "replay_engine.integrity.verdict_match",
+            ));
+        }
+    }
+    if let (Some(top), Some(run_pv)) = (
+        export.get("policy_version").and_then(|v| v.as_str()),
+        export
+            .get("run")
+            .and_then(|r| r.get("policy_version"))
+            .and_then(|v| v.as_str()),
+    ) {
+        if top != run_pv {
+            changed.push(trace_claim(
+                "changed.policy_version_drift",
+                &format!("top-level policy_version {top} differs from run.policy_version {run_pv}"),
+                "export.policy_version vs export.run.policy_version",
+            ));
+        }
+    }
+    if let Some((trained_sha, promoted_sha)) = model_artifact_digests(export) {
+        if trained_sha != promoted_sha {
+            changed.push(trace_claim(
+                "changed.model_artifact_drift",
+                &format!("model_trained sha {trained_sha} differs from model_promoted sha {promoted_sha}"),
+                "export.evidence_events.model_trained vs model_promoted",
+            ));
+        }
+    }
+
+    if !opts.policy_artifact_available.unwrap_or(false) {
+        unverifiable.push(trace_claim(
+            "unverifiable.policy_artifact",
+            "policy artifact bytes are not available for independent replay rule set R",
+            "policy_archive",
+        ));
+    }
+    for path in external_artifact_paths(export) {
+        unverifiable.push(trace_claim(
+            "unverifiable.external_artifact",
+            &format!("artifact path {path} cannot be verified from export alone"),
+            "export.evidence_events.payload.artifact_path",
+        ));
+    }
+    if !replay.ok {
+        unverifiable.push(trace_claim(
+            "unverifiable.replay_output",
+            "replay output cannot be trusted while integrity checks fail",
+            "replay_engine",
+        ));
+    }
+
+    for slice in [&mut known, &mut evidenced, &mut inferred, &mut changed, &mut unverifiable] {
+        slice.sort_by(|a, b| a.claim_id.cmp(&b.claim_id));
+    }
+
+    DecisionKnowledgeTraceSlices {
+        known,
+        evidenced,
+        inferred,
+        changed,
+        unverifiable,
+    }
+}
+
+fn policy_version_drift_detected(export: &Value) -> bool {
+    match (
+        export.get("policy_version").and_then(|v| v.as_str()),
+        export
+            .get("run")
+            .and_then(|r| r.get("policy_version"))
+            .and_then(|v| v.as_str()),
+    ) {
+        (Some(a), Some(b)) => a != b,
+        _ => false,
+    }
+}
+
+fn model_artifact_digests(export: &Value) -> Option<(String, String)> {
+    let events = export.get("evidence_events")?.as_array()?;
+    let mut trained: Option<String> = None;
+    let mut promoted: Option<String> = None;
+    for ev in events {
+        let Some(ty) = ev.get("event_type").and_then(|v| v.as_str()) else {
+            continue;
+        };
+        let Some(sha) = ev
+            .get("payload")
+            .and_then(|p| p.get("artifact_sha256"))
+            .and_then(|v| v.as_str())
+        else {
+            continue;
+        };
+        match ty {
+            "model_trained" => trained = Some(sha.to_string()),
+            "model_promoted" => promoted = Some(sha.to_string()),
+            _ => {}
+        }
+    }
+    Some((trained?, promoted?))
+}
+
+fn external_artifact_paths(export: &Value) -> Vec<String> {
+    let mut paths = Vec::new();
+    if let Some(events) = export.get("evidence_events").and_then(|v| v.as_array()) {
+        for ev in events {
+            if let Some(path) = ev
+                .get("payload")
+                .and_then(|p| p.get("artifact_path"))
+                .and_then(|v| v.as_str())
+            {
+                if path.starts_with("registry://") || path.starts_with("http://") || path.starts_with("https://") {
+                    paths.push(path.to_string());
+                }
+            }
+        }
+    }
+    paths.sort();
+    paths.dedup();
+    paths
+}
+
 fn lineage_resolved_from_export(
     export: &Value,
     replay: &crate::replay_engine::ReplayResult,
@@ -425,6 +830,8 @@ fn derive_status(
         "missing_evidence_reference",
         "unsigned_dependency",
         "unresolved_lineage",
+        "model_artifact_drift",
+        "policy_version_drift",
     ]
     .into_iter()
     .collect();
@@ -670,7 +1077,7 @@ mod tests {
         assert!(r.compliance_verdict_valid);
         assert!(r.reconstructable);
         assert!(r.readiness_gaps.is_empty());
-        assert_eq!(r.coverage.ratio, "9/9");
+        assert_eq!(r.coverage.ratio, "11/11");
     }
 
     #[test]
@@ -850,5 +1257,117 @@ mod tests {
                 .and_then(|v| v.as_str())
                 .unwrap()
         );
+    }
+
+    #[test]
+    fn model_artifact_drift_detected() {
+        let run_id = "epistemic-model-drift";
+        let mut events = golden_events(run_id);
+        events[7]["payload"]["artifact_sha256"] =
+            json!("bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb");
+        let chain = chain_for(&events);
+        let export = build_export(run_id, events, "VALID", chain, None);
+        let r = evaluate(&export, Some(true));
+        assert!(r
+            .readiness_gaps
+            .contains(&"model_artifact_drift".to_string()));
+        assert!(r
+            .decision_knowledge
+            .changed
+            .iter()
+            .any(|c| c.claim_id == "changed.model_artifact_drift"));
+        assert!(!r.gap_report.gaps.is_empty());
+    }
+
+    #[test]
+    fn policy_version_drift_detected() {
+        let run_id = "epistemic-policy-drift";
+        let events = golden_events(run_id);
+        let chain = chain_for(&events);
+        let mut export = build_export(run_id, events, "VALID", chain, None);
+        export["policy_version"] = json!("policy-a");
+        export["run"]["policy_version"] = json!("policy-b");
+        let r = evaluate(&export, Some(true));
+        assert!(r
+            .readiness_gaps
+            .contains(&"policy_version_drift".to_string()));
+        assert!(r
+            .decision_knowledge
+            .changed
+            .iter()
+            .any(|c| c.claim_id == "changed.policy_version_drift"));
+    }
+
+    #[test]
+    fn unverifiable_external_artifact_paths() {
+        let run_id = "epistemic-unverifiable";
+        let events = golden_events(run_id);
+        let chain = chain_for(&events);
+        let export = build_export(run_id, events, "VALID", chain, None);
+        let r = evaluate(&export, Some(false));
+        assert!(r
+            .decision_knowledge
+            .unverifiable
+            .iter()
+            .any(|c| c.claim_id == "unverifiable.external_artifact"));
+        assert!(r
+            .decision_knowledge
+            .unverifiable
+            .iter()
+            .any(|c| c.claim_id == "unverifiable.policy_artifact"));
+    }
+
+    #[test]
+    fn replay_verdict_mismatch_surfaces_in_changed() {
+        let run_id = "epistemic-replay-mismatch";
+        let events = golden_events(run_id);
+        let chain = chain_for(&events);
+        let export = build_export(run_id, events, "BLOCKED", chain, None);
+        let r = evaluate(&export, Some(true));
+        assert!(!r.compliance_verdict_valid);
+        assert!(r
+            .decision_knowledge
+            .changed
+            .iter()
+            .any(|c| c.claim_id == "changed.replay_verdict_mismatch"));
+    }
+
+    #[test]
+    fn knowledge_continuity_validation_reports_failures() {
+        let continuity = KnowledgeContinuity {
+            chain_continuous: false,
+            events_digest_continuous: true,
+            policy_reference_present: true,
+            policy_artifact_retrievable: false,
+            lineage_resolved: true,
+        };
+        let validation = validate_knowledge_continuity(&continuity);
+        assert!(!validation.valid);
+        assert!(validation.failures.iter().any(|f| f.contains("chain")));
+        assert!(validation
+            .failures
+            .iter()
+            .any(|f| f.contains("policy artifact")));
+    }
+
+    #[test]
+    fn trace_verification_plan_attached_to_readiness() {
+        let run_id = "epistemic-trace-plan";
+        let events = golden_events(run_id);
+        let chain = chain_for(&events);
+        let export = build_export(run_id, events, "VALID", chain, None);
+        let r = evaluate(&export, Some(true));
+        assert_eq!(
+            r.trace_verification_plan
+                .get("schema_version")
+                .and_then(|v| v.as_str()),
+            Some("govai.standards.trace_verification_plan.v1")
+        );
+        assert!(r
+            .trace_verification_plan
+            .get("plan_digest")
+            .and_then(|v| v.as_str())
+            .unwrap_or("")
+            .starts_with("sha256:"));
     }
 }

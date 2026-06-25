@@ -111,6 +111,10 @@ pub fn build_audit_export_v1(
             "epistemic_readiness".to_string(),
             epistemic_readiness_to_json(&readiness),
         );
+        obj.insert(
+            "trace_verification_plan".to_string(),
+            readiness.trace_verification_plan.clone(),
+        );
     }
     Ok(doc)
 }

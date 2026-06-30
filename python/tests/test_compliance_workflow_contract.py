@@ -80,6 +80,19 @@ def test_release_promotion_emit_run_id_stays_unique_per_workflow_run() -> None:
     assert "echo \"run_id=release-promotion-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}\"" in body
 
 
+def test_dependabot_dependency_only_pr_skips_report_and_artifact_gate() -> None:
+    """Lockfile-only Dependabot PRs must not require docs/reports or evidence_pack artefacts."""
+    lines = _compliance_yml().splitlines()
+    body = _workflow_job_declaration_body(lines, "changes")
+    assert "dependency_only_dependabot" in body
+    assert "is_dependency_manifest_path()" in body
+    assert "is_dependabot_identity()" in body
+    assert "app/dependabot" in body
+    assert "rust/Cargo.lock" in body
+    assert 'NEEDS_REPORT="false"' in body
+    assert 'RUN_ARTIFACT_GATE="false"' in body
+
+
 def test_compliance_pull_request_trigger_has_no_activity_types_filter() -> None:
     """A narrow `types:` list can skip runs so the PR head SHA never gets required check-runs."""
     text = _compliance_yml()

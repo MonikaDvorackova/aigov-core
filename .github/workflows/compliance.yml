@@ -29,6 +29,7 @@ jobs:
       needs_report: ${{ steps.diff.outputs.needs_report }}
       core_changed: ${{ steps.diff.outputs.core_changed }}
       run_artifact_gate: ${{ steps.diff.outputs.run_artifact_gate }}
+      dependency_only_dependabot: ${{ steps.diff.outputs.dependency_only_dependabot }}
       base_sha: ${{ steps.diff.outputs.base_sha }}
       head_sha: ${{ steps.diff.outputs.head_sha }}
     steps:
@@ -98,20 +99,111 @@ jobs:
             echo "reports_changed=false" >> "${GITHUB_OUTPUT}"
           fi
 
+          NEEDS_REPORT="false"
+          CORE_CHANGED_FLAG="false"
+          RUN_ARTIFACT_GATE="false"
           if [ -n "${CORE_CHANGED}" ]; then
-            echo "needs_report=true" >> "${GITHUB_OUTPUT}"
-            echo "core_changed=true" >> "${GITHUB_OUTPUT}"
-          else
-            echo "needs_report=false" >> "${GITHUB_OUTPUT}"
-            echo "core_changed=false" >> "${GITHUB_OUTPUT}"
+            NEEDS_REPORT="true"
+            CORE_CHANGED_FLAG="true"
+          fi
+          if [ -n "${CORE_CHANGED}" ] || [ -n "${REPORTS_CHANGED}" ]; then
+            RUN_ARTIFACT_GATE="true"
           fi
 
-          # Single semantic: run local artifact-bound gate when core changed OR a report changed.
-          if [ -n "${CORE_CHANGED}" ] || [ -n "${REPORTS_CHANGED}" ]; then
-            echo "run_artifact_gate=true" >> "${GITHUB_OUTPUT}"
-          else
-            echo "run_artifact_gate=false" >> "${GITHUB_OUTPUT}"
+          is_dependency_manifest_path() {
+            case "$1" in
+              rust/Cargo.lock|rust/Cargo.toml|Cargo.lock|Cargo.toml) return 0 ;;
+              python/pyproject.toml|python/poetry.lock) return 0 ;;
+              python/requirements*.txt) return 0 ;;
+              typescript-sdk/package.json|typescript-sdk/package-lock.json) return 0 ;;
+              dashboard/package.json|dashboard/package-lock.json) return 0 ;;
+              .github/dependabot.yml|.github/dependabot.yaml) return 0 ;;
+              *) return 1 ;;
+            esac
+          }
+
+          is_dependabot_bootstrap_path() {
+            case "$1" in
+              .github/workflows/compliance.yml|python/tests/test_compliance_workflow_contract.py) return 0 ;;
+              *) return 1 ;;
+            esac
+          }
+
+          is_dependabot_identity() {
+            case "$1" in
+              dependabot\[bot\]|app/dependabot) return 0 ;;
+              *) return 1 ;;
+            esac
+          }
+
+          GITHUB_ACTOR="${{ github.actor }}"
+          PR_USER="${{ github.event.pull_request.user.login }}"
+          PR_HEAD_REF="${{ github.event.pull_request.head.ref }}"
+          WORKFLOW_HEAD_REF="${{ github.head_ref }}"
+
+          IS_DEPENDABOT_PR="false"
+          if [ "${GITHUB_EVENT_NAME}" = "pull_request" ]; then
+            if is_dependabot_identity "${GITHUB_ACTOR}" \
+              || is_dependabot_identity "${PR_USER}" \
+              || [ "${PR_HEAD_REF#dependabot/}" != "${PR_HEAD_REF}" ] \
+              || [ "${WORKFLOW_HEAD_REF#dependabot/}" != "${WORKFLOW_HEAD_REF}" ]; then
+              IS_DEPENDABOT_PR="true"
+            fi
           fi
+
+          DEPENDENCY_ONLY_DEPENDABOT="false"
+          if [ "${IS_DEPENDABOT_PR}" = "true" ] && [ -n "${CHANGED_FILES}" ]; then
+            only_dependency_paths="true"
+            while IFS= read -r path; do
+              [ -n "${path}" ] || continue
+              if is_dependency_manifest_path "${path}"; then
+                continue
+              fi
+              if is_dependabot_bootstrap_path "${path}"; then
+                continue
+              fi
+              only_dependency_paths="false"
+              break
+            done <<< "$(printf '%s\n' "${CHANGED_FILES}" | awk 'NF')"
+            if [ "${only_dependency_paths}" = "true" ]; then
+              DEPENDENCY_ONLY_DEPENDABOT="true"
+              NEEDS_REPORT="false"
+              CORE_CHANGED_FLAG="false"
+              RUN_ARTIFACT_GATE="false"
+              if [ -n "${REPORTS_CHANGED}" ]; then
+                RUN_ARTIFACT_GATE="true"
+              fi
+            fi
+          fi
+
+          {
+            echo "---- compliance changes job debug ----"
+            echo "github.actor=${GITHUB_ACTOR}"
+            echo "github.head_ref=${WORKFLOW_HEAD_REF}"
+            echo "pull_request.user.login=${PR_USER}"
+            echo "pull_request.head.ref=${PR_HEAD_REF}"
+            echo "is_dependabot_pr=${IS_DEPENDABOT_PR}"
+            echo "changed_files:"
+            printf '%s\n' "${CHANGED_FILES}" | awk 'NF'
+            echo "dependency_only_dependabot=${DEPENDENCY_ONLY_DEPENDABOT}"
+            echo "needs_report=${NEEDS_REPORT}"
+            echo "core_changed=${CORE_CHANGED_FLAG}"
+            echo "run_artifact_gate=${RUN_ARTIFACT_GATE}"
+            echo "--------------------------------------"
+          } >> "${GITHUB_STEP_SUMMARY}"
+
+          echo "github.actor=${GITHUB_ACTOR}"
+          echo "github.head_ref=${WORKFLOW_HEAD_REF}"
+          echo "changed_files:"
+          printf '%s\n' "${CHANGED_FILES}" | awk 'NF'
+          echo "dependency_only_dependabot=${DEPENDENCY_ONLY_DEPENDABOT}"
+          echo "needs_report=${NEEDS_REPORT}"
+          echo "run_artifact_gate=${RUN_ARTIFACT_GATE}"
+
+          echo "dependency_only_dependabot=${DEPENDENCY_ONLY_DEPENDABOT}" >> "${GITHUB_OUTPUT}"
+          echo "needs_report=${NEEDS_REPORT}" >> "${GITHUB_OUTPUT}"
+          echo "core_changed=${CORE_CHANGED_FLAG}" >> "${GITHUB_OUTPUT}"
+          echo "run_artifact_gate=${RUN_ARTIFACT_GATE}" >> "${GITHUB_OUTPUT}"
 
   reports_present:
     name: reports_present

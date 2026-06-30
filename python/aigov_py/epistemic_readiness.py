@@ -82,4 +82,26 @@ def format_epistemic_summary(report: dict[str, Any]) -> str:
         lines.append("readiness_gaps:")
         for gap in gaps:
             lines.append(f"  - {gap}")
+    gap_report = report.get("gap_report") or {}
+    structured = gap_report.get("gaps") or []
+    if structured:
+        lines.append("structured_gaps:")
+        for gap in structured:
+            lines.append(
+                f"  - {gap.get('code')} ({gap.get('severity')}): {gap.get('detail')}"
+            )
+    dk = report.get("decision_knowledge") or {}
+    for label in ("known", "evidenced", "inferred", "changed", "unverifiable"):
+        claims = dk.get(label) or []
+        if claims:
+            lines.append(f"{label}:")
+            for claim in claims[:5]:
+                lines.append(f"  - {claim.get('claim_id')}: {claim.get('statement')}")
+            if len(claims) > 5:
+                lines.append(f"  - ... ({len(claims) - 5} more)")
+    continuity_validation = report.get("continuity_validation") or {}
+    if continuity_validation.get("valid") is False:
+        lines.append("continuity_validation_failures:")
+        for failure in continuity_validation.get("failures") or []:
+            lines.append(f"  - {failure}")
     return "\n".join(lines)

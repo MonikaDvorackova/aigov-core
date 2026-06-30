@@ -47,7 +47,7 @@
     },
     "rules-skills-no-scaffold-tokens": {
       "type": "file_exists",
-      "path": ".cursor-plugin/rules/compliance-gate.mdc"
+      "path": "rules/compliance-gate.mdc"
     },
     "reviewer-notes": {
       "type": "file_exists",

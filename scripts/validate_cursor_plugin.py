@@ -5,7 +5,6 @@ Exit code 0 on success, non-zero on failure.
 """
 from __future__ import annotations
 
-import hashlib
 import json
 import re
 import sys
@@ -21,7 +20,10 @@ from cursor_marketplace_publication import validate_publication_package
 REPO_ROOT = _SCRIPTS_DIR.parent
 PLUGIN_DIR = REPO_ROOT / ".cursor-plugin"
 MANIFEST = PLUGIN_DIR / "plugin.json"
-PLUGIN_MCP_JSON = PLUGIN_DIR / "mcp.json"
+RULES_DIR = REPO_ROOT / "rules"
+SKILLS_DIR = REPO_ROOT / "skills"
+REPO_MCP_JSON = REPO_ROOT / "mcp.json"
+LOGO_PATH = PLUGIN_DIR / "assets" / "logo.png"
 MCP_SERVER = REPO_ROOT / "mcp" / "aigov_mcp_server.py"
 README = PLUGIN_DIR / "README.md"
 LOCAL_CONFIG = PLUGIN_DIR / "examples" / "local-config.json"
@@ -106,22 +108,41 @@ def _validate_mcp_servers_block(obj: Any, label: str, errors: list[str]) -> None
 
 def _manifest_mcp_or_file(data: dict[str, Any], errors: list[str]) -> None:
     has_inline = isinstance(data.get("mcpServers"), dict) and data["mcpServers"]
-    has_file = PLUGIN_MCP_JSON.is_file()
+    has_file = REPO_MCP_JSON.is_file()
     if has_inline:
         _validate_mcp_servers_block(data.get("mcpServers"), "plugin.json mcpServers", errors)
     if has_file:
         try:
-            mcp_data = json.loads(PLUGIN_MCP_JSON.read_text(encoding="utf-8"))
+            mcp_data = json.loads(REPO_MCP_JSON.read_text(encoding="utf-8"))
         except json.JSONDecodeError as e:
-            errors.append(f".cursor-plugin/mcp.json is not valid JSON: {e}")
+            errors.append(f"mcp.json is not valid JSON: {e}")
             return
         ms = mcp_data.get("mcpServers")
         if isinstance(ms, dict) and ms:
-            _validate_mcp_servers_block(ms, ".cursor-plugin/mcp.json mcpServers", errors)
+            _validate_mcp_servers_block(ms, "mcp.json mcpServers", errors)
         else:
-            errors.append(".cursor-plugin/mcp.json: missing or empty mcpServers")
+            errors.append("mcp.json: missing or empty mcpServers")
     if not has_inline and not has_file:
-        errors.append("Provide mcpServers in plugin.json and/or .cursor-plugin/mcp.json")
+        errors.append("Provide mcpServers in plugin.json and/or mcp.json at repository root")
+
+
+def _validate_open_plugins_layout(errors: list[str]) -> None:
+    if not RULES_DIR.is_dir():
+        errors.append("Open Plugins layout: rules/ missing at repository root")
+    elif not list(RULES_DIR.glob("*.mdc")):
+        errors.append("Open Plugins layout: rules/ has no .mdc files at repository root")
+    if not SKILLS_DIR.is_dir():
+        errors.append("Open Plugins layout: skills/ missing at repository root")
+    elif not any(
+        (child / "SKILL.md").is_file()
+        for child in SKILLS_DIR.iterdir()
+        if child.is_dir() and not child.name.startswith(".")
+    ):
+        errors.append("Open Plugins layout: skills/*/SKILL.md missing at repository root")
+    if not REPO_MCP_JSON.is_file():
+        errors.append("Open Plugins layout: mcp.json missing at repository root")
+    if not LOGO_PATH.is_file():
+        errors.append("Open Plugins layout: .cursor-plugin/assets/logo.png missing")
 
 
 def _validate_manifest(data: dict[str, Any], errors: list[str]) -> None:
@@ -152,32 +173,25 @@ def _validate_manifest(data: dict[str, Any], errors: list[str]) -> None:
     logo = data.get("logo")
     if not isinstance(logo, str) or not logo.strip():
         errors.append("plugin.json: logo must be a non-empty path string")
-    else:
-        logo_path = PLUGIN_DIR / logo.strip()
-        if not logo_path.is_file():
-            errors.append(f"plugin.json: logo file missing: {logo} (resolved under .cursor-plugin/)")
+    elif not LOGO_PATH.is_file():
+        errors.append("plugin.json: logo file missing: .cursor-plugin/assets/logo.png")
 
     rules_ref = data.get("rules")
-    if not isinstance(rules_ref, str) or not rules_ref.strip():
-        errors.append("plugin.json: rules must be a non-empty path string (directory of .mdc rules)")
-    else:
-        rules_dir = PLUGIN_DIR / rules_ref.strip()
-        if not rules_dir.is_dir():
-            errors.append(f"plugin.json: rules directory missing: {rules_ref}")
-        else:
-            mdc = list(rules_dir.glob("*.mdc"))
-            if not mdc:
-                errors.append(f"plugin.json: rules directory has no .mdc files: {rules_ref}")
+    if not isinstance(rules_ref, str) or rules_ref.strip() != "rules":
+        errors.append('plugin.json: rules must be "rules" (repository-root rules/)')
+    elif not RULES_DIR.is_dir():
+        errors.append("plugin.json: rules directory missing at repository root")
+    elif not list(RULES_DIR.glob("*.mdc")):
+        errors.append("plugin.json: rules/ has no .mdc files at repository root")
 
     skills_ref = data.get("skills")
-    if not isinstance(skills_ref, str) or not skills_ref.strip():
-        errors.append("plugin.json: skills must be a non-empty path string (directory of skill folders)")
-    else:
-        skills_dir = PLUGIN_DIR / skills_ref.strip()
-        if not skills_dir.is_dir():
-            errors.append(f"plugin.json: skills directory missing: {skills_ref}")
+    if not isinstance(skills_ref, str) or skills_ref.strip() != "skills":
+        errors.append('plugin.json: skills must be "skills" (repository-root skills/)')
+    elif not SKILLS_DIR.is_dir():
+        errors.append("plugin.json: skills directory missing at repository root")
 
     _manifest_mcp_or_file(data, errors)
+    _validate_open_plugins_layout(errors)
 
 
 def _validate_skill_tree(skills_dir: Path, errors: list[str]) -> list[Path]:
@@ -230,36 +244,31 @@ def main() -> int:
     _check_nonempty_text(README, "README", errors)
     _check_nonempty_text(LOCAL_CONFIG, "local MCP example config", errors)
 
-    rules_ref = data.get("rules") if isinstance(data.get("rules"), str) else ""
-    skills_ref = data.get("skills") if isinstance(data.get("skills"), str) else ""
-    rules_dir = PLUGIN_DIR / rules_ref.strip() if rules_ref else PLUGIN_DIR / "rules"
-    skills_dir = PLUGIN_DIR / skills_ref.strip() if skills_ref else PLUGIN_DIR / "skills"
-
-    rule_paths = sorted(rules_dir.glob("*.mdc")) if rules_dir.is_dir() else []
+    rule_paths = sorted(RULES_DIR.glob("*.mdc")) if RULES_DIR.is_dir() else []
     for p in rule_paths:
         _check_nonempty_text(p, "rule", errors)
         if p.is_file():
             _scan_forbidden(p, errors)
 
-    if skills_dir.is_dir():
-        for legacy in sorted(skills_dir.glob("*.md")):
+    if SKILLS_DIR.is_dir():
+        for legacy in sorted(SKILLS_DIR.glob("*.md")):
             errors.append(
                 f"legacy flat skill file not allowed (use skills/<name>/SKILL.md): "
                 f"{legacy.relative_to(REPO_ROOT)}"
             )
 
-    skill_paths = _validate_skill_tree(skills_dir, errors)
+    skill_paths = _validate_skill_tree(SKILLS_DIR, errors)
     for p in skill_paths:
         _check_nonempty_text(p, "skill", errors)
         if p.is_file():
             _scan_forbidden(p, errors)
 
-    _check_nonempty_text(PLUGIN_MCP_JSON, "plugin-level mcp.json", errors)
-    if PLUGIN_MCP_JSON.is_file():
+    _check_nonempty_text(REPO_MCP_JSON, "repository-root mcp.json", errors)
+    if REPO_MCP_JSON.is_file():
         try:
-            json.loads(PLUGIN_MCP_JSON.read_text(encoding="utf-8"))
+            json.loads(REPO_MCP_JSON.read_text(encoding="utf-8"))
         except json.JSONDecodeError as e:
-            errors.append(f".cursor-plugin/mcp.json invalid JSON: {e}")
+            errors.append(f"mcp.json invalid JSON: {e}")
 
     if LOCAL_CONFIG.is_file():
         try:
@@ -283,8 +292,9 @@ def main() -> int:
 
     print("=== AIGov Cursor plugin validation: PASS ===")
     _ok("plugin.json marketplace fields (name, version, author, homepage, repository, license, keywords, logo)")
-    _ok("plugin.json rules and skills paths")
-    _ok("plugin.json mcpServers and/or .cursor-plugin/mcp.json")
+    _ok('plugin.json rules="rules" and skills="skills" at repository root')
+    _ok("plugin.json mcpServers and/or repository-root mcp.json")
+    _ok("Open Plugins layout (rules/, skills/, mcp.json, logo at expected paths)")
     _ok(f"rules ({len(rule_paths)} files)")
     _ok(f"skills ({len(skill_paths)} SKILL.md files under skills/*/)")
     _ok("mcp/aigov_mcp_server.py present")

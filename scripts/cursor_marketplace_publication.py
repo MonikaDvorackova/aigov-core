@@ -128,7 +128,7 @@ def validate_approved_brand_source(errors: list[str]) -> None:
 def _resolve_path(rel: str) -> Path:
     if rel.startswith(".cursor-plugin/"):
         return REPO_ROOT / rel
-    if rel.startswith("mcp/") or rel.startswith("scripts/") or rel.startswith("docs/"):
+    if rel.startswith(("mcp/", "scripts/", "docs/", "rules/", "skills/")) or rel == "mcp.json":
         return REPO_ROOT / rel
     return PLUGIN_DIR / rel
 

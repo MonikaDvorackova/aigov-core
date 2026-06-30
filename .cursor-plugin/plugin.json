@@ -16,7 +16,7 @@
     "cursor",
     "govai-platform"
   ],
-  "logo": "assets/logo.png",
+  "logo": ".cursor-plugin/assets/logo.png",
   "rules": "rules",
   "skills": "skills",
   "mcpServers": {

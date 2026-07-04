@@ -1,5 +1,7 @@
 # GovAI Core
 
+[![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/MonikaDvorackova/govai-core/govai-ci.yml)](https://github.com/MonikaDvorackova/govai-core/actions/workflows/govai-ci.yml) [![GitHub License](https://img.shields.io/github/license/MonikaDvorackova/govai-core)](https://github.com/MonikaDvorackova/govai-core/blob/main/LICENSE) [![Crates.io](https://img.shields.io/badge/crates.io-not%20published-lightgrey)]() [![PyPI Version](https://img.shields.io/pypi/v/aigov-py)](https://pypi.org/project/aigov-py/) [![Documentation](https://img.shields.io/badge/docs-GitHub-blue)](https://github.com/MonikaDvorackova/govai-core/tree/main/docs)
+
 GovAI Core is the **open-source**, ledger-authoritative audit runtime for reconstructible AI governance. The `aigov_audit` service appends evidence to tenant-scoped ledgers, enforces policy at ingest, derives **VALID / INVALID / BLOCKED** from ledger projection (`GET /compliance-summary`), exports `aigov.audit_export.v1`, and verifies hash chains.
 
 **Quickstart:** [`docs/quickstart-runtime.md`](docs/quickstart-runtime.md) · **Mounted API contract:** [`docs/runtime-api-contract.md`](docs/runtime-api-contract.md) · **Repository scope:** [`OPEN_SOURCE_SCOPE.md`](OPEN_SOURCE_SCOPE.md)

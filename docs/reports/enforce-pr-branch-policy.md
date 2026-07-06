@@ -6,7 +6,7 @@ This change updates the GitHub Actions workflow that enforces the repository bra
 
 ## Change
 
-The workflow now enforces the following policy:
+The workflow enforces the following policy:
 
 - Feature, documentation, and contributor branches must target staging.
 - Only staging may open a pull request into main.
@@ -15,16 +15,26 @@ The workflow now enforces the following policy:
 
 The repository follows the branch workflow:
 
-feature branch → staging → main
+feature branch -> staging -> main
 
 This prevents accidental direct pull requests into main.
 
-## Validation
+## Evaluation gate
 
-- feature/docs → staging: pass
-- feature/docs → main: fail
-- staging → main: pass
+Validation scope:
+
+- feature/docs -> staging: expected pass
+- feature/docs -> main: expected fail
+- staging -> main: expected pass
+
+No runtime, API, Rust crate, Python package, or governance primitive behavior is changed.
+
+## Human approval gate
+
+This workflow change requires maintainer review before merge because it affects repository merge policy.
+
+Maintainer review should confirm that normal contributor work targets staging and that only staging can promote into main.
 
 ## Runtime impact
 
-No runtime, API, library, or governance functionality is modified. This change only affects the GitHub Actions workflow.
+This change only affects GitHub Actions pull request branch policy enforcement.

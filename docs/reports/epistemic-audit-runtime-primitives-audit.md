@@ -2,7 +2,7 @@
 
 ## Summary
 
-Extends AIGov Core epistemic readiness from compliance-oriented replay checks toward **epistemic traceability**: explicit classification of what is known, evidenced, inferred, changed, and unverifiable for audit exports.
+Extends GovAI Core epistemic readiness from compliance-oriented replay checks toward **epistemic traceability**: explicit classification of what is known, evidenced, inferred, changed, and unverifiable for audit exports.
 
 ## Thesis alignment
 

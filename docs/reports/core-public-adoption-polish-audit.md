@@ -1,12 +1,12 @@
 # Core public adoption polish
 
-Documentation and demo fixtures that make AIGov Core easier for external users to understand and try after runtime, packaging, and offline verifier work.
+Documentation and demo fixtures that make GovAI Core easier for external users to understand and try after runtime, packaging, and offline verifier work.
 
 ## User-facing changes
 
 | Area | Change |
 |------|--------|
-| README | New **Try AIGov Core locally** section: venv, runtime start, smoke ingest/export, offline bundle verify |
+| README | New **Try GovAI Core locally** section: venv, runtime start, smoke ingest/export, offline bundle verify |
 | Verifier docs | [`docs/signed-audit-export-verifier.md`](../signed-audit-export-verifier.md) — CLI, staged output, crypto vs completeness |
 | Demo fixture | `examples/signed-audit-export-bundle/demo.valid.zip` + `trust-demo.json` + snapshot |
 | Generator | `scripts/generate_signed_audit_export_bundle_demo.py` — rebuild fixture without runtime |

@@ -2,7 +2,7 @@
 
 ## Scope
 
-This report documents the GitHub Actions cost optimization changes for aigov-core.
+This report documents the GitHub Actions cost optimization changes for govai-core.
 
 ## Changes
 

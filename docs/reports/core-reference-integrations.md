@@ -2,7 +2,7 @@
 
 ## Summary
 
-Adds four reference integration examples and documentation showing how AI applications record ledger-authoritative evidence through AIGov Core (`aigov_audit`): OpenAI-style mocked inference, FastAPI middleware hooks, tool-call reconstruction, and human approval lifecycle. Includes `make reference-integrations-check` and CI wiring. No runtime semantics, billing, or platform route changes.
+Adds four reference integration examples and documentation showing how AI applications record ledger-authoritative evidence through GovAI Core (`aigov_audit`): OpenAI-style mocked inference, FastAPI middleware hooks, tool-call reconstruction, and human approval lifecycle. Includes `make reference-integrations-check` and CI wiring. No runtime semantics, billing, or platform route changes.
 
 ## Evaluation gate
 

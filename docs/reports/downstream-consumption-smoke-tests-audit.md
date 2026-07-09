@@ -2,7 +2,7 @@
 
 ## Summary
 
-Adds minimal downstream consumers that install AIGov Core as an external dependency (Rust path crate + non-editable Python pip install) and run offline smoke checks in CI on pull requests. Closes #48 and #49.
+Adds minimal downstream consumers that install GovAI Core as an external dependency (Rust path crate + non-editable Python pip install) and run offline smoke checks in CI on pull requests. Closes #48 and #49.
 
 ## Files changed
 
@@ -20,7 +20,7 @@ Adds minimal downstream consumers that install AIGov Core as an external depende
 ## Architecture
 
 ```
-aigov-core/
+govai-core/
   rust/                          # aigov_audit library (published surface)
   python/                        # aigov-py package
   tests/downstream-consumption/
@@ -54,7 +54,7 @@ make release-readiness-check
 
 ## CI integration
 
-Job `aigov-core-portable` in `.github/workflows/govai-ci.yml` runs on pull requests to `main` and `staging`, after the main Rust test step:
+Job `govai-core-portable` in `.github/workflows/govai-ci.yml` runs on pull requests to `main` and `staging`, after the main Rust test step:
 
 1. `cd tests/downstream-consumption/rust-consumer && cargo test --locked`
 2. `python3 scripts/downstream_python_consumption_smoke.py`

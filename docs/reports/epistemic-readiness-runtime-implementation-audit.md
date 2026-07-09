@@ -1,6 +1,6 @@
 # Epistemic readiness runtime implementation audit
 
-Derived epistemic readiness for governance eligibility reconstruction in AIGov Core.
+Derived epistemic readiness for governance eligibility reconstruction in GovAI Core.
 
 ## Architecture
 
@@ -78,7 +78,7 @@ govai epistemic-readiness --export audit_export.json --json
 
 ## Engine independence
 
-All logic lives in AIGov Core (`aigov_audit` crate). No Engine crate, API, or dependency was introduced. Evaluation uses existing replay, projection, and export structures only.
+All logic lives in GovAI Core (`aigov_audit` crate). No Engine crate, API, or dependency was introduced. Evaluation uses existing replay, projection, and export structures only.
 
 ## Evaluation gate
 

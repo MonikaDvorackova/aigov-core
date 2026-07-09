@@ -1,7 +1,7 @@
 # Enterprise governance and trust maturity pass
 
 **Date:** 2026-05-22  
-**Scope:** Targeted documentation and trust narrative improvements after platform stabilization, commercial normalization, pricing normalization, `aigov-core` runtime extraction, and hosted SaaS boundary separation.  
+**Scope:** Targeted documentation and trust narrative improvements after platform stabilization, commercial normalization, pricing normalization, `govai-core` runtime extraction, and hosted SaaS boundary separation.  
 **Out of scope:** Pricing cleanup, OSS licensing rewrites, tier renaming, marketing landing polish, fake certifications.
 
 ## Summary
@@ -17,7 +17,7 @@ This pass strengthens GovAI’s presentation as **evidence-grade AI governance i
 | File | Purpose |
 |------|---------|
 | `docs/architecture/README.md` | Enterprise architecture hub and document map |
-| `docs/architecture/platform-vs-core-boundary.md` | GovAI Platform vs AIGov Core; control plane vs runtime |
+| `docs/architecture/platform-vs-core-boundary.md` | GovAI Platform vs GovAI Core; control plane vs runtime |
 | `docs/architecture/hosted-vs-self-host-topology.md` | Deployment topologies and evidence location |
 | `docs/architecture/governance-semantics.md` | Formal verdict, integrity, replay, chain-of-custody semantics |
 | `docs/architecture/governance-execution-flow.md` | End-to-end governance execution sequence |
@@ -45,7 +45,7 @@ This pass strengthens GovAI’s presentation as **evidence-grade AI governance i
 | `docs/runtime/deployment-guidance.md` | Topology and boundary cross-links |
 | `docs/architecture/diagrams/evidence_lifecycle.md` | Cross-link to narrative lifecycle doc |
 | `docs/architecture/diagrams/audit_replay_architecture.md` | Cross-link to formal replay semantics |
-| `OPEN_SOURCE_SCOPE.md` | GovAI Platform vs AIGov Core naming; architecture links |
+| `OPEN_SOURCE_SCOPE.md` | GovAI Platform vs GovAI Core naming; architecture links |
 | `docs/trust/trust-manifest.json` | Registered new trust and governance semantics paths |
 
 ---
@@ -92,7 +92,7 @@ No fabricated SOC 2, ISO, FedRAMP, or “AI Act compliant” product claims were
 
 ## Terminology enforcement
 
-- **`docs/terminology.md`:** GovAI Platform, AIGov Core, Hosted Professional, Enterprise, Strategic Advisory, governance execution, audit evidence, compliance verdict, policy evaluation, evidence replay.
+- **`docs/terminology.md`:** GovAI Platform, GovAI Core, Hosted Professional, Enterprise, Strategic Advisory, governance execution, audit evidence, compliance verdict, policy evaluation, evidence replay.
 - **Discouraged phrasing:** Observability-platform framing, “AI copilot governance,” “AI Act compliant” guarantees, “certified by GovAI.”
 - **Index and trust-center routing** updated so enterprise buyers land on terminology and trust package first.
 
@@ -117,7 +117,7 @@ Existing `docs/observability/` remains for **operational telemetry** with explic
 | **Hosted docs scatter** | Hosted material lives under `hosted-backend-deployment.md` and manifests; consider `docs/hosted/README.md` hub mirroring architecture README |
 | **Multi-tenant JSON vs prose** | Machine-readable `multi-tenant/` manifests exist; deeper alignment with new tenant isolation architecture page for RFP automation |
 | **Runtime observability naming** | Directory name `observability/` is intentional for operators; glossary steers governance readers away from conflating it with verdicts |
-| **Separate aigov-core repo docs** | If runtime is canonical in external **aigov-core** GitHub, mirror or symlink architecture hub there to avoid dual-narrative drift |
+| **Separate govai-core repo docs** | If runtime is canonical in external **govai-core** GitHub, mirror or symlink architecture hub there to avoid dual-narrative drift |
 | **Pen test / third-party attestations** | No public pen-test summary in tree — add only when real engagements exist |
 | **WORM / immutability product options** | Roadmap items; document operator patterns when shipped |
 
@@ -135,13 +135,13 @@ Existing `docs/observability/` remains for **operational telemetry** with explic
 | **Deployment maturity** | **Good** | Topology and boundaries clear; operator runbooks already exist separately |
 | **Evidence-grade positioning** | **Strong** | Narrative emphasizes audit infrastructure over observability SaaS |
 
-**Overall:** GovAI documentation now presents a **coherent enterprise AI governance infrastructure** story suitable for architects and procurement, with technically defensible semantics and honest limitation statements. Further maturity is primarily **product copy alignment**, **hosted doc hub consolidation**, and **external aigov-core repo parity** — not additional compliance buzzwords.
+**Overall:** GovAI documentation now presents a **coherent enterprise AI governance infrastructure** story suitable for architects and procurement, with technically defensible semantics and honest limitation statements. Further maturity is primarily **product copy alignment**, **hosted doc hub consolidation**, and **external govai-core repo parity** — not additional compliance buzzwords.
 
 ---
 
 ## Validation checklist (pass)
 
-- [x] Terminology references GovAI Platform and AIGov Core consistently in new material
+- [x] Terminology references GovAI Platform and GovAI Core consistently in new material
 - [x] Hosted vs self-host boundaries explicit with custody tables
 - [x] Governance semantics remain deterministic and linked to `GET /compliance-summary`
 - [x] No fake regulatory or certification claims added

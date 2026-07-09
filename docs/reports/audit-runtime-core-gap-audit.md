@@ -2,7 +2,7 @@
 
 Date: 2026-05-25  
 Branch: `feature/audit-runtime-core-completion`  
-Scope: AIGov Core only (ledger-authoritative audit runtime)
+Scope: GovAI Core only (ledger-authoritative audit runtime)
 
 ## Implemented gaps
 

@@ -1,7 +1,7 @@
 # Core production-readiness fixes audit
 
 **Date:** 2026-06-10  
-**Scope:** AIGov Core (`aigov-core`) — highest-priority production-readiness fixes (single PR)  
+**Scope:** GovAI Core (`govai-core`) — highest-priority production-readiness fixes (single PR)  
 **Engine independence:** No imports, submodules, or runtime coupling to GovAI Engine / Platform. All changes are self-contained in Core.
 
 ## Issues addressed

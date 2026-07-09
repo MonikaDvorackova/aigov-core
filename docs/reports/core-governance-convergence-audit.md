@@ -1,12 +1,12 @@
 # Core governance convergence audit (PR A)
 
 **Date:** 2026-06-10  
-**Scope:** AIGov Core (`aigov-core`) — canonical governance runtime copy  
+**Scope:** GovAI Core (`govai-core`) — canonical governance runtime copy  
 **Source reference:** GovAI Engine (`aigov-compliance-engine`) cherry-picks only; no Engine dependency added.
 
 ## Summary
 
-AIGov Core now owns the shared `AIGOV_*` / `GOVAI_*` environment resolution layer and the latest governance-runtime fixes that previously existed only in Engine. Core semantics remain canonical: `GovAIClient` naming, `runtime_key_lookup_enabled()`, lineage fields on `EvidenceEvent`, and `--from-evidence` offline digest mode in `write_digest_manifest.py`.
+GovAI Core now owns the shared `AIGOV_*` / `GOVAI_*` environment resolution layer and the latest governance-runtime fixes that previously existed only in Engine. Core semantics remain canonical: `GovAIClient` naming, `runtime_key_lookup_enabled()`, lineage fields on `EvidenceEvent`, and `--from-evidence` offline digest mode in `write_digest_manifest.py`.
 
 ## Files changed
 
@@ -108,12 +108,12 @@ Verified:
 
 - No `Cargo.toml` path dependency on Engine
 - No Python import of Engine packages
-- All `aigov_env` and governance fixes are **in-tree copies** in `aigov-core`
+- All `aigov_env` and governance fixes are **in-tree copies** in `govai-core`
 - Grep for runtime imports of `aigov-compliance-engine` in `rust/` and `python/aigov_py/` returns no matches (only historical paths in docs, migration scripts, and captured evidence JSON)
 
 ## Next step (out of scope for PR A)
 
-Engine should adopt `aigov-core` as a dependency (PR C) and delete duplicated governance paths (PR D) once packaging lands (PR B).
+Engine should adopt `govai-core` as a dependency (PR C) and delete duplicated governance paths (PR D) once packaging lands (PR B).
 
 ## Evaluation gate
 

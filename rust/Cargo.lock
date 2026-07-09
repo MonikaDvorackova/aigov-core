@@ -33,7 +33,7 @@ dependencies = [
  "http-body-util",
  "jsonwebtoken",
  "once_cell",
- "rand 0.10.2",
+"rand 0.10.2",
  "reqwest",
  "serde",
  "serde_json",

@@ -1,6 +1,6 @@
 # Signed evidence bundles (audit export)
 
-GovAI Core produces deterministic **`aigov.audit_export.v1`** documents from the append-only ledger (`GET /api/export/:run_id`). **Signing** is an optional post-export step: it binds a canonical digest of export fields to an Ed25519 key without changing ledger ingest, policy enforcement, or compliance projection semantics.
+AIGov Core produces deterministic **`aigov.audit_export.v1`** documents from the append-only ledger (`GET /api/export/:run_id`). **Signing** is an optional post-export step: it binds a canonical digest of export fields to an Ed25519 key without changing ledger ingest, policy enforcement, or compliance projection semantics.
 
 ## What is signed
 

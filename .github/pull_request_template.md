@@ -7,7 +7,7 @@ Describe what this PR changes.
 - [ ] This PR targets **`staging`** for normal feature, documentation, or contributor work.
 - [ ] This PR targets **`main`** only if it is a maintainer promotion PR from `staging`.
 
-GovAI Core branch workflow:
+AIGov Core branch workflow:
 
 ```text
 feature branch → staging → main
@@ -45,7 +45,7 @@ If this PR changes `rust/`, evidence ingest, compliance summary, export, verify,
 
 ## Scope check
 
-- [ ] This PR does **not** add hosted SaaS, Stripe/billing, pricing, dashboard ACL, or commercial onboarding to GovAI Core.
+- [ ] This PR does **not** add hosted SaaS, Stripe/billing, pricing, dashboard ACL, or commercial onboarding to AIGov Core.
 
 ## Related issue
 

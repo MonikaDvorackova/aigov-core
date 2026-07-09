@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""OpenAI-style chat completion flow audited via GovAI Core POST /evidence (mocked model I/O)."""
+"""OpenAI-style chat completion flow audited via AIGov Core POST /evidence (mocked model I/O)."""
 
 from __future__ import annotations
 
@@ -43,7 +43,7 @@ def build_events(run_id: str) -> list[dict]:
             "event_type": "model_input",
             "ts_utc": "2026-01-01T00:00:10Z",
             "actor": "openai-runtime-audit",
-            "system": "govai-core-examples",
+            "system": "aigov-core-examples",
             "run_id": run_id,
             "payload": {
                 "provider": "openai-style-mock",
@@ -58,7 +58,7 @@ def build_events(run_id: str) -> list[dict]:
             "event_type": "model_output",
             "ts_utc": "2026-01-01T00:00:11Z",
             "actor": "openai-runtime-audit",
-            "system": "govai-core-examples",
+            "system": "aigov-core-examples",
             "run_id": run_id,
             "payload": {
                 "provider": "openai-style-mock",
@@ -74,7 +74,7 @@ def build_events(run_id: str) -> list[dict]:
             "event_type": "policy_evaluation",
             "ts_utc": "2026-01-01T00:00:12Z",
             "actor": "openai-runtime-audit",
-            "system": "govai-core-examples",
+            "system": "aigov-core-examples",
             "run_id": run_id,
             "payload": {
                 "policy_id": "govai.runtime.content-safety.dev",
@@ -90,7 +90,7 @@ def build_events(run_id: str) -> list[dict]:
 def main() -> None:
     cfg = env_config()
     run_id = str(cfg["run_id"])
-    print("OpenAI-style GovAI Core reference (mocked model; no OpenAI API key).")
+    print("OpenAI-style AIGov Core reference (mocked model; no OpenAI API key).")
     print(f"base_url={cfg['base']} run_id={run_id}")
     print(f"mock_prompt={MOCK_PROMPT!r}")
 

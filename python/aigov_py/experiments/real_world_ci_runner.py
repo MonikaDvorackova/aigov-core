@@ -74,7 +74,7 @@ def govai_pip_install_snippet() -> str:
     git_sha = (os.environ.get("RWCI_AIGOV_GIT_COMMIT") or "").strip()
     if git_sha:
         url = (
-            "git+https://github.com/MonikaDvorackova/govai-core.git"
+            "git+https://github.com/MonikaDvorackova/aigov-core.git"
             f"@{git_sha}#subdirectory=python"
         )
         return f'python -m pip install --upgrade pip\npip install "{url}"'

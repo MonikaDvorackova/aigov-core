@@ -26,7 +26,7 @@ fi
 AUTH=(-H "Authorization: Bearer ${API_KEY}")
 JSON=(-H "Content-Type: application/json")
 
-echo "== GovAI Core runtime smoke =="
+echo "== AIGov Core runtime smoke =="
 echo "base_url=${BASE}"
 echo "run_id=${RUN_ID}"
 echo

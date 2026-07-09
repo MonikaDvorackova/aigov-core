@@ -5,16 +5,16 @@ body:
   - type: markdown
     attributes:
       value: |
-        Use this category for questions about **GovAI Core** — the open-source ledger-authoritative audit runtime (`aigov_audit`).
+        Use this category for questions about **AIGov Core** — the open-source ledger-authoritative audit runtime (`aigov_audit`).
 
         - Runtime quickstart: [docs/quickstart-runtime.md](../../docs/quickstart-runtime.md)
         - Reference integrations: [docs/reference-integrations.md](../../docs/reference-integrations.md)
 
-        For security vulnerabilities, use [GitHub Security Advisories](https://github.com/MonikaDvorackova/govai-core/security/advisories/new), not public discussions.
+        For security vulnerabilities, use [GitHub Security Advisories](https://github.com/MonikaDvorackova/aigov-core/security/advisories/new), not public discussions.
   - type: textarea
     id: body
     attributes:
       label: Your question or topic
-      description: What are you trying to accomplish with GovAI Core?
+      description: What are you trying to accomplish with AIGov Core?
     validations:
       required: true

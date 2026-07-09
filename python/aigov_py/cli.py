@@ -1637,7 +1637,7 @@ def build_parser() -> GovaiArgumentParser:
     s_verify_pack.add_argument(
         "--portable-only",
         action="store_true",
-        help="Offline GovAI Core gate: validate manifest vs bundle digest only (no /bundle-hash or compliance-summary HTTP).",
+        help="Offline AIGov Core gate: validate manifest vs bundle digest only (no /bundle-hash or compliance-summary HTTP).",
     )
     s_verify_pack.add_argument(
         "--artifact-file",

@@ -1,1 +1,1 @@
-"""Shared helpers for GovAI Core reference integration examples."""
+"""Shared helpers for AIGov Core reference integration examples."""

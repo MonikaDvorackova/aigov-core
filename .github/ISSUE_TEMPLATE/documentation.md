@@ -1,6 +1,6 @@
 ---
 name: Documentation improvement
-about: Improve GovAI Core documentation (runtime, SDK, examples, or contributor docs)
+about: Improve AIGov Core documentation (runtime, SDK, examples, or contributor docs)
 title: "[DOCS] "
 labels: documentation
 assignees: ""

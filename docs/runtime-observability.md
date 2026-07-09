@@ -1,6 +1,6 @@
 # Runtime observability
 
-Operator visibility for self-hosted GovAI Core (`aigov_audit`). This is **not** a commercial dashboard or SaaS control plane.
+Operator visibility for self-hosted AIGov Core (`aigov_audit`). This is **not** a commercial dashboard or SaaS control plane.
 
 ## HTTP probes
 
@@ -49,7 +49,7 @@ Log `replay_verification_failed` with `error_code` when offline or CLI replay di
 
 ## OpenTelemetry and trace linking
 
-GovAI Core does **not** bundle an OpenTelemetry SDK. Optional linking:
+AIGov Core does **not** bundle an OpenTelemetry SDK. Optional linking:
 
 1. Parse W3C `traceparent` at your agent/gateway ([`python/aigov_py/trace_context.py`](../python/aigov_py/trace_context.py), Rust `trace_context` module).
 2. Attach to evidence payload:

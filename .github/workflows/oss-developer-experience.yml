@@ -1,4 +1,4 @@
-# GovAI Core OSS developer experience: scripts that exist in this repository only.
+# AIGov Core OSS developer experience: scripts that exist in this repository only.
 # Platform-wide validators (commercial, hosted, regulatory, and similar) live in the proprietary platform repository.
 
 name: oss-developer-experience

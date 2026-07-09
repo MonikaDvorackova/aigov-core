@@ -1,15 +1,15 @@
 # Support
 
-**GovAI Core** is the open-source, ledger-authoritative audit runtime for reconstructible AI governance.
+**AIGov Core** is the open-source, ledger-authoritative audit runtime for reconstructible AI governance.
 
 ## Get help
 
 | Channel | Use for |
 |---------|---------|
-| [Question issue](https://github.com/MonikaDvorackova/govai-core/issues/new?template=question.md) | Usage, architecture, contributing |
-| [Bug report](https://github.com/MonikaDvorackova/govai-core/issues/new?template=bug_report.md) | Defects in `aigov_audit`, SDK, or core CI |
-| [Discussions](https://github.com/MonikaDvorackova/govai-core/discussions) | Open-ended integration and governance topics |
-| [Security advisories](https://github.com/MonikaDvorackova/govai-core/security/advisories/new) | Undisclosed vulnerabilities ([SECURITY.md](../SECURITY.md)) |
+| [Question issue](https://github.com/MonikaDvorackova/aigov-core/issues/new?template=question.md) | Usage, architecture, contributing |
+| [Bug report](https://github.com/MonikaDvorackova/aigov-core/issues/new?template=bug_report.md) | Defects in `aigov_audit`, SDK, or core CI |
+| [Discussions](https://github.com/MonikaDvorackova/aigov-core/discussions) | Open-ended integration and governance topics |
+| [Security advisories](https://github.com/MonikaDvorackova/aigov-core/security/advisories/new) | Undisclosed vulnerabilities ([SECURITY.md](../SECURITY.md)) |
 
 ## Documentation
 

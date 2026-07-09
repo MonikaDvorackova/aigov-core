@@ -1,6 +1,6 @@
 # Append-only ledger semantics
 
-The GovAI Core ledger is an **append-only, hash-chained** event log per deployment (tenant-scoped in hosted and self-host configurations). It is the **system of record** for governance execution.
+The AIGov Core ledger is an **append-only, hash-chained** event log per deployment (tenant-scoped in hosted and self-host configurations). It is the **system of record** for governance execution.
 
 ## Guarantees
 

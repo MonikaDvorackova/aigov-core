@@ -1,6 +1,6 @@
 # Docker Compose operator stack
 
-Self-hosted **GovAI Core** (`aigov_audit`) with Postgres for SQL migrations. No commercial platform UI or entitlement services.
+Self-hosted **AIGov Core** (`aigov_audit`) with Postgres for SQL migrations. No commercial platform UI or entitlement services.
 
 ```bash
 cd deployments/docker-compose

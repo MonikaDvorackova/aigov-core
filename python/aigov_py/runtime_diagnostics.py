@@ -1,4 +1,4 @@
-"""Operator diagnostics against GovAI Core ``/health``, ``/ready``, and ``/status``."""
+"""Operator diagnostics against AIGov Core ``/health``, ``/ready``, and ``/status``."""
 
 from __future__ import annotations
 
@@ -104,7 +104,7 @@ def run_runtime_diagnostics(
 def main(argv: list[str] | None = None) -> int:
     import argparse
 
-    p = argparse.ArgumentParser(description="GovAI Core runtime diagnostics (health/ready/status).")
+    p = argparse.ArgumentParser(description="AIGov Core runtime diagnostics (health/ready/status).")
     p.add_argument(
         "--base-url",
         default=None,

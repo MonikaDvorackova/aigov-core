@@ -183,7 +183,7 @@ async fn get_root() -> Json<Value> {
     Json(json!({
         "ok": true,
         "service": "aigov_audit",
-        "surface": "govai-core",
+        "surface": "aigov-core",
     }))
 }
 

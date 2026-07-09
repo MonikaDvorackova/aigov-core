@@ -1,6 +1,6 @@
 # Contributor code of conduct
 
-We want the **GovAI Core** community to stay a respectful, technical, and productive place to collaborate.
+We want the **AIGov Core** community to stay a respectful, technical, and productive place to collaborate.
 
 ## Our standards
 

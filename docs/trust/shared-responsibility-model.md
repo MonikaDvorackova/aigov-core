@@ -41,7 +41,7 @@ GovAI deployments split obligations between **GovAI Platform (operator)** and **
 
 **Customer controls:**
 
-- Entire GovAI Core deployment boundary
+- Entire AIGov Core deployment boundary
 - Network, secrets, backups, and `GET /ready` routing
 - Optional Platform components if licensed separately
 

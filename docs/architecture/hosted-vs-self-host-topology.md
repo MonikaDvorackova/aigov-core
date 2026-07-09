@@ -56,7 +56,7 @@ flowchart LR
     APP[Applications]
     SDK[GovAI SDK / CLI]
     ING[Customer ingress / mTLS]
-    AUD[aigov_audit GovAI Core]
+    AUD[aigov_audit AIGov Core]
     PG[(Customer Postgres)]
     LED[Customer ledger volume]
     CI --> SDK

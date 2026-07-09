@@ -48,7 +48,7 @@ def _base(run_id: str, event_id: str, event_type: str, ts: str, payload: dict) -
         "event_type": event_type,
         "ts_utc": ts,
         "actor": "reconstructible-agent-demo",
-        "system": "govai-core-examples",
+        "system": "aigov-core-examples",
         "run_id": run_id,
         "payload": payload,
     }
@@ -150,11 +150,11 @@ def final_decision_event(run_id: str) -> dict:
 def approval_and_promotion(run_id: str) -> list[dict]:
     human = human_approved(run_id)
     human["actor"] = "reconstructible-agent-demo"
-    human["system"] = "govai-core-examples"
+    human["system"] = "aigov-core-examples"
     human["ts_utc"] = "2026-05-01T10:00:09Z"
     promote = model_promoted(run_id)
     promote["actor"] = "reconstructible-agent-demo"
-    promote["system"] = "govai-core-examples"
+    promote["system"] = "aigov-core-examples"
     promote["ts_utc"] = "2026-05-01T10:00:10Z"
     return [human, promote]
 
@@ -188,7 +188,7 @@ def print_plan(run_id: str) -> None:
         "13. Verify endpoint",
         "14. Open viewer/index.html with saved export",
     ]
-    print("Reconstructible agent demo (GovAI Core runtime routes only).")
+    print("Reconstructible agent demo (AIGov Core runtime routes only).")
     print(f"base_url={env_config()['base']} run_id={run_id}")
     print("\nSimulated lifecycle:")
     for line in steps:

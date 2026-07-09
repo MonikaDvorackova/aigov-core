@@ -1,6 +1,6 @@
 # Core adoption quickstart and examples
 
-Audit of the adoption package for the completed GovAI Core `aigov_audit` runtime.
+Audit of the adoption package for the completed AIGov Core `aigov_audit` runtime.
 
 ## Evaluation gate
 

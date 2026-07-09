@@ -1,6 +1,6 @@
 ---
 name: Bug report
-about: Report a bug in GovAI Core (aigov_audit runtime, SDK, or core CI)
+about: Report a bug in AIGov Core (aigov_audit runtime, SDK, or core CI)
 title: "[BUG] "
 labels: bug
 assignees: ""
@@ -29,7 +29,7 @@ Describe actual behavior.
 - OS:
 - Python version:
 - Rust version:
-- GovAI Core context: local `aigov_audit` / integrator fork
+- AIGov Core context: local `aigov_audit` / integrator fork
 - `AIGOV_ENVIRONMENT` (if relevant):
 - Tenant mapping: `GOVAI_API_KEYS` + `GOVAI_API_KEYS_JSON` configured? (yes/no — do not paste secrets)
 

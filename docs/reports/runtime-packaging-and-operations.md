@@ -42,7 +42,7 @@ cd ..
 Optional local image smoke:
 
 ```bash
-docker build -t govai-core:local .
-docker run --rm -p 8088:8088 -v govai-ledger:/var/lib/govai/ledger govai-core:local
+docker build -t aigov-core:local .
+docker run --rm -p 8088:8088 -v govai-ledger:/var/lib/govai/ledger aigov-core:local
 curl -sS http://127.0.0.1:8088/health
 ```

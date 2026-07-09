@@ -1,6 +1,6 @@
-# GovAI Core reference integrations
+# AIGov Core reference integrations
 
-These examples show how real AI applications use **GovAI Core** (`aigov_audit`) as a ledger-authoritative audit runtime. They call only **mounted core routes** and do not start hosted SaaS, billing, or dashboard flows.
+These examples show how real AI applications use **AIGov Core** (`aigov_audit`) as a ledger-authoritative audit runtime. They call only **mounted core routes** and do not start hosted SaaS, billing, or dashboard flows.
 
 ## What each example proves
 
@@ -52,7 +52,7 @@ Optional FastAPI server: see [examples/fastapi-runtime-middleware/README.md](../
 
 ## Expected verdict behavior
 
-GovAI Core derives compliance verdicts **deterministically** from append-only ledger evidence (see `GET /compliance-summary/{run_id}`).
+AIGov Core derives compliance verdicts **deterministically** from append-only ledger evidence (see `GET /compliance-summary/{run_id}`).
 
 | Situation | Typical verdict |
 |-----------|-----------------|

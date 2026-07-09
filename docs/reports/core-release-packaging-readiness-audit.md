@@ -1,8 +1,8 @@
-# GovAI Core release and packaging readiness audit
+# AIGov Core release and packaging readiness audit
 
 ## Summary
 
-This change set improves GovAI Core release metadata, documentation accuracy, validation scripts, and CI artifact builds without publishing to public registries. Platform-only release validators referenced after the open-core split were removed from manifests and docs; only scripts present in this repository are referenced.
+This change set improves AIGov Core release metadata, documentation accuracy, validation scripts, and CI artifact builds without publishing to public registries. Platform-only release validators referenced after the open-core split were removed from manifests and docs; only scripts present in this repository are referenced.
 
 ## Files changed
 
@@ -83,7 +83,7 @@ python -m pip install build && python -m build --outdir dist/python python
 
 ## Engine independence
 
-GovAI Core remains **Engine-independent**: no imports, workflows, or release gates reference `aigov-compliance-engine`. Release scripts operate on Core manifests, CHANGELOG, and packaging files only. Hosted Platform, billing, and proprietary validators stay out of this repository.
+AIGov Core remains **Engine-independent**: no imports, workflows, or release gates reference `aigov-compliance-engine`. Release scripts operate on Core manifests, CHANGELOG, and packaging files only. Hosted Platform, billing, and proprietary validators stay out of this repository.
 
 ## Evaluation gate
 

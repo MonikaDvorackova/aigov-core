@@ -1,7 +1,7 @@
 # Dependabot staging target audit
 
 **Date:** 2026-06-20  
-**Repository:** [govai-core](https://github.com/MonikaDvorackova/govai-core)  
+**Repository:** [aigov-core](https://github.com/MonikaDvorackova/aigov-core)  
 **Issue:** Dependabot opened Cargo dependency pull requests against `main` instead of `staging`.
 
 ## Root cause

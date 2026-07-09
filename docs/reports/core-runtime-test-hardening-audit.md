@@ -1,4 +1,4 @@
-# GovAI Core runtime test hardening audit
+# AIGov Core runtime test hardening audit
 
 ## Summary
 
@@ -52,7 +52,7 @@ New Rust tests added: **18** (5 projection, 9 replay validation, 4 audit export;
 
 ## Engine independence
 
-All changes are confined to GovAI Core Rust runtime modules and Core integration tests. No references to `aigov-compliance-engine`, hosted Platform routes, or proprietary Engine validators were introduced.
+All changes are confined to AIGov Core Rust runtime modules and Core integration tests. No references to `aigov-compliance-engine`, hosted Platform routes, or proprietary Engine validators were introduced.
 
 ## Evaluation gate
 

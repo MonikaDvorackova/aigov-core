@@ -2,7 +2,7 @@
 
 ## Summary
 
-Adds `examples/reconstructible-agent-demo/` — a developer-facing runtime demonstrator with `run_demo.py`, offline `viewer/index.html`, export replay under `exports/<run_id>.json`, operator documentation, and `make reconstructible-demo-check` wired into `govai-ci.yml`. The demo exercises GovAI Core mounted routes only (`POST /evidence`, `GET /compliance-summary`, `GET /api/export`, `GET /verify`, `GET /bundle-hash`). Mocked agent text and tool results; live ledger ingest and verdict reads. No commercial SaaS dashboard or platform workflow routes.
+Adds `examples/reconstructible-agent-demo/` — a developer-facing runtime demonstrator with `run_demo.py`, offline `viewer/index.html`, export replay under `exports/<run_id>.json`, operator documentation, and `make reconstructible-demo-check` wired into `govai-ci.yml`. The demo exercises AIGov Core mounted routes only (`POST /evidence`, `GET /compliance-summary`, `GET /api/export`, `GET /verify`, `GET /bundle-hash`). Mocked agent text and tool results; live ledger ingest and verdict reads. No commercial SaaS dashboard or platform workflow routes.
 
 ## Evaluation gate
 

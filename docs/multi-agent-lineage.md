@@ -1,6 +1,6 @@
 # Multi-agent lineage
 
-GovAI Core records **append-only evidence** for AI governance. Multi-agent lineage extends reconstructibility beyond a single `run_id` to delegated flows, cross-run parent/child relationships, and governance graphs suitable for audit replay.
+AIGov Core records **append-only evidence** for AI governance. Multi-agent lineage extends reconstructibility beyond a single `run_id` to delegated flows, cross-run parent/child relationships, and governance graphs suitable for audit replay.
 
 ## Lineage fields (evidence)
 

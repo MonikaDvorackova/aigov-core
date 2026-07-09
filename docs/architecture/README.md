@@ -8,7 +8,7 @@ GovAI is **evidence-grade AI governance infrastructure**: append-only audit evid
 
 | Product | Role | Primary documentation |
 |---------|------|------------------------|
-| **GovAI Core** | Portable audit runtime: ledger, policy enforcement at ingest, compliance projection, export and replay semantics | [platform-vs-core-boundary.md](platform-vs-core-boundary.md), [../strong-core-contract-note.md](../strong-core-contract-note.md), [../../ARCHITECTURE.md](../../ARCHITECTURE.md) |
+| **AIGov Core** | Portable audit runtime: ledger, policy enforcement at ingest, compliance projection, export and replay semantics | [platform-vs-core-boundary.md](platform-vs-core-boundary.md), [../strong-core-contract-note.md](../strong-core-contract-note.md), [../../ARCHITECTURE.md](../../ARCHITECTURE.md) |
 | **GovAI Platform** | Proprietary hosted SaaS, enterprise control plane, billing, onboarding, dashboard, governance operations | [platform-vs-core-boundary.md](platform-vs-core-boundary.md), [../hosted-backend-deployment.md](../hosted-backend-deployment.md), [../../ENTERPRISE_LAYER.md](../../ENTERPRISE_LAYER.md) |
 
 Repository packaging is described in [../../OPEN_SOURCE_SCOPE.md](../../OPEN_SOURCE_SCOPE.md) (stable filename; describes Platform vs Core boundaries).

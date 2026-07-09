@@ -1,6 +1,6 @@
 # Signed audit export verifier (offline)
 
-GovAI Core ships a **Rust-native** verifier for signed audit export zip bundles. Auditors and downstream tooling can validate exports **without a running GovAI instance**.
+AIGov Core ships a **Rust-native** verifier for signed audit export zip bundles. Auditors and downstream tooling can validate exports **without a running GovAI instance**.
 
 ## Command
 

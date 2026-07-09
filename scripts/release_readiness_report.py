@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Aggregate release packaging readiness checks for GovAI Core."""
+"""Aggregate release packaging readiness checks for AIGov Core."""
 
 from __future__ import annotations
 

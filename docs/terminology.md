@@ -6,8 +6,8 @@ Use these terms consistently in architecture reviews, RFPs, security questionnai
 
 | Term | Definition | Do not confuse with |
 |------|------------|---------------------|
-| **GovAI Core** | Portable audit runtime: ledger, policy at ingest, compliance verdict, export/replay | “Open core” as a vague label; generic logging |
-| **GovAI Platform** | Proprietary hosted SaaS, billing, onboarding, dashboard, enterprise control plane | GovAI Core alone |
+| **AIGov Core** | Portable audit runtime: ledger, policy at ingest, compliance verdict, export/replay | “Open core” as a vague label; generic logging |
+| **GovAI Platform** | Proprietary hosted SaaS, billing, onboarding, dashboard, enterprise control plane | AIGov Core alone |
 | **Hosted Professional** | Self-service hosted Platform tier with Stripe checkout and operator-managed runtime | Enterprise self-host |
 | **Enterprise** | Contracted tier: advanced control plane, isolation, and operational expectations per order form | Legal “enterprise” as certification |
 | **Strategic Advisory** | Advisory engagement tier (process and architecture guidance); not a separate runtime | Product license |

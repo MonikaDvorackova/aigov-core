@@ -1,5 +1,5 @@
-# GovAI Core — official runtime image (aigov_audit ledger HTTP service).
-# Build: docker build -t govai-core:local .
+# AIGov Core — official runtime image (aigov_audit ledger HTTP service).
+# Build: docker build -t aigov-core:local .
 # Run:   docker run --rm -p 8088:8088 -v govai-ledger:/var/lib/govai/ledger ...
 
 FROM rust:1-bookworm AS builder

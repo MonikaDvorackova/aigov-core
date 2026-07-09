@@ -35,7 +35,7 @@ discovery_scan:
 FORCE:
 
 # Optional operator-provided audit HTTP base URL (GovAI Platform or customer self-host).
-# GovAI Core does not start, background-manage, or readiness-poll a hosted audit server.
+# AIGov Core does not start, background-manage, or readiness-poll a hosted audit server.
 AUDIT_URL ?= $(GOVAI_AUDIT_BASE_URL)
 
 # Legacy: GOVAI_AUTO_MIGRATE applied only when using an external Platform-operated runtime.
@@ -84,7 +84,7 @@ standards-conformance:
 
 # Validates shipped interchange examples against the explicit registry-backed validators.
 governance-standards-check:
-	@echo "governance-standards-check is not available in GovAI Core; platform standards validation belongs to the proprietary platform repository."
+	@echo "governance-standards-check is not available in AIGov Core; platform standards validation belongs to the proprietary platform repository."
 
 public-sdk-packages-check:
 	@python3 scripts/public_sdk_packages_check.py
@@ -98,7 +98,7 @@ oss-ecosystem-check:
 	@$(MAKE) gate
 	@echo "oss-ecosystem-check: OK"
 
-# Aggregate checks implemented with scripts/ present in GovAI Core (not the full platform repo).
+# Aggregate checks implemented with scripts/ present in AIGov Core (not the full platform repo).
 enterprise-readiness-check:
 	@$(MAKE) gate
 	@$(MAKE) public-sdk-packages-check
@@ -149,7 +149,7 @@ release-readiness-check:
 
 # Optional: read-only probe against operator-configured GOVAI_AUDIT_BASE_URL (Platform/self-host). Core does not start a server.
 local-demo:
-	@echo "local-demo: requires GovAI Platform scripts/run_local_demo.py (not shipped in GovAI Core)."
+	@echo "local-demo: requires GovAI Platform scripts/run_local_demo.py (not shipped in AIGov Core)."
 	@exit 2
 
 local-demo-curl:
@@ -170,12 +170,12 @@ run-audit: build-audit
 	cd rust && cargo run --bin aigov_audit --locked
 
 audit_bg audit_stop audit_restart audit_logs:
-	@echo "$@: GovAI Core does not manage a hosted audit HTTP service lifecycle."
+	@echo "$@: AIGov Core does not manage a hosted audit HTTP service lifecycle."
 	@echo "Run the GovAI Platform repository for SaaS runtime orchestration, or configure GOVAI_AUDIT_BASE_URL to your operator runtime."
 	@exit 2
 require_audit_url:
 	@if [ -z "$${GOVAI_AUDIT_BASE_URL:-}" ]; then \
-		echo "GOVAI_AUDIT_BASE_URL is required (GovAI Core does not start a local audit server)."; \
+		echo "GOVAI_AUDIT_BASE_URL is required (AIGov Core does not start a local audit server)."; \
 		echo "Point it at GovAI Platform or your self-host runtime, or use offline targets: governance-standards-check, scripts/ci_portable_artifact_bundle.py"; \
 		exit 2; \
 	fi
@@ -204,7 +204,7 @@ require_run:
 	fi
 
 check_audit:
-	@echo "check_audit: removed in GovAI Core (no GET /ready polling or localhost orchestration)."
+	@echo "check_audit: removed in AIGov Core (no GET /ready polling or localhost orchestration)."
 	@echo "Use require_audit_url + operator runtime, or offline portable CI: python3 scripts/ci_portable_artifact_bundle.py"
 	@exit 2
 

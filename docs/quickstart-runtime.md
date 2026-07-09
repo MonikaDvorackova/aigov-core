@@ -1,4 +1,4 @@
-# GovAI Core audit runtime quickstart
+# AIGov Core audit runtime quickstart
 
 Run the open-source **`aigov_audit`** binary: append evidence to a tenant-scoped ledger, read a ledger-authoritative compliance verdict, export an audit bundle, and verify the hash chain.
 

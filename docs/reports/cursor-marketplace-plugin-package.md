@@ -2,7 +2,7 @@
 
 ## Summary
 
-This change adds the AIGov Cursor Marketplace plugin package to govai-core.
+This change adds the AIGov Cursor Marketplace plugin package to aigov-core.
 
 The package includes Cursor plugin metadata, rules, skills, local MCP server entrypoints, marketplace listing assets, publication documentation, validation scripts, and publication tests.
 

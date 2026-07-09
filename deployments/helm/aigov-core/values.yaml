@@ -1,7 +1,7 @@
 replicaCount: 1
 
 image:
-  repository: govai-core
+  repository: aigov-core
   tag: latest
   pullPolicy: IfNotPresent
 

@@ -1,10 +1,10 @@
-# GovAI Core governance
+# AIGov Core governance
 
-This document describes how the **GovAI Core** open-source repository is governed.
+This document describes how the **AIGov Core** open-source repository is governed.
 
 ## Project scope
 
-GovAI Core is the ledger-authoritative audit runtime (`aigov_audit`), integrator SDKs, portable standards tooling, and documentation for self-hosted or embedded audit deployments.
+AIGov Core is the ledger-authoritative audit runtime (`aigov_audit`), integrator SDKs, portable standards tooling, and documentation for self-hosted or embedded audit deployments.
 
 Changes that expand into hosted SaaS, billing, dashboard ACL, or commercial onboarding are out of scope for this repository unless explicitly reclassified by maintainers.
 

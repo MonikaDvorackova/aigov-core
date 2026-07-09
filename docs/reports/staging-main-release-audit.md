@@ -2,7 +2,7 @@
 
 ## Summary
 
-This report documents the staging to main promotion for the current govai-core release batch.
+This report documents the staging to main promotion for the current aigov-core release batch.
 
 The release includes Cursor Marketplace plugin packaging, publisher logo assets, runtime observability diagnostics, frontend and documentation updates, CI readiness fixes, and schema alignment fixes for runtime diagnostics evidence events.
 

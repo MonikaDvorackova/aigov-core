@@ -100,3 +100,15 @@ gh workflow run release-validation.yml --repo MonikaDvorackova/aigov-core
 ## Evaluation gate
 
 **PASS** — Root cause addressed by adding the policy files the Dockerfile already expects. Release validation strength unchanged.
+
+## Evaluation gate
+
+PASS.
+
+This change restores release-validation compatibility by adding Dockerfile-required policy files. It does not weaken release validation, change runtime behavior, or alter repository rename semantics.
+
+## Human approval gate
+
+APPROVED FOR REVIEW.
+
+Human review is required before merging because the change affects release artifacts and Docker build inputs.

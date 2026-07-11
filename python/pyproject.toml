@@ -27,10 +27,10 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/MonikaDvorackova/govai-core"
-Repository = "https://github.com/MonikaDvorackova/govai-core"
-Documentation = "https://github.com/MonikaDvorackova/govai-core/tree/main/docs"
-Changelog = "https://github.com/MonikaDvorackova/govai-core/blob/main/CHANGELOG.md"
+Homepage = "https://github.com/MonikaDvorackova/aigov-core"
+Repository = "https://github.com/MonikaDvorackova/aigov-core"
+Documentation = "https://github.com/MonikaDvorackova/aigov-core/tree/main/docs"
+Changelog = "https://github.com/MonikaDvorackova/aigov-core/blob/main/CHANGELOG.md"
 
 [project.scripts]
 govai = "aigov_py.cli:main"

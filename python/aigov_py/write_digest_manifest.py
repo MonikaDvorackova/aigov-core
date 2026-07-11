@@ -3,7 +3,7 @@ Write `.aigov_ci_artifacts/evidence_digest_manifest.json`.
 
 Modes:
 - Default: GET /bundle-hash from an operator-provided audit base URL (GovAI Platform or self-host).
-- ``--from-evidence``: offline portable digest from a local evidence bundle JSON (GovAI Core CI).
+- ``--from-evidence``: offline portable digest from a local evidence bundle JSON (AIGov Core CI).
 """
 
 from __future__ import annotations
@@ -66,7 +66,7 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument(
         "--from-evidence",
         default="",
-        help="Path to docs/evidence/<run_id>.json; compute digest offline (GovAI Core CI; no HTTP).",
+        help="Path to docs/evidence/<run_id>.json; compute digest offline (AIGov Core CI; no HTTP).",
     )
     p.add_argument(
         "--audit-url",

@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-Build CI evidence artefacts offline for GovAI Core (no HTTP audit server).
+Build CI evidence artefacts offline for AIGov Core (no HTTP audit server).
 
-GovAI Core does not start or poll a hosted audit runtime. This script writes
+AIGov Core does not start or poll a hosted audit runtime. This script writes
 ledger-shaped evidence bundles on disk, runs portable export/pack steps, and
 emits evidence_digest_manifest.json using portable_evidence_digest_v1.
 
@@ -340,7 +340,7 @@ def build(run_id: str, artifact_dir: Path, report_basename: str | None) -> None:
 
 
 def main(argv: list[str] | None = None) -> int:
-    p = argparse.ArgumentParser(description="Offline portable CI evidence artefacts for GovAI Core.")
+    p = argparse.ArgumentParser(description="Offline portable CI evidence artefacts for AIGov Core.")
     p.add_argument("--run-id", required=True)
     p.add_argument("--artifact-dir", required=True)
     p.add_argument("--report-basename", default="", help="Committed docs/reports/<basename>.md stem")

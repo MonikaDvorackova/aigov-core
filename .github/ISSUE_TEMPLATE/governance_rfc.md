@@ -1,6 +1,6 @@
 ---
 name: Governance RFC
-about: Propose a governance, CI gate, or contributor-policy change for GovAI Core
+about: Propose a governance, CI gate, or contributor-policy change for AIGov Core
 title: "[RFC-GOV] "
 labels: governance
 assignees: ""

@@ -33,7 +33,7 @@ def build_events(run_id: str) -> list[dict]:
             "event_type": "tool_call",
             "ts_utc": "2026-01-01T00:00:20Z",
             "actor": "tool-call-audit",
-            "system": "govai-core-examples",
+            "system": "aigov-core-examples",
             "run_id": run_id,
             "payload": {
                 "tool_name": "search_knowledge_base",
@@ -46,7 +46,7 @@ def build_events(run_id: str) -> list[dict]:
             "event_type": "tool_output",
             "ts_utc": "2026-01-01T00:00:21Z",
             "actor": "tool-call-audit",
-            "system": "govai-core-examples",
+            "system": "aigov-core-examples",
             "run_id": run_id,
             "payload": {
                 "tool_name": "search_knowledge_base",
@@ -60,7 +60,7 @@ def build_events(run_id: str) -> list[dict]:
             "event_type": "ai_decision_completed",
             "ts_utc": "2026-01-01T00:00:22Z",
             "actor": "tool-call-audit",
-            "system": "govai-core-examples",
+            "system": "aigov-core-examples",
             "run_id": run_id,
             "payload": {
                 "decision": "approve_with_citations",
@@ -74,7 +74,7 @@ def build_events(run_id: str) -> list[dict]:
 def main() -> None:
     cfg = env_config()
     run_id = str(cfg["run_id"])
-    print("Tool-call GovAI Core reference.")
+    print("Tool-call AIGov Core reference.")
     print(f"base_url={cfg['base']} run_id={run_id}")
 
     events = build_events(run_id)

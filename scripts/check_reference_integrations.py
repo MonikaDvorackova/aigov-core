@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate GovAI Core reference integration examples (structure, routes, scope)."""
+"""Validate AIGov Core reference integration examples (structure, routes, scope)."""
 
 from __future__ import annotations
 

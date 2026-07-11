@@ -119,7 +119,7 @@ flowchart LR
 
 ## Rust service (`rust/`, crate `aigov_audit`)
 
-- **Binary**: `cargo build --locked --bin aigov_audit` or `make build-audit`; run with `cargo run --bin aigov_audit --locked` from `rust/` or `make run-audit`. GovAI Core does **not** manage a background service lifecycle (`make audit_bg` exits with guidance).
+- **Binary**: `cargo build --locked --bin aigov_audit` or `make build-audit`; run with `cargo run --bin aigov_audit --locked` from `rust/` or `make run-audit`. AIGov Core does **not** manage a background service lifecycle (`make audit_bg` exits with guidance).
 - **Default bind**: `127.0.0.1:8088` — override with `AIGOV_BIND`.
 - **Startup line**: includes `environment` and `policy_version` (`rust/src/lib.rs`).
 - **Policy version**: `v0.5_dev` / `v0.5_staging` / `v0.5_prod` from [`rust/src/govai_environment.rs`](rust/src/govai_environment.rs) (tier from `AIGOV_ENVIRONMENT` → `AIGOV_ENV` → `GOVAI_ENV`). Full rules: [docs/env-resolution.md](docs/env-resolution.md).

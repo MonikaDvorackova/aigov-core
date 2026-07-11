@@ -1,6 +1,6 @@
 # Policy evaluation lifecycle
 
-**Policy evaluation** in GovAI Core occurs at **evidence ingest** and again implicitly during **projection** when building the compliance summary. There is no separate hidden policy engine that can override ledger facts.
+**Policy evaluation** in AIGov Core occurs at **evidence ingest** and again implicitly during **projection** when building the compliance summary. There is no separate hidden policy engine that can override ledger facts.
 
 ## Lifecycle
 

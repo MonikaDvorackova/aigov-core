@@ -1,6 +1,6 @@
 # Kubernetes manifests
 
-Plain manifests for self-hosted GovAI Core. **Not** a multi-replica HA ledger — default `replicas: 1` with a ReadWriteOnce ledger volume.
+Plain manifests for self-hosted AIGov Core. **Not** a multi-replica HA ledger — default `replicas: 1` with a ReadWriteOnce ledger volume.
 
 ```bash
 kubectl apply -f namespace.yaml
@@ -11,4 +11,4 @@ kubectl apply -f deployment.yaml
 kubectl apply -f service.yaml
 ```
 
-Or use the Helm chart under `deployments/helm/govai-core/`.
+Or use the Helm chart under `deployments/helm/aigov-core/`.

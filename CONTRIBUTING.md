@@ -1,10 +1,10 @@
-# Contributing to GovAI Core
+# Contributing to AIGov Core
 
-Thank you for contributing to **GovAI Core** — the open-source, ledger-authoritative audit runtime for reconstructible AI governance.
+Thank you for contributing to **AIGov Core** — the open-source, ledger-authoritative audit runtime for reconstructible AI governance.
 
-## What GovAI Core is
+## What AIGov Core is
 
-GovAI Core provides:
+AIGov Core provides:
 
 - Append-only evidence ingest (`POST /evidence`)
 - Ledger integrity verification (`GET /verify`)
@@ -13,7 +13,7 @@ GovAI Core provides:
 - Runtime examples and SDK-facing HTTP contracts
 - Portable governance standards validators (offline)
 
-## What GovAI Core is not
+## What AIGov Core is not
 
 Do not add to this repository:
 

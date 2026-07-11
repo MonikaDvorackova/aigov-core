@@ -1,0 +1,30 @@
+name: PR branch policy
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize, edited, ready_for_review]
+    branches:
+      - main
+      - staging
+
+jobs:
+  enforce-branch-policy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Enforce GovAI branch workflow
+        run: |
+          set -euo pipefail
+
+          BASE="${{ github.base_ref }}"
+          HEAD="${{ github.head_ref }}"
+
+          echo "Base branch: ${BASE}"
+          echo "Head branch: ${HEAD}"
+
+          if [ "$BASE" = "main" ] && [ "$HEAD" != "staging" ]; then
+            echo "::error::Pull requests to main must come only from staging (got head branch '${HEAD}')."
+            echo "::error::Correct flow: feature or documentation branch -> staging -> main."
+            exit 1
+          fi
+
+          echo "GovAI branch policy passed."

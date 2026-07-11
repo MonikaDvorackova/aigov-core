@@ -1,6 +1,6 @@
 # Epistemic audit runtime primitives
 
-GovAI Core exposes **derived** epistemic traceability primitives on top of `aigov.audit_export.v1`. They answer what is **known**, **evidenced**, **inferred**, **changed**, and **unverifiable** for a governance run — without replacing ledger authority or compliance verdicts.
+AIGov Core exposes **derived** epistemic traceability primitives on top of `aigov.audit_export.v1`. They answer what is **known**, **evidenced**, **inferred**, **changed**, and **unverifiable** for a governance run — without replacing ledger authority or compliance verdicts.
 
 This aligns with Knowledge Preservation Architecture: audit logging records events; epistemic primitives classify reconstructability and continuity gaps for years-later review.
 

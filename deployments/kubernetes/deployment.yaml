@@ -3,19 +3,19 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: govai-core
-  namespace: govai-core
+  name: aigov-core
+  namespace: aigov-core
   labels:
-    app.kubernetes.io/name: govai-core
+    app.kubernetes.io/name: aigov-core
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app.kubernetes.io/name: govai-core
+      app.kubernetes.io/name: aigov-core
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: govai-core
+        app.kubernetes.io/name: aigov-core
     spec:
       securityContext:
         runAsNonRoot: true
@@ -23,17 +23,17 @@ spec:
         runAsGroup: 1000
         fsGroup: 1000
       containers:
-        - name: govai-core
-          image: govai-core:latest
+        - name: aigov-core
+          image: aigov-core:latest
           imagePullPolicy: IfNotPresent
           ports:
             - name: http
               containerPort: 8088
           envFrom:
             - configMapRef:
-                name: govai-core
+                name: aigov-core
             - secretRef:
-                name: govai-core
+                name: aigov-core
           volumeMounts:
             - name: ledger
               mountPath: /var/lib/govai/ledger

@@ -1,5 +1,5 @@
 [package]
-name = "govai-core-downstream-rust-smoke"
+name = "aigov-core-downstream-rust-smoke"
 version = "0.0.0"
 edition = "2021"
 publish = false

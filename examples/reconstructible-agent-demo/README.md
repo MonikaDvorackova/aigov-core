@@ -2,7 +2,7 @@
 
 Developer-facing runtime demonstrator for **append-only evidence**, **deterministic replay**, **policy evaluation**, **tool usage**, **human approval**, **ledger-authoritative compliance verdicts**, and **audit export**.
 
-Not a SaaS dashboard. Uses **GovAI Core** mounted routes only.
+Not a SaaS dashboard. Uses **AIGov Core** mounted routes only.
 
 ## Prerequisites
 

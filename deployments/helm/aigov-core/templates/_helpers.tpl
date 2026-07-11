@@ -1,8 +1,8 @@
-{{- define "govai-core.name" -}}
+{{- define "aigov-core.name" -}}
 {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
-{{- define "govai-core.fullname" -}}
+{{- define "aigov-core.fullname" -}}
 {{- if .Values.fullnameOverride }}
 {{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" }}
 {{- else }}
@@ -15,15 +15,15 @@
 {{- end }}
 {{- end }}
 
-{{- define "govai-core.labels" -}}
-helm.sh/chart: {{ include "govai-core.name" . }}-{{ .Chart.Version | replace "+" "_" }}
-app.kubernetes.io/name: {{ include "govai-core.name" . }}
+{{- define "aigov-core.labels" -}}
+helm.sh/chart: {{ include "aigov-core.name" . }}-{{ .Chart.Version | replace "+" "_" }}
+app.kubernetes.io/name: {{ include "aigov-core.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end }}
 
-{{- define "govai-core.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "govai-core.name" . }}
+{{- define "aigov-core.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "aigov-core.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}

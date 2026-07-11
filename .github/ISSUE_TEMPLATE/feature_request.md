@@ -1,6 +1,6 @@
 ---
 name: Feature request
-about: Suggest an improvement to GovAI Core (audit runtime, SDK, examples, or core docs)
+about: Suggest an improvement to AIGov Core (audit runtime, SDK, examples, or core docs)
 title: "[FEATURE] "
 labels: enhancement
 assignees: ""
@@ -22,7 +22,7 @@ What other approaches did you consider?
 
 - Does this touch enforcement, evidence, tenant isolation, or compliance verdicts?
 - Is this documentation-only, developer experience, or runtime behavior?
-- **Out of scope for GovAI Core:** hosted SaaS, Stripe/billing, pricing, dashboard ACL, commercial onboarding (belongs in GovAI Platform).
+- **Out of scope for AIGov Core:** hosted SaaS, Stripe/billing, pricing, dashboard ACL, commercial onboarding (belongs in GovAI Platform).
 
 ## Additional context
 

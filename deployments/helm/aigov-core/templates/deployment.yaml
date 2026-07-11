@@ -1,18 +1,18 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "govai-core.fullname" . }}
+  name: {{ include "aigov-core.fullname" . }}
   labels:
-    {{- include "govai-core.labels" . | nindent 4 }}
+    {{- include "aigov-core.labels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      {{- include "govai-core.selectorLabels" . | nindent 6 }}
+      {{- include "aigov-core.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       labels:
-        {{- include "govai-core.selectorLabels" . | nindent 8 }}
+        {{- include "aigov-core.selectorLabels" . | nindent 8 }}
     spec:
       securityContext:
         runAsNonRoot: true
@@ -28,10 +28,10 @@ spec:
               containerPort: {{ .Values.service.port }}
           envFrom:
             - configMapRef:
-                name: {{ include "govai-core.fullname" . }}
+                name: {{ include "aigov-core.fullname" . }}
             {{- if or .Values.secrets.DATABASE_URL .Values.secrets.GOVAI_API_KEYS .Values.secrets.GOVAI_API_KEYS_JSON }}
             - secretRef:
-                name: {{ include "govai-core.fullname" . }}
+                name: {{ include "aigov-core.fullname" . }}
             {{- end }}
           {{- if .Values.persistence.enabled }}
           volumeMounts:
@@ -56,5 +56,5 @@ spec:
       volumes:
         - name: ledger
           persistentVolumeClaim:
-            claimName: {{ include "govai-core.fullname" . }}-ledger
+            claimName: {{ include "aigov-core.fullname" . }}-ledger
       {{- end }}

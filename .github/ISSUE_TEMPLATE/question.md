@@ -1,6 +1,6 @@
 ---
 name: Question
-about: Ask about GovAI Core usage, the audit runtime, or contributing
+about: Ask about AIGov Core usage, the audit runtime, or contributing
 title: "[QUESTION] "
 labels: discussion
 assignees: ""
@@ -10,7 +10,7 @@ assignees: ""
 
 What are you trying to do? (for example: local `aigov_audit`, evidence ingest, compliance summary, reference integrations, contributor setup)
 
-**GovAI Core** = open-source ledger-authoritative audit runtime in this repository.  
+**AIGov Core** = open-source ledger-authoritative audit runtime in this repository.  
 **GovAI Platform** (hosted SaaS, billing, dashboard) is a separate product — see `docs/hosted/` for reference only.
 
 ## Question

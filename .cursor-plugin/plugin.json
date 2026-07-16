@@ -1,7 +1,7 @@
 {
   "name": "govai",
   "version": "0.1.0",
-  "description": "AIGov platform repository tooling for Cursor: rules, agent skills, and a local stdio MCP bridge to audit-runtime and platform CI gates. Proprietary platform; public runtime is govai-core.",
+  "description": "AIGov platform repository tooling for Cursor: rules, agent skills, and a local stdio MCP bridge to audit-runtime and platform CI gates. Proprietary platform; public runtime is aigov-core.",
   "author": "AIGov maintainers",
   "homepage": "https://github.com/MonikaDvorackova/aigov-compliance-engine",
   "repository": "https://github.com/MonikaDvorackova/aigov-compliance-engine",

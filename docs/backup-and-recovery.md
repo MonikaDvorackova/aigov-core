@@ -1,6 +1,6 @@
 # Backup and recovery
 
-Operator guidance for GovAI Core persistence: append-only ledger, Postgres, and signed exports.
+Operator guidance for AIGov Core persistence: append-only ledger, Postgres, and signed exports.
 
 ## Append-only ledger backup
 
@@ -68,7 +68,7 @@ Mismatch indicates incomplete restore, corruption, or policy drift — stop prom
 
 ## Recovery objectives (operator-defined)
 
-GovAI Core does not enforce RPO/RTO. Operators should document:
+AIGov Core does not enforce RPO/RTO. Operators should document:
 
 - Maximum acceptable ledger age at restore.
 - Whether exports alone satisfy regulatory read models.

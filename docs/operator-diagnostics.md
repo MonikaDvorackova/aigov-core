@@ -1,6 +1,6 @@
 # Operator diagnostics
 
-Runbook for monitoring GovAI Core in production. Pair with [runtime-observability.md](./runtime-observability.md) and [runtime-operations.md](./runtime-operations.md).
+Runbook for monitoring AIGov Core in production. Pair with [runtime-observability.md](./runtime-observability.md) and [runtime-operations.md](./runtime-operations.md).
 
 ## Health vs ready vs status
 

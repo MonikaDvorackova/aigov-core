@@ -2,9 +2,9 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: {{ include "govai-core.fullname" . }}-ledger
+  name: {{ include "aigov-core.fullname" . }}-ledger
   labels:
-    {{- include "govai-core.labels" . | nindent 4 }}
+    {{- include "aigov-core.labels" . | nindent 4 }}
 spec:
   accessModes:
     - {{ .Values.persistence.accessMode }}

@@ -1,6 +1,6 @@
 # Threat model (foundation)
 
-This document frames security assumptions for self-hosted GovAI Core. It does **not** claim formal certification or complete mitigation of all AI governance risks.
+This document frames security assumptions for self-hosted AIGov Core. It does **not** claim formal certification or complete mitigation of all AI governance risks.
 
 ## Trust boundaries
 

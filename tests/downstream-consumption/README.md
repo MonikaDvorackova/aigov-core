@@ -1,6 +1,6 @@
 # Downstream consumption smoke tests
 
-These checks prove GovAI Core can be consumed as an **external dependency**, not only when built inside this repository.
+These checks prove AIGov Core can be consumed as an **external dependency**, not only when built inside this repository.
 
 ## What is validated
 

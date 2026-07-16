@@ -1,6 +1,6 @@
 # Governance semantics (formal)
 
-This document defines **deterministic, technically defensible** governance semantics for GovAI Core. It extends the concise [trust-model.md](../trust-model.md) with lifecycle, integrity, and export vocabulary suitable for architecture and security review.
+This document defines **deterministic, technically defensible** governance semantics for AIGov Core. It extends the concise [trust-model.md](../trust-model.md) with lifecycle, integrity, and export vocabulary suitable for architecture and security review.
 
 ## Authoritative decision surface
 

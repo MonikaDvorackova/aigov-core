@@ -10,8 +10,8 @@ Concise path from clone to a working audit service, documentation gates, and tes
 ## 1. Clone
 
 ```bash
-git clone https://github.com/MonikaDvorackova/govai-core.git
-cd govai-core
+git clone https://github.com/MonikaDvorackova/aigov-core.git
+cd aigov-core
 ```
 
 ## 2. Python tooling (venv + editable install)

@@ -1,4 +1,4 @@
-# GovAI Core CI: portable runtime / evidence infrastructure (no hosted HTTP audit server).
+# AIGov Core CI: portable runtime / evidence infrastructure (no hosted HTTP audit server).
 # Hosted SaaS lifecycle (GET /ready, background audit service) belongs to the GovAI Platform repo.
 
 name: govai-ci
@@ -11,8 +11,8 @@ env:
   AIGOV_POLICY_STRICT: "true"
 
 jobs:
-  govai-core-portable:
-    name: govai-core-portable
+  aigov-core-portable:
+    name: aigov-core-portable
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
@@ -25,7 +25,7 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Install GovAI from workspace
+      - name: Install AIGov from workspace
         run: |
           set -euo pipefail
           python -m pip install --upgrade pip
@@ -121,7 +121,7 @@ jobs:
         run: |
           set -euo pipefail
           {
-            echo "# GovAI Core portable CI"
+            echo "# AIGov Core portable CI"
             echo
             echo "Validates \`aigov_audit\` build, Rust tests (including in-process HTTP integration), offline governance standards, documentation gate, and portable evidence/digest/replay semantics."
             echo

@@ -362,7 +362,7 @@ jobs:
             echo "Full Rust and Python suites run in nightly-full-validation and release-validation."
           } >> "${GITHUB_STEP_SUMMARY}"
 
-  # Portable evidence / artefact gate for GovAI Core (offline bundles). No localhost audit HTTP server.
+  # Portable evidence / artefact gate for AIGov Core (offline bundles). No localhost audit HTTP server.
   evidence_pack:
     name: evidence_pack
     runs-on: ubuntu-latest

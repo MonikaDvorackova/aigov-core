@@ -11,7 +11,7 @@ def _base(run_id: str, event_id: str, event_type: str, ts: str, payload: dict[st
         "event_type": event_type,
         "ts_utc": ts,
         "actor": "reference-integration",
-        "system": "govai-core-examples",
+        "system": "aigov-core-examples",
         "run_id": run_id,
         "payload": payload,
     }
@@ -61,7 +61,7 @@ def model_trained(run_id: str) -> dict[str, Any]:
             "ai_system_id": "as-ref",
             "dataset_id": "ds-ref",
             "model_type": "mock-llm",
-            "artifact_path": "registry://govai-core/examples/mock-model",
+            "artifact_path": "registry://aigov-core/examples/mock-model",
             "artifact_sha256": "abc1234567890123456789012345678901234567890123456789012345678901234",
         },
     )
@@ -159,7 +159,7 @@ def model_promoted(run_id: str) -> dict[str, Any]:
             "ai_system_id": "as-ref",
             "dataset_id": "ds-ref",
             "model_version_id": "mv-ref",
-            "artifact_path": "registry://govai-core/examples/mock-model",
+            "artifact_path": "registry://aigov-core/examples/mock-model",
             "artifact_sha256": "abc1234567890123456789012345678901234567890123456789012345678901234",
             "promotion_reason": "reference integration",
             "approved_human_event_id": f"{run_id}-human",

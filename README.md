@@ -1,12 +1,14 @@
-# GovAI Core
+# AIGov Core
 
-GovAI Core is the **open-source**, ledger-authoritative audit runtime for reconstructible AI governance. The `aigov_audit` service appends evidence to tenant-scoped ledgers, enforces policy at ingest, derives **VALID / INVALID / BLOCKED** from ledger projection (`GET /compliance-summary`), exports `aigov.audit_export.v1`, and verifies hash chains.
+[![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/MonikaDvorackova/aigov-core/govai-ci.yml)](https://github.com/MonikaDvorackova/aigov-core/actions/workflows/govai-ci.yml) [![GitHub License](https://img.shields.io/github/license/MonikaDvorackova/aigov-core)](https://github.com/MonikaDvorackova/aigov-core/blob/main/LICENSE) [![Crates.io](https://img.shields.io/badge/crates.io-not%20published-lightgrey)]() [![PyPI Version](https://img.shields.io/pypi/v/aigov-py)](https://pypi.org/project/aigov-py/) [![Documentation](https://img.shields.io/badge/docs-GitHub-blue)](https://github.com/MonikaDvorackova/aigov-core/tree/main/docs)
+
+AIGov Core is the **open-source**, ledger-authoritative audit runtime for reconstructible AI governance. The `aigov_audit` service appends evidence to tenant-scoped ledgers, enforces policy at ingest, derives **VALID / INVALID / BLOCKED** from ledger projection (`GET /compliance-summary`), exports `aigov.audit_export.v1`, and verifies hash chains.
 
 **Quickstart:** [`docs/quickstart-runtime.md`](docs/quickstart-runtime.md) · **Mounted API contract:** [`docs/runtime-api-contract.md`](docs/runtime-api-contract.md) · **Repository scope:** [`OPEN_SOURCE_SCOPE.md`](OPEN_SOURCE_SCOPE.md)
 
 ## What this repository is
 
-| In scope (GovAI Core) | Out of scope (GovAI Platform — separate product) |
+| In scope (AIGov Core) | Out of scope (GovAI Platform — separate product) |
 |----------------------|--------------------------------------------------|
 | Append-only evidence ingest (`POST /evidence`) | Hosted SaaS operations |
 | Ledger integrity and `GET /verify` | Stripe / billing / pricing |
@@ -16,7 +18,7 @@ GovAI Core is the **open-source**, ledger-authoritative audit runtime for recons
 
 License terms: [`LICENSE`](LICENSE). Contributor expectations: [`CONTRIBUTING.md`](CONTRIBUTING.md), [`GOVERNANCE.md`](GOVERNANCE.md), [`SECURITY.md`](SECURITY.md).
 
-## Try GovAI Core locally
+## Try AIGov Core locally
 
 From a clean clone with **Rust** and **Python 3** only — no hosted platform or external services.
 
@@ -130,7 +132,7 @@ Minimal deterministic local example using the **existing evidence-pack format**:
 - `docs/golden-path.md`
 - `docs/evidence-pack.md` (generate a minimal customer-ready evidence pack)
 
-## Makefile targets (GovAI Core)
+## Makefile targets (AIGov Core)
 
 All targets are defined in the repository **`Makefile`**. Common checks:
 
@@ -253,8 +255,8 @@ Choose one:
 1. Clone the repo
 
 ```bash
-git clone https://github.com/MonikaDvorackova/govai-core.git
-cd govai-core
+git clone https://github.com/MonikaDvorackova/aigov-core.git
+cd aigov-core
 ```
 
 2. Run GovAI (Docker)
@@ -348,7 +350,7 @@ See:
 - enforcing approval workflows before release
 - requiring audit evidence for decisions
 
-## GovAI Platform (not in GovAI Core)
+## GovAI Platform (not in AIGov Core)
 
 Commercial hosting, billing, pricing, dashboard ACL, onboarding, and managed tenant provisioning belong to the **GovAI Platform** product (separate from this repository). Reference material may appear under `docs/pricing/`, `docs/billing/`, `docs/hosted/`, and `dashboard/` for historical context only.
 
@@ -512,7 +514,7 @@ If you are onboarding a new pilot customer, follow `docs/hosted-pilot-runbook.md
 
 ```yaml
       - name: GovAI artefact-bound gate (submit + verify digest + VALID)
-        uses: MonikaDvorackova/govai-core@v1
+        uses: MonikaDvorackova/aigov-core@v1
         with:
           run_id: ${{ vars.GOVAI_RUN_ID }}
           artifacts_path: ${{ github.workspace }}/downloaded-artifacts
@@ -658,7 +660,7 @@ Publication-ready **channel playbooks**, **FAQ**, and **positioning** live under
 
 # Contributors and community
 
-Contributions to **GovAI Core** belong in this repository. See [`CONTRIBUTING.md`](CONTRIBUTING.md), [`GOVERNANCE.md`](GOVERNANCE.md), and [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md). Do not weaken ledger-authoritative invariants documented there.
+Contributions to **AIGov Core** belong in this repository. See [`CONTRIBUTING.md`](CONTRIBUTING.md), [`GOVERNANCE.md`](GOVERNANCE.md), and [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md). Do not weaken ledger-authoritative invariants documented there.
 
 ## Contributor onboarding
 

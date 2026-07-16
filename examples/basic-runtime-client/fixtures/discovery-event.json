@@ -3,7 +3,7 @@
   "event_type": "ai_discovery_reported",
   "ts_utc": "2026-01-01T00:00:01Z",
   "actor": "basic-runtime-client",
-  "system": "govai-core-examples",
+  "system": "aigov-core-examples",
   "run_id": "REPLACE_RUN_ID",
   "payload": {
     "openai": false,

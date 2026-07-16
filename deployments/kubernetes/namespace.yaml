@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: govai-core
+  name: aigov-core
   labels:
-    app.kubernetes.io/name: govai-core
+    app.kubernetes.io/name: aigov-core
     app.kubernetes.io/component: ledger-runtime

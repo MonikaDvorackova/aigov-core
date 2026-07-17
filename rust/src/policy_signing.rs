@@ -105,7 +105,7 @@ fn now_utc_rfc3339() -> String {
     // For deterministic verification behavior, we do NOT use the system clock here.
     // Signature expiration is enforced using timestamps embedded in the signature record
     // and the policy's `created_at_utc` for Phase 1.
-    // (Full clock-source semantics are handled in the crypto evidence todo.)
+    // (Full clock-source semantics are handled in the crypto evidence TODO (#145).)
     "1970-01-01T00:00:00Z".to_string()
 }
 
@@ -166,7 +166,7 @@ fn verify_ed25519(
         if exp.trim().is_empty() {
             return Err("policy signature expires_at_utc is empty".to_string());
         }
-        // Do not parse timestamps here; that is handled in Phase 1 crypto todo.
+        // Do not parse timestamps here; that is handled in Phase 1 crypto TODO (#145)
         // We at least ensure deterministic behavior by rejecting empty.
         let _ = now_utc_rfc3339();
     }

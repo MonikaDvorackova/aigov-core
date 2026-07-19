@@ -7,6 +7,10 @@ and this project adheres to the [versioning policy](docs/releases/versioning-pol
 
 ## [Unreleased]
 
+### Changed
+
+- Repository slug and documentation branding: **`govai-core` → `aigov-core`** (GitHub rename prepared in-tree). Runtime package names unchanged (`aigov_audit`, `aigov-py`, `govai` CLI compat). Helm chart, Kubernetes manifests, Docker tags, and CI job `aigov-core-portable` use the new slug.
+
 ### Added
 
 - *(none yet)*
@@ -22,7 +26,7 @@ and this project adheres to the [versioning policy](docs/releases/versioning-pol
 ### Changed
 
 - PostgreSQL-only SQLx dependency graph (removed `sqlx-mysql` / `rsa` transitives); runtime migrations use `sqlx_core::migrate::Migrator`.
-- Release documentation and examples aligned with scripts and Makefile targets shipped in GovAI Core (removed references to platform-only release validators).
+- Release documentation and examples aligned with scripts and Makefile targets shipped in AIGov Core (removed references to platform-only release validators).
 
 ### Fixed
 

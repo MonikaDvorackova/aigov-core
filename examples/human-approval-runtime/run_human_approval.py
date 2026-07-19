@@ -29,7 +29,7 @@ def verdict_label(summary: dict) -> str:
 def main() -> None:
     cfg = env_config()
     run_id = str(cfg["run_id"])
-    print("Human approval GovAI Core reference.")
+    print("Human approval AIGov Core reference.")
     print(f"base_url={cfg['base']} run_id={run_id}")
 
     blocked_phase = pre_promotion_lifecycle(run_id)

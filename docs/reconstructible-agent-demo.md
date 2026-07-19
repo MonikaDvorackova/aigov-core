@@ -1,6 +1,6 @@
 # Reconstructible agent demo
 
-The **reconstructible agent demo** (`examples/reconstructible-agent-demo/`) is a developer-facing runtime demonstrator. It shows how an AI agent workflow records **append-only evidence** on GovAI Core, derives a **ledger-authoritative compliance verdict**, exports an audit bundle, and replays the decision lifecycle offline.
+The **reconstructible agent demo** (`examples/reconstructible-agent-demo/`) is a developer-facing runtime demonstrator. It shows how an AI agent workflow records **append-only evidence** on AIGov Core, derives a **ledger-authoritative compliance verdict**, exports an audit bundle, and replays the decision lifecycle offline.
 
 This is not observability tooling, a SaaS dashboard, or enterprise admin UI.
 
@@ -13,7 +13,7 @@ A run is reconstructible when an auditor can:
 3. Confirm **hash-chain integrity** (`GET /verify`, `evidence_hashes.log_chain` in export)
 4. Relate **agent steps** (request → reasoning → tools → policy → decision → approval → promotion) to the final **VALID / BLOCKED / INVALID** verdict
 
-GovAI Core does not reconstruct from distributed traces or log aggregators. The **ledger is authoritative**.
+AIGov Core does not reconstruct from distributed traces or log aggregators. The **ledger is authoritative**.
 
 ## Append-only evidence
 

@@ -1,10 +1,10 @@
-# GovAI Platform vs GovAI Core
+# GovAI Platform vs AIGov Core
 
 GovAI is delivered as two cooperating products. Confusing them breaks procurement reviews, threat models, and integration design.
 
-## GovAI Core (portable audit runtime)
+## AIGov Core (portable audit runtime)
 
-**GovAI Core** is the regulation-agnostic **audit runtime** and contract surface:
+**AIGov Core** is the regulation-agnostic **audit runtime** and contract surface:
 
 - Append-only, hash-chained evidence ledger (`POST /evidence`)
 - Policy enforcement at ingest (`policy.rs` on accepted events)
@@ -37,7 +37,7 @@ Many deployments run **one Rust binary** with both surfaces merged at the router
 
 ```mermaid
 flowchart TB
-  subgraph core [GovAI Core — ledger authority]
+  subgraph core [AIGov Core — ledger authority]
     E["POST /evidence"]
     L["append-only audit_log"]
     S["GET /compliance-summary"]
@@ -53,7 +53,7 @@ flowchart TB
   end
 ```
 
-| Concern | GovAI Core | GovAI Platform |
+| Concern | AIGov Core | GovAI Platform |
 |---------|------------|----------------|
 | Writes hash-chained evidence | Yes | No |
 | Defines promotion eligibility (`VALID` / `BLOCKED`) | Yes (via projection) | No (workflow may block operationally only) |
@@ -65,7 +65,7 @@ flowchart TB
 
 | Surface | Bound to | License / distribution |
 |---------|----------|-------------------------|
-| Python CLI / `aigov-py`, TypeScript SDK | Core HTTP contracts | Published from **govai-core** open runtime repository |
+| Python CLI / `aigov-py`, TypeScript SDK | Core HTTP contracts | Published from **aigov-core** open runtime repository |
 | GitHub Action (composite) | Core gates and evidence paths | Same |
 | Dashboard, hosted billing, enterprise `/api/*` | Platform | Proprietary; this platform repository |
 

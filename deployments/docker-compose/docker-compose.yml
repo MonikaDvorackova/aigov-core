@@ -1,4 +1,4 @@
-# GovAI Core operator stack (ledger runtime + Postgres for optional SQL migrations).
+# AIGov Core operator stack (ledger runtime + Postgres for optional SQL migrations).
 # Self-hosted infrastructure only (not a commercial platform bundle).
 #
 # Usage (from this directory):
@@ -24,11 +24,11 @@ services:
       retries: 12
       start_period: 20s
 
-  govai-core:
+  aigov-core:
     build:
       context: ../..
       dockerfile: Dockerfile
-    image: govai-core:local
+    image: aigov-core:local
     restart: unless-stopped
     depends_on:
       postgres:

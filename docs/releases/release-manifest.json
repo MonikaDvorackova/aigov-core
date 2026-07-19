@@ -35,7 +35,7 @@
     "GitHub Releases (or equivalent) with Markdown body from docs/releases/release-notes-template.md",
     "CHANGELOG.md as canonical consumer-facing history"
   ],
-  "release_program": "GovAI Core release engineering: changelog validation, deterministic release note generation, readiness reporting, Makefile gates, and CI artifact builds aligned with staging integration and promotion to main.",
+  "release_program": "AIGov Core release engineering: changelog validation, deterministic release note generation, readiness reporting, Makefile gates, and CI artifact builds aligned with staging integration and promotion to main.",
   "required_artifacts": [
     {"path": "CHANGELOG.md", "role": "keep_a_changelog_root"},
     {"path": "docs/releases/release-manifest.json", "role": "release_manifest"},

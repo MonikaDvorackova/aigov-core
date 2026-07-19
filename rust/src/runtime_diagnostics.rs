@@ -249,7 +249,7 @@ pub async fn build_status_body(
     let mut body = json!({
         "ok": true,
         "service": "aigov_audit",
-        "surface": "govai-core",
+        "surface": "aigov-core",
         "runtime_version": env!("CARGO_PKG_VERSION"),
         "environment": st.deployment_env.as_str(),
         "policy_version": crate::govai_environment::policy_version_for(st.deployment_env),

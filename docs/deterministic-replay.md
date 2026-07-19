@@ -1,6 +1,6 @@
 # Deterministic governance replay
 
-GovAI Core can **reconstruct governance state** from an exported `aigov.audit_export.v1` document without contacting a live runtime. Replay recomputes evaluation, approval, and promotion projection and derives the same **VALID / INVALID / BLOCKED** verdict rules used by `GET /compliance-summary`.
+AIGov Core can **reconstruct governance state** from an exported `aigov.audit_export.v1` document without contacting a live runtime. Replay recomputes evaluation, approval, and promotion projection and derives the same **VALID / INVALID / BLOCKED** verdict rules used by `GET /compliance-summary`.
 
 This is **not** distributed tracing or log replay. It is **ledger-authoritative governance reconstruction** from append-only evidence.
 

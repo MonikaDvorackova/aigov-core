@@ -1,4 +1,4 @@
-"""Shared helpers for GovAI Core release validation scripts (stdlib only)."""
+"""Shared helpers for AIGov Core release validation scripts (stdlib only)."""
 
 from __future__ import annotations
 

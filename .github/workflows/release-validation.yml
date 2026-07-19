@@ -172,17 +172,17 @@ jobs:
       - name: Build Docker image (local artifact only)
         run: |
           set -euo pipefail
-          docker build -t govai-core:ci-${{ github.sha }} .
-          docker save govai-core:ci-${{ github.sha }} -o dist/govai-core-image.tar
+          docker build -t aigov-core:ci-${{ github.sha }} .
+          docker save aigov-core:ci-${{ github.sha }} -o dist/aigov-core-image.tar
 
       - name: Upload release artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: govai-core-release-artifacts
+          name: aigov-core-release-artifacts
           path: |
             dist/python/
             dist/rust/
-            dist/govai-core-image.tar
+            dist/aigov-core-image.tar
             changelog-validation.json
             release-readiness-report.json
           if-no-files-found: error

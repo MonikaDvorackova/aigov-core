@@ -10,7 +10,7 @@ GovAI ships as two cooperating products:
 
 | Product | Responsibility |
 |---------|----------------|
-| **GovAI Core** | Append-only ledger, policy enforcement, compliance projection, export and replay |
+| **AIGov Core** | Append-only ledger, policy enforcement, compliance projection, export and replay |
 | **GovAI Platform** | Hosted SaaS, billing, onboarding, dashboard, enterprise control plane (`/api/*`) |
 
 Boundary detail: [platform-vs-core-boundary.md](platform-vs-core-boundary.md). Deployment modes: [hosted-vs-self-host-topology.md](hosted-vs-self-host-topology.md).
@@ -22,7 +22,7 @@ flowchart TB
     CI[CI / GitHub Action]
     RT[Runtime applications]
   end
-  subgraph core [GovAI Core]
+  subgraph core [AIGov Core]
     ING[POST /evidence]
     LED[(Append-only ledger)]
     SUM[GET /compliance-summary]
@@ -46,7 +46,7 @@ flowchart TB
 | Layer | Function | Authoritative for verdict? |
 |-------|----------|---------------------------|
 | **Integrators** | Submit evidence; consume summary and exports | No |
-| **GovAI Core** | Ingest, ledger, policy, projection, verdict | **Yes** |
+| **AIGov Core** | Ingest, ledger, policy, projection, verdict | **Yes** |
 | **GovAI Platform** | Teams, workflow queue, hosted operations | No (must reconcile with summary) |
 | **Customer GRC** | Long-term export archive, legal process | No |
 
@@ -81,7 +81,7 @@ Lifecycle: [evidence-lifecycle.md](evidence-lifecycle.md). Ledger rules: [append
 
 ## Main components
 
-### Rust audit service (GovAI Core)
+### Rust audit service (AIGov Core)
 
 - `POST /evidence` — ingest with policy enforcement
 - `GET /compliance-summary` — authoritative compliance verdict

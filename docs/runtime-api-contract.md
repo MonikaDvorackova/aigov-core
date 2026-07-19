@@ -1,4 +1,4 @@
-# GovAI Core runtime API contract (`aigov_audit`)
+# AIGov Core runtime API contract (`aigov_audit`)
 
 This document describes the HTTP surface **mounted by the `aigov_audit` binary** in this repository. It is ledger-authoritative: compliance verdicts and exports are derived from append-only evidence in tenant-scoped JSONL ledgers, not from Postgres trace tables or platform workflow state.
 

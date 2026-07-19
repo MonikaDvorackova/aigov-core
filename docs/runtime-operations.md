@@ -1,6 +1,6 @@
 # Runtime operations
 
-GovAI Core ships as a self-hosted **ledger HTTP runtime** (`aigov_audit`). This document describes deployment models, persistence, backups, upgrades, and what operators can rely on today.
+AIGov Core ships as a self-hosted **ledger HTTP runtime** (`aigov_audit`). This document describes deployment models, persistence, backups, upgrades, and what operators can rely on today.
 
 ## Deployment models
 
@@ -9,7 +9,7 @@ GovAI Core ships as a self-hosted **ledger HTTP runtime** (`aigov_audit`). This 
 | Docker image | Root `Dockerfile` | Single host, CI smoke, minimal footprint |
 | Docker Compose | `deployments/docker-compose/` | Dev/staging operator stack with Postgres |
 | Kubernetes (plain) | `deployments/kubernetes/` | Cluster operators who manage manifests directly |
-| Helm | `deployments/helm/govai-core/` | Parameterized installs with persistence and secrets |
+| Helm | `deployments/helm/aigov-core/` | Parameterized installs with persistence and secrets |
 
 All models run the same binary entrypoint: `aigov_audit` on port **8088** (configurable via `AIGOV_BIND`).
 

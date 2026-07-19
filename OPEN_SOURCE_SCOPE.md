@@ -1,6 +1,6 @@
-# GovAI Core open-source scope
+# AIGov Core open-source scope
 
-This repository **is** [GovAI Core](https://github.com/MonikaDvorackova/govai-core): the ledger-authoritative audit runtime, portable contracts, integrator SDKs, and offline validation tooling.
+This repository **is** [AIGov Core](https://github.com/MonikaDvorackova/aigov-core): the ledger-authoritative audit runtime, portable contracts, integrator SDKs, and offline validation tooling.
 
 The **GovAI Platform** (hosted SaaS, billing, dashboard, enterprise control plane) is a **separate product** and is not implemented by the `aigov_audit` HTTP surface in this tree.
 
@@ -10,7 +10,7 @@ Canonical terminology: [docs/terminology.md](docs/terminology.md). Architecture 
 
 See [LICENSE](LICENSE) for terms governing this repository.
 
-## Included in GovAI Core (this repository)
+## Included in AIGov Core (this repository)
 
 | Area | Examples |
 |------|----------|
@@ -23,7 +23,7 @@ See [LICENSE](LICENSE) for terms governing this repository.
 | Examples | `examples/basic-runtime-client/`, `examples/python-runtime-client/` |
 | CI | `govai-ci.yml`, portable digest smoke, `make core-runtime-examples-check` |
 
-## Excluded from GovAI Core (platform-only)
+## Excluded from AIGov Core (platform-only)
 
 These may appear in documentation or directories for **reference** but are **not** mounted on `aigov_audit`:
 

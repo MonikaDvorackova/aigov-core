@@ -1,6 +1,6 @@
 # Epistemic model
 
-This document defines vocabulary for **Knowledge Preservation Architecture** as applied to GovAI Core, and **critiques** that direction. It is written for principal-level architecture review: precise definitions first, adversarial analysis second.
+This document defines vocabulary for **Knowledge Preservation Architecture** as applied to AIGov Core, and **critiques** that direction. It is written for principal-level architecture review: precise definitions first, adversarial analysis second.
 
 Companion (directional): [knowledge-preservation-layer.md](knowledge-preservation-layer.md).  
 Implemented today: append-only ledger, projection, verdicts, export/replay ([governance-semantics.md](governance-semantics.md)).
@@ -53,7 +53,7 @@ If `π` requires live database state, undisclosed credentials, or privileged mem
 4. **With which authority** binding actions were attributed (actors, delegation, allowlists)
 5. **With what integrity** the record can be trusted (hashes, signatures, chain continuity)
 
-Decision Knowledge is **decision-relative**: it exists for a specific `decision_id` / `run_id` and a specific decision class (for GovAI Core today: **promotion eligibility** — `VALID` / `INVALID` / `BLOCKED`).
+Decision Knowledge is **decision-relative**: it exists for a specific `decision_id` / `run_id` and a specific decision class (for AIGov Core today: **promotion eligibility** — `VALID` / `INVALID` / `BLOCKED`).
 
 ### What must survive (years-later reconstruction)
 
@@ -85,11 +85,11 @@ Decision Knowledge is **decision-relative**: it exists for a specific `decision_
 
 **Governance Knowledge** is Decision Knowledge where the decision class is **organizational permission**: whether an entity (model, system, deployment, delegation) was **eligible** for an action under institutional rules.
 
-GovAI Core’s implemented slice is **governance eligibility knowledge**: ledger → projection → verdict.
+AIGov Core’s implemented slice is **governance eligibility knowledge**: ledger → projection → verdict.
 
 ### Contrasts
 
-| Category | Subject matter | Typical questions | GovAI Core today |
+| Category | Subject matter | Typical questions | AIGov Core today |
 |----------|----------------|-------------------|----------------|
 | **Governance knowledge** | Permission, duty, approval, policy conformance | “Were we allowed to promote?” | **Primary** |
 | **System knowledge** | Infrastructure topology, config, dependencies | “What was running in prod?” | Partial via identifiers in events; not full CMDB |
@@ -127,7 +127,7 @@ A decision `D` is **reconstructable** at time `t₂` with respect to rule set `R
 | **Semantic drift** | `π` changed without version bump; old exports fail replay for social reasons not technical |
 | **Equivalence ambiguity** | `≡` undefined — “same decision” disputed |
 
-### GovAI Core today
+### AIGov Core today
 
 Reconstructability is **partially implemented** for eligibility:
 
@@ -339,7 +339,7 @@ OpenTelemetry, Langfuse, Phoenix, Weights & Biases already preserve **traces** w
 
 ### 10.4 Overlap with event sourcing
 
-GovAI Core **is** event sourcing:
+AIGov Core **is** event sourcing:
 
 - Events = `EvidenceEvent`
 - Aggregate = `run_id`
@@ -400,7 +400,7 @@ It remains **worth building** if it:
 - Keeps `π` public and integrity-checked
 - Stays out of prompt/token capture
 
-GovAI Core’s honest positioning in engineering terms:
+AIGov Core’s honest positioning in engineering terms:
 
 > **An event-sourced, policy-versioned, replayable eligibility ledger for AI lifecycle promotion — not a knowledge graph of AI cognition.**
 

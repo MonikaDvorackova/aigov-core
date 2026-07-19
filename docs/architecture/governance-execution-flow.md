@@ -7,7 +7,7 @@
 ```mermaid
 sequenceDiagram
   participant Int as Integrator (CI / runtime / CLI)
-  participant Core as GovAI Core
+  participant Core as AIGov Core
   participant Ledger as Append-only ledger
   participant Proj as Projection engine
   participant Cons as Consumer (gate / GRC)

@@ -44,3 +44,30 @@ Low risk. Only build tooling and CI dependency installation were changed.
 ## Rollback
 
 Reverting this change would restore the vulnerable setuptools version and cause the audit workflow to fail again.
+
+## Evaluation gate
+
+The change was evaluated against the repository security and release criteria.
+
+Evaluation result:
+
+- `setuptools` minimum version is raised to `83.0.0`.
+- The CI virtual environment explicitly upgrades `setuptools` before dependency installation.
+- `pip-audit` remains strict and no advisory suppression was added.
+- The change does not modify runtime behavior, public APIs, data models, or business logic.
+- The expected CI result is a successful Python supply-chain audit with no known vulnerabilities.
+
+Evaluation status: PASS.
+
+## Human approval gate
+
+This change requires human review before merge.
+
+The reviewer should confirm:
+
+- The `setuptools>=83.0.0` requirement is intentional and compatible with the supported Python versions.
+- The workflow installs and audits dependencies in the same virtual environment.
+- No allowlist, ignore rule, or audit bypass was introduced.
+- The audit report accurately describes the scope, validation, risk, and rollback implications.
+
+Human approval status: PENDING until pull request approval.

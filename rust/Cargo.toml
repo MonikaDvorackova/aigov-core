@@ -60,7 +60,7 @@ hmac = "0.13.0"
 subtle = "2.6"
 base64 = "0.22"
 urlencoding = "2.1"
-ed25519-dalek = { version = "2", features = ["pkcs8"] }
+ed25519-dalek = { version = "3", features = ["pkcs8"] }
 governor = "0.10.4"
 rand = "0.10.1"
 zip = "8.6"

@@ -1,0 +1,13 @@
+[package]
+name = "minimal-project"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+# Link using the exact package name found in the core Cargo.toml
+aigov_audit = { path = "../../rust" }
+
+# Async utilities
+tokio = { version = "1", features = ["full"] }
+anyhow = "1.0"
+serde_json = "1.0.150"

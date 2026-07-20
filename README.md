@@ -392,6 +392,7 @@ Start the audit service, emit evidence, and read the authoritative decision from
 
 Quickstarts:
 
+- `docs/cli-reference.md#python-cli-quickstart` (install and verify the Python CLI)
 - `docs/customer-onboarding-10min.md` (hosted customer onboarding — canonical)
 - `docs/quickstart-5min.md` (local demo)
 - `docs/customer-quickstart.md` (legacy customer / CI quickstart)

@@ -6,6 +6,45 @@ The `govai` command is shipped with the **`aigov-py`** Python package in this re
 python -m pip install "aigov-py==0.2.1"
 ```
 
+## Python CLI quickstart
+
+Install the CLI in a fresh virtual environment:
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+python -m pip install --upgrade pip
+python -m pip install "aigov-py==0.2.1"
+```
+
+For repository development, install from this checkout instead:
+
+```bash
+cd python
+python -m pip install -e ".[dev]"
+```
+
+First command:
+
+```bash
+govai --version
+```
+
+Expected output:
+
+```text
+0.2.1
+```
+
+The version command only checks that the Python package and `govai` console script are installed. Commands such as `govai check`, `govai compliance-summary`, and `govai run demo` also require a reachable audit service plus `GOVAI_AUDIT_BASE_URL` and `GOVAI_API_KEY` (or matching flags).
+
+Troubleshooting:
+
+- `govai: command not found`: activate the virtual environment, or run `python -m pip install "aigov-py==0.2.1"` again in the Python environment you are using.
+- `No package metadata was found for aigov-py`: the source tree is on `PYTHONPATH`, but the package was not installed. Run `python -m pip install -e ./python` from the repository root.
+- Connection refused or `/ready` is not reachable: start the local audit runtime first, then set `GOVAI_AUDIT_BASE_URL` to that origin.
+- `401` or `403` from audit routes: verify that `GOVAI_API_KEY` matches the server-side `GOVAI_API_KEYS` / `GOVAI_API_KEYS_JSON` configuration.
+
 Run `govai --help` and `govai <command> --help` for the exact flags for your installed version.
 
 ```docs

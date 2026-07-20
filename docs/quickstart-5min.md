@@ -151,7 +151,7 @@ steps:
     command: |
       govai check --audit-base-url "http://127.0.0.1:8088" --api-key "$GOVAI_API_KEY" --run-id "$GOVAI_RUN_ID"
       echo $?
-    expected: stdout BLOCKED; exit code 2
+    expected: stdout BLOCKED; exit code 3
 ```
 
 At this point (only 1 event), the expected verdict is **`BLOCKED`**.

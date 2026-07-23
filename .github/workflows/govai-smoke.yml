@@ -26,6 +26,10 @@ on:
         type: string
         default: ""
 
+concurrency:
+  group: govai-smoke-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   govai-synthetic-smoke:
     runs-on: ubuntu-latest
@@ -168,19 +172,19 @@ jobs:
               export EVIDENCE_POST_BODY_PATH="${body_file}"
               # shellcheck disable=SC2310
               if python <<'PY'
-import json
-import os
-from pathlib import Path
+              import json
+              import os
+              from pathlib import Path
 
-from aigov_py.evidence_artifact_gate import is_duplicate_event_id_idempotent_acceptance
+              from aigov_py.evidence_artifact_gate import is_duplicate_event_id_idempotent_acceptance
 
-status_code = int(os.environ["EVIDENCE_POST_HTTP_STATUS"])
-resp_txt = Path(os.environ["EVIDENCE_POST_RESPONSE_PATH"]).read_text(encoding="utf-8")
-submitted = json.loads(Path(os.environ["EVIDENCE_POST_BODY_PATH"]).read_text(encoding="utf-8"))
-raise SystemExit(
-    0 if is_duplicate_event_id_idempotent_acceptance(status_code, resp_txt, submitted) else 1
-)
-PY
+              status_code = int(os.environ["EVIDENCE_POST_HTTP_STATUS"])
+              resp_txt = Path(os.environ["EVIDENCE_POST_RESPONSE_PATH"]).read_text(encoding="utf-8")
+              submitted = json.loads(Path(os.environ["EVIDENCE_POST_BODY_PATH"]).read_text(encoding="utf-8"))
+              raise SystemExit(
+                  0 if is_duplicate_event_id_idempotent_acceptance(status_code, resp_txt, submitted) else 1
+              )
+              PY
               then
                 echo "idempotent duplicate accepted"
                 rm -f "${body_file}"

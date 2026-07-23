@@ -43,6 +43,15 @@ Follow **[CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)**. Maintainer model: **[GOVERN
 
 **Local setup:** [docs/project/local_development.md](docs/project/local_development.md) · **Runtime quickstart:** [docs/quickstart-runtime.md](docs/quickstart-runtime.md)
 
+## Contributor License Agreement (CLA)
+
+External code contributions to this Covered Project require acceptance of an AIMLGov Contributor License Agreement. Signing a CLA does **not** transfer copyright.
+
+- **Individuals:** [Individual CLA](legal/published/individual-contributor-license-agreement.md)
+- **Organizations:** [Corporate CLA](legal/published/corporate-contributor-license-agreement.md)
+
+Sign by commenting on the pull request (see **[docs/community/cla.md](docs/community/cla.md)**). The status check name is `CLAAssistant`.
+
 ## Development workflow
 
 See **[docs/project/contributor_workflow.md](docs/project/contributor_workflow.md)**.

@@ -71,3 +71,6 @@ No. Once accepted, the CLA remains effective according to its terms.
 ### I am contributing on behalf of my employer.
 
 Use the Corporate CLA and ensure you are listed as an Authorized Contributor before opening code pull requests.
+
+
+<!-- phase2-cla-check-name-test: 2026-07-23T21:20:33Z -->

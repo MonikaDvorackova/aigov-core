@@ -1,0 +1,97 @@
+# CLA Assistant — Individual CLA enforcement
+#
+# Uses CLA Assistant Lite (contributor-assistant/github-action).
+# Does not use DCO.
+#
+# Security notes (pull_request_target):
+# - This workflow must NOT checkout or execute code from the PR head.
+# - Only the pinned third-party action runs; inputs are static (not PR-controlled).
+# - Signatures are written with GITHUB_TOKEN in this repository (same-repo storage).
+# - Do not add PERSONAL_ACCESS_TOKEN here unless using a remote signatures repository;
+#   a long-lived PAT on pull_request_target expands blast radius if the action is compromised.
+
+name: CLA Assistant
+
+on:
+  issue_comment:
+    types: [created]
+  pull_request_target:
+    types: [opened, closed, synchronize]
+
+# Serialize signature writes for the same PR (avoid lost updates to cla.json).
+concurrency:
+  group: cla-${{ github.event.pull_request.number || github.event.issue.number || github.run_id }}
+  cancel-in-progress: false
+
+permissions:
+  actions: write
+  contents: write
+  pull-requests: write
+  statuses: write
+
+jobs:
+  CLAAssistant:
+    name: CLAAssistant
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: CLA Assistant
+        # Run on PR events, or on PR comments that are exactly the sign / recheck phrases.
+        # github.event.issue.pull_request is set only for pull-request comments (not plain issues).
+        if: >-
+          github.event_name == 'pull_request_target' ||
+          (
+            github.event.issue.pull_request &&
+            (
+              github.event.comment.body == 'recheck' ||
+              github.event.comment.body == 'I have read the CLA Document and I hereby sign the CLA'
+            )
+          )
+        # Pin to the immutable commit for tag v2.6.1 (tag can be moved; SHA cannot).
+        uses: contributor-assistant/github-action@ca4a40a7d1004f18d9960b404b97e5f30a505a08 # v2.6.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          path-to-signatures: signatures/version1/cla.json
+          path-to-document: https://github.com/MonikaDvorackova/aigov-core/blob/main/legal/published/individual-contributor-license-agreement.md
+          # Signatures commit to main via GITHUB_TOKEN. If main is branch-protected,
+          # allow github-actions[bot] to push this path (or use an unprotected signatures branch).
+          branch: main
+          use-dco-flag: false
+          lock-pullrequest-aftermerge: true
+          suggest-recheck: true
+          # Maintainers + known bots bypass Individual CLA signing.
+          # Do not use bot* — unanchored wildcard matching can exempt unintended usernames.
+          # Corporate CLA Authorized Contributors: add GitHub usernames after CCLA + Schedule A.
+          allowlist: MonikaDvorackova,dependabot[bot],github-actions[bot]
+          custom-notsigned-prcomment: >
+            Thank you for your contribution to AIGov Core.
+
+
+            External code contributions require a signed Contributor License Agreement.
+
+
+            **Individuals:** please read the
+            [Individual CLA](https://github.com/MonikaDvorackova/aigov-core/blob/main/legal/published/individual-contributor-license-agreement.md)
+            and comment exactly:
+
+
+            `I have read the CLA Document and I hereby sign the CLA`
+
+
+            **Organizations:** execute the
+            [Corporate CLA](https://github.com/MonikaDvorackova/aigov-core/blob/main/legal/published/corporate-contributor-license-agreement.md)
+            and ask a maintainer to add Authorized Contributor GitHub usernames to the CLA allowlist.
+
+
+            Overview: [docs/community/cla.md](https://github.com/MonikaDvorackova/aigov-core/blob/main/docs/community/cla.md)
+
+
+            After signing, comment `recheck` if the status check does not update.
+          custom-allsigned-prcomment: >-
+            **CLA Assistant:** all contributors on this pull request have signed the Individual CLA
+            (or are on the allowlist for maintainers / Corporate CLA Authorized Contributors).
+          signed-commit-message: >-
+            chore(cla): $contributorName signed the Individual CLA ($owner/$repo#$pullRequestNo)
+          create-file-commit-message: >-
+            chore(cla): create signatures/version1/cla.json for CLA Assistant

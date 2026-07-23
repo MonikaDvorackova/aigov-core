@@ -16,7 +16,7 @@ AIGov Core is the **open-source**, ledger-authoritative audit runtime for recons
 | Audit export and portable standards validators | Commercial onboarding flows |
 | Python CLI, runtime SDK, examples, GitHub Action patterns | Enterprise JWT `/api/*` control plane (not mounted on `aigov_audit`) |
 
-License terms: [`LICENSE`](LICENSE). Contributor expectations: [`CONTRIBUTING.md`](CONTRIBUTING.md), [`GOVERNANCE.md`](GOVERNANCE.md), [`SECURITY.md`](SECURITY.md).
+License terms: [`LICENSE`](LICENSE). Contributor expectations: [`CONTRIBUTING.md`](CONTRIBUTING.md), [`GOVERNANCE.md`](GOVERNANCE.md), [`SECURITY.md`](SECURITY.md). External code contributions require a signed [CLA](docs/community/cla.md).
 
 ## Try AIGov Core locally
 

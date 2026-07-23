@@ -14,6 +14,19 @@
 # GitHub Actions, issue templates, and CI governance gates
 /.github/ @MonikaDvorackova
 
+# CLA Assistant workflow (explicit; also covered by /.github/)
+/.github/workflows/cla.yml @MonikaDvorackova
+
+# CLA signatures (CLA Assistant commits → signatures/version1/cla.json)
+/signatures/ @MonikaDvorackova
+
+# Published CLA legal instruments
+/legal/published/individual-contributor-license-agreement.md @MonikaDvorackova
+/legal/published/corporate-contributor-license-agreement.md @MonikaDvorackova
+
+# CLA contributor documentation
+/docs/community/cla.md @MonikaDvorackova
+
 # Documentation and audit reports
 /docs/ @MonikaDvorackova
 

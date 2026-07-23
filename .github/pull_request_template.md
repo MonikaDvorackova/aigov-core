@@ -34,6 +34,7 @@ If this PR changes `rust/`, evidence ingest, compliance summary, export, verify,
 ## Checklist
 
 - [ ] I used a dedicated feature branch, not `main`.
+- [ ] I have signed the applicable Contributor License Agreement (Individual or Corporate). (Checklist only — legal acceptance is via CLA Assistant comment or executed Corporate CLA; see links below.)
 - [ ] Documentation was updated if behavior or integrator contracts changed.
 - [ ] Relevant checks were run:
   - `make gate`
@@ -42,6 +43,8 @@ If this PR changes `rust/`, evidence ingest, compliance summary, export, verify,
   - `cd rust && cargo test --locked` (if Rust changed)
 - [ ] For core or governance changes, an audit report exists under `docs/reports/*.md` when required (see [`docs/community/maintainer-guide.md`](../docs/community/maintainer-guide.md)).
 - [ ] Governance RFC followed when required ([`docs/community/rfc-process.md`](../docs/community/rfc-process.md)).
+
+CLA overview: [`docs/community/cla.md`](../docs/community/cla.md) · Individual: [`legal/published/individual-contributor-license-agreement.md`](../legal/published/individual-contributor-license-agreement.md) · Corporate: [`legal/published/corporate-contributor-license-agreement.md`](../legal/published/corporate-contributor-license-agreement.md)
 
 ## Scope check
 

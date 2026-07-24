@@ -11,7 +11,13 @@ env:
 jobs:
   full-validation:
     name: full-validation
-    runs-on: ubuntu-latest
+    # Linux ARM64 self-hosted nightly runner (labels must all match).
+    # Do not use bare "self-hosted" — that can select a macOS runner without service containers.
+    runs-on:
+      - self-hosted
+      - Linux
+      - ARM64
+      - aigov-nightly
     timeout-minutes: 120
 
     services:

@@ -67,7 +67,7 @@ jobs:
           # Maintainers + known bots bypass Individual CLA signing.
           # Do not use bot* — unanchored wildcard matching can exempt unintended usernames.
           # Corporate CLA Authorized Contributors: add GitHub usernames after CCLA + Schedule A.
-          allowlist: MonikaDvorackova,dependabot[bot],github-actions[bot]
+          allowlist: dependabot[bot],github-actions[bot]
           custom-notsigned-prcomment: >
             Thank you for your contribution to AIGov Core.
 

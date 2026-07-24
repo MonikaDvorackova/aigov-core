@@ -6,7 +6,8 @@
 # Security notes (pull_request_target):
 # - This workflow must NOT checkout or execute code from the PR head.
 # - Only the pinned third-party action runs; inputs are static (not PR-controlled).
-# - Signatures are written with GITHUB_TOKEN in this repository (same-repo storage).
+# - Signatures are written with GITHUB_TOKEN to the unprotected `cla-signatures` branch
+#   (same repository). Do not store signatures on protected `main`/`staging`.
 # - Do not add PERSONAL_ACCESS_TOKEN here unless using a remote signatures repository;
 #   a long-lived PAT on pull_request_target expands blast radius if the action is compromised.
 
@@ -23,17 +24,20 @@ concurrency:
   group: cla-${{ github.event.pull_request.number || github.event.issue.number || github.run_id }}
   cancel-in-progress: false
 
-permissions:
-  actions: write
-  contents: write
-  pull-requests: write
-  statuses: write
+# Default deny; CLA Assistant Lite requires write to comment, set statuses, and
+# commit signature JSON to `cla-signatures` via GITHUB_TOKEN (documented by the action).
+permissions: {}
 
 jobs:
   CLAAssistant:
     name: CLAAssistant
     runs-on: ubuntu-latest
     timeout-minutes: 5
+    permissions:
+      actions: write
+      contents: write # required: action commits signatures/version1/cla.json on cla-signatures
+      pull-requests: write
+      statuses: write
     steps:
       - name: CLA Assistant
         # Run on PR events, or on PR comments that are exactly the sign / recheck phrases.
@@ -54,9 +58,9 @@ jobs:
         with:
           path-to-signatures: signatures/version1/cla.json
           path-to-document: https://github.com/MonikaDvorackova/aigov-core/blob/main/legal/published/individual-contributor-license-agreement.md
-          # Signatures commit to main via GITHUB_TOKEN. If main is branch-protected,
-          # allow github-actions[bot] to push this path (or use an unprotected signatures branch).
-          branch: main
+          # Dedicated unprotected branch (action docs: "branch should not be protected").
+          # Do not use main/staging — rulesets block direct signature commits.
+          branch: cla-signatures
           use-dco-flag: false
           lock-pullrequest-aftermerge: true
           suggest-recheck: true

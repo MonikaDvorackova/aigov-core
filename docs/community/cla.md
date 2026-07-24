@@ -48,13 +48,13 @@ Pull requests (including those targeting `staging` or `main`) are checked by the
 I have read the CLA Document and I hereby sign the CLA
 ```
 
-Signatures are stored in `signatures/version1/cla.json` on the `main` branch (created automatically on first signature). Comment `recheck` to re-run verification.
+Signatures are stored in `signatures/version1/cla.json` on the dedicated **`cla-signatures`** branch (created automatically on first signature — do not create that file manually). Comment `recheck` to re-run verification.
 
 **Organizations** execute the Corporate CLA separately and maintain Authorized Contributors (Schedule A). After AIMLGov accepts a Corporate CLA, maintainers add those GitHub usernames to the workflow `allowlist` in `.github/workflows/cla.yml`.
 
 Maintainers listed in the allowlist (and named bot accounts such as `dependabot[bot]` and `github-actions[bot]`) are not required to sign for routine maintenance commits.
 
-Signature commits use the workflow `GITHUB_TOKEN`. If `main` is branch-protected, configure protection so `github-actions[bot]` can update `signatures/version1/cla.json` (or store signatures on an unprotected branch).
+Signature commits use the workflow `GITHUB_TOKEN` and write only to unprotected `cla-signatures` (not `main`/`staging`). Maintainer ops notes: [`docs/operations/cla-signatures.md`](../operations/cla-signatures.md).
 
 ---
 

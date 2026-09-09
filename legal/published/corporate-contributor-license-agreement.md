@@ -534,7 +534,7 @@ Czech Republic
 
 Company ID: 29742188
 
-Email: [INSERT LEGAL EMAIL]
+Email: legal@govbase.dev
 
 Website: https://govbase.dev
 

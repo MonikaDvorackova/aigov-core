@@ -7,6 +7,6 @@
     "simulate:action": "node scripts/simulate-action.js",
     "test": "npm run test --prefix dashboard && npm run test --prefix typescript-sdk",
     "build": "npm run build --prefix dashboard && npm run build --prefix typescript-sdk"
-  }
+  },
+  "license": "AGPL-3.0-only"
 }
-

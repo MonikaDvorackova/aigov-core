@@ -3,8 +3,8 @@ name = "aigov-py"
 version = "0.2.1"
 description = "AIGov Python package: thin govai audit HTTP client (import govai) and related tooling."
 readme = "README.md"
-license = "Apache-2.0"
-authors = [{ name = "GovAI Contributors" }]
+license = "AGPL-3.0-only"
+authors = [{ name = "AIGov Contributors" }]
 requires-python = ">=3.10"
 classifiers = [
   "Development Status :: 4 - Beta",

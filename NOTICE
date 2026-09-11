@@ -1,0 +1,21 @@
+AIGov Core
+
+Copyright (c) 2026 Monika Dvorackova and AIGov Core contributors.
+
+The version of AIGov Core containing this notice is licensed under the
+GNU Affero General Public License version 3 only (AGPL-3.0-only), as set
+out in the LICENSE file.
+
+Versions of AIGov Core distributed before the effective relicensing
+commit may remain available under the license terms applicable to those
+historical versions. This relicensing does not retroactively revoke
+rights validly granted under earlier licenses.
+
+Third-party components and contributions remain subject to their
+applicable copyright notices and license terms.
+
+AIGov Platform is separate proprietary software and is not licensed
+under the AIGov Core license.
+
+The AIGov name, logos, trademarks, service marks, domain names, and
+branding are not licensed under the GNU Affero General Public License.

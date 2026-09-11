@@ -47,7 +47,7 @@ RUST_METADATA_KEYS = (
     "categories",
 )
 PYPROJECT_MARKERS = (
-    'license = "Apache-2.0"',
+    'license = "AGPL-3.0-only"',
     "authors =",
     "classifiers =",
     "[project.urls]",

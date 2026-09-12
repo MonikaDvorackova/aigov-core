@@ -470,7 +470,7 @@ Nové Město
 
 Czech Republic
 
-Email: **[INSERT LEGAL EMAIL]**
+Email: **legal@govbase.dev**
 
 **To the Individual Contributor**
 
@@ -597,7 +597,7 @@ Czech Republic
 
 Company ID No.: 29742188
 
-Email: **[INSERT LEGAL EMAIL]**
+Email: **legal@govbase.dev**
 
 Website: **https://govbase.dev**
 
